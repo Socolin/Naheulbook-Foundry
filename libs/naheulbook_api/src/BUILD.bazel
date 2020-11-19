@@ -1,5 +1,6 @@
 load("@npm//@bazel/typescript:index.bzl", "ts_project")
-load("@npm//@bazel/terser:index.bzl", "terser_minified")
+load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 ts_project(
     name = "src",
@@ -7,8 +8,33 @@ ts_project(
     tsconfig = {
         "compilerOptions": {
             "declaration": True,
-            "module": "ESNext"
+            "module": "ESNext",
+            "moduleResolution": "node",
+            "lib": ["es6", "dom"]
         },
     },
+    deps = [
+        "@npm//@microsoft/signalr",
+        "@npm//@types/node"
+    ],
     out_dir = "dist"
+)
+
+copy_to_bin(
+    name = "index",
+    srcs = ["index.js"]
+)
+
+rollup_bundle(
+    name = "bundle",
+    srcs = [":src"],
+    deps = [
+        "@npm//@rollup/plugin-commonjs",
+        "@npm//@rollup/plugin-node-resolve",
+        "@npm//@rollup/plugin-json",
+        "//src:src",
+    ],
+    format = "esm",
+    entry_point = "index",
+    config_file = "rollup.config.js",
 )
