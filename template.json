@@ -1,0 +1,70 @@
+{
+  "Actor": {
+    "types": ["character"],
+    "templates": {
+      "background": {
+        "biography": ""
+      },
+      "resources": {
+        "health": {
+          "min": 0,
+          "value": 10,
+          "max": 10
+        },
+        "mana": {
+          "min": 0,
+          "value": 1,
+          "max": 3
+        },
+        "at":  {
+          "min": 0,
+          "value": 8
+        },
+        "prd": {
+          "min": 0,
+          "value": 10
+        },
+        "pr":  {
+          "min": 0,
+          "value": 0
+        },
+        "cou": {
+          "min": 0,
+          "value": 10
+        },
+        "int":  {
+          "min": 0,
+          "value": 10
+        },
+        "cha": {
+          "min": 0,
+          "value": 10
+        },
+        "ad":  {
+          "min": 0,
+          "value": 10
+        },
+        "fo": {
+          "min": 0,
+          "value": 10
+        }
+      }
+    },
+    "character": {
+      "templates": ["background", "resources"]
+    }
+  },
+  "Item": {
+    "types": ["weapon", "spell"],
+    "templates": {
+    },
+    "weapon": {
+      "templates": [],
+      "damage": 5
+    },
+    "spell": {
+      "templates": [],
+      "cost": 2
+    }
+  }
+}

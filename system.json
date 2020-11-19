@@ -1,0 +1,34 @@
+{
+  "name": "naheulbook",
+  "title": "Naheulbeuk",
+  "description": "Many details here.",
+  "version": "1.0.0",
+  "templateVersion": 2,
+  "author": "Socolin",
+  "minimumCoreVersion": "0.7.7",
+  "scripts": [
+  ],
+  "esmodules": [
+    "modules/init.js"
+  ],
+  "styles": [
+    "styles/actor-sheet.css"
+  ],
+  "packs": [
+  ],
+  "languages": [
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "lang/fr.json"
+    }
+  ],
+  "socket": false,
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "primaryTokenAttribute": "resources.health",
+  "secondaryTokenAttribute": "resources.mana",
+  "url": "https://your/hosted/system/repo/",
+  "manifest": "https://your/hosted/system/repo/system.json",
+  "download": "https://your/packaged/download/archive.zip"
+}
