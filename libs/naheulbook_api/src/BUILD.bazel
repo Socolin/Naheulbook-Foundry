@@ -1,0 +1,14 @@
+load("@npm//@bazel/typescript:index.bzl", "ts_project")
+load("@npm//@bazel/terser:index.bzl", "terser_minified")
+
+ts_project(
+    name = "src",
+    srcs = ["naheulbook-api.ts"],
+    tsconfig = {
+        "compilerOptions": {
+            "declaration": True,
+            "module": "ESNext"
+        },
+    },
+    out_dir = "dist"
+)

@@ -1,0 +1,20 @@
+{
+    "name": "naheulbook_api",
+    "version": "0.1.0",
+    "private": true,
+    "devDependencies": {
+        "@bazel/bazelisk": "latest",
+        "@bazel/ibazel": "latest",
+        "@bazel/buildifier": "latest",
+        "@bazel/typescript": "latest",
+        "typescript": "^4.0.5"
+    },
+    "scripts": {
+        "build": "bazel build //...",
+        "test": "bazel test //..."
+    },
+    "dependencies": {
+        "@bazel/terser": "^2.3.0",
+        "terser": "^5.4.0"
+    }
+}

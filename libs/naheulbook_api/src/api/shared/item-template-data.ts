@@ -1,0 +1,45 @@
+import {IIconDescription} from './icon-description';
+import {IDurable} from './durable';
+import {IItemTemplateGunData} from './item-template-gun-data';
+import {IItemTemplateInstrumentData} from './item-template-instrument-data';
+
+export interface IItemTemplateData {
+    actions?: any[];
+    availableLocation?: string;
+    bonusDamage?: number;
+    bruteWeapon?: boolean;
+    charge?: number;
+    container?: boolean;
+    damageDice?: number;
+    damageType?: any;
+    description?: string;
+    diceDrop?: number;
+    duration?: string;
+    enchantment?: string;
+    god?: string;
+    gun?: IItemTemplateGunData;
+    icon?: IIconDescription;
+    isCurrency?: boolean;
+    instrument?: IItemTemplateInstrumentData;
+    itemTypes?: string[];
+    lifetime?: IDurable;
+    magicProtection?: number;
+    note?: string;
+    notIdentifiedName?: string;
+    origin?: string;
+    price?: number;
+    protection?: number;
+    protectionAgainstMagic?: any;
+    protectionAgainstType?: any;
+    quantifiable?: boolean;
+    rarityIndicator?: string;
+    relic?: boolean;
+    requireLevel?: number;
+    rupture?: number;
+    sex?: string;
+    skillBook?: boolean;
+    space?: string;
+    throwable?: boolean;
+    useUG?: boolean;
+    weight?: number;
+}
