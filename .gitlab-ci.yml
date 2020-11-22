@@ -12,13 +12,13 @@ build:
     - bazel --output_base output build //:main
   artifacts:
     paths:
-      - dist/bin/*.json
-      - dist/bin/templates/**",
-      - dist/bin/assets/**",
-      - dist/bin/modules/**",
-      - dist/bin/styles/**/*.css",
-      - dist/bin/system.json",
-      - dist/bin/template.json"
+      - output/dist/bin/*.json
+      - output/dist/bin/templates/**",
+      - output/dist/bin/assets/**",
+      - output/dist/bin/modules/**",
+      - output/dist/bin/styles/**/*.css",
+      - output/dist/bin/system.json",
+      - output/dist/bin/template.json"
   cache:
     key: $BAZEL_DIGEST_VERSION
     paths:
