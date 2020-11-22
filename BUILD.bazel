@@ -28,7 +28,7 @@ copy_to_bin(
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 pkg_zip(
-    name = "main",
+    name = "package",
     strip_prefix = ".",
     srcs = [
         ":system-files"

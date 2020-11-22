@@ -9,7 +9,7 @@ build:
     entrypoint: [""]
   stage: build
   script:
-    - bazel --output_base output build //:main
+    - bazel --output_base output build //:system-files-bin
     - ls dist
     - ls dist/bin
   artifacts:
