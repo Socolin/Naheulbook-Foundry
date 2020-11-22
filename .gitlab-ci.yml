@@ -10,15 +10,15 @@ build:
   stage: build
   script:
     - bazel --output_base output build //:system-files-bin
+    - cp dist/bin/modules/naheulbook-api.js modules/naheulbook-api.js
   artifacts:
     paths:
-      - dist/bin/*.json
-      - dist/bin/templates/**
-      - dist/bin/assets/**
-      - dist/bin/modules/**
-      - dist/bin/styles/**/*.css
-      - dist/bin/system.json
-      - dist/bin/template.json
+      - templates/**
+      - assets/**
+      - modules/**
+      - styles/**/*.css
+      - system.json
+      - template.json
   cache:
     key: $BAZEL_DIGEST_VERSION
     paths:
