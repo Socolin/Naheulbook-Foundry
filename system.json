@@ -26,8 +26,8 @@
   "socket": false,
   "gridDistance": 1,
   "gridUnits": "m",
-  "primaryTokenAttribute": "resources.health",
-  "secondaryTokenAttribute": "resources.mana",
+  "primaryTokenAttribute": "resources.ev",
+  "secondaryTokenAttribute": "resources.ea",
   "url": "https://your/hosted/system/repo/",
   "manifest": "https://your/hosted/system/repo/system.json",
   "download": "https://your/packaged/download/archive.zip"

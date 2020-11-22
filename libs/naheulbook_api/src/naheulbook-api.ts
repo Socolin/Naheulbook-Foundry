@@ -1,31 +1,60 @@
-import * as signalR from '@microsoft/signalr';
+import {Character} from './models/character.model';
+import {NaheulbookWebsocket} from './naheulbook-websocket';
+import {NaheulbookHttpApi} from './naheulbook-http-api';
+import {NaheulbookDataApi} from './naheulbook-data-api';
+import {CharacterResponse} from './api/responses';
+
+export interface WsMessage {
+    opcode: string;
+    type: string;
+    id: number;
+    data: any;
+}
+
+export class WsEvent {
+    id: number;
+    opcode: string;
+    data: any;
+}
 
 export class NaheulbookApi {
-    public test(): string {
-        console.log('Hello from bazel');
-        return 'hello from bazel';
+    constructor(
+        private readonly naheulbookWebsocket: NaheulbookWebsocket,
+        private readonly naheulbookHttpApi: NaheulbookHttpApi,
+        private readonly naheulbookDataApi: NaheulbookDataApi
+    ) {
     }
 
-    public async test2() {
-        let result = await fetch("https://naheulbook.fr/api/v2/jobs");
-        if (result.ok) {
-            return await result.json();
-        }
-        throw new Error("Failed to fetch from naheulbook api");
+    async init() {
+        await this.naheulbookWebsocket.connectToNaheulbookWebsocket();
     }
 
-    public async test3() {
-        let connection = new signalR.HubConnectionBuilder()
-            .withUrl(" http://localhost:5000/ws/listen")
-            .withAutomaticReconnect()
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
+    async synchronizeCharacter(characterId: number, onChange: (character: Character) => void): Promise<Character> {
+        let character = await this.loadCharacterData(characterId);
+        await this.naheulbookWebsocket.synchronizeCharacter(character);
+        character.onUpdate.subscribe(onChange);
+        character.update();
+        return character;
+    }
 
-        connection.on("event", data => {
-            console.log(data);
+    changeCharacterStat(characterId: number, stat: string, value: any): Promise<any> {
+        return this.naheulbookHttpApi.patch(`/api/v2/characters/${characterId}/`, {
+            [stat]: value
         });
+    }
 
-        connection.start()
-            .then(() => connection.invoke("SubscribeCharacter", 42));
+    private async loadCharacterData(characterId: number): Promise<Character> {
+        let origins = await this.naheulbookDataApi.getOrigins();
+        let jobs = await this.naheulbookDataApi.getJobs();
+        let skillsById = await this.naheulbookDataApi.getSkillsById();
+        let characterResponse = await this.naheulbookHttpApi.get<CharacterResponse>(`/api/v2/characters/${characterId}`);
+        return Character.fromResponse(characterResponse, origins, jobs, skillsById);
+    }
+
+    public static create(): NaheulbookApi {
+        const naheulbookWebsocket = new NaheulbookWebsocket();
+        const naheulbookHttpApi = new NaheulbookHttpApi();
+        const naheulbookDataApi = new NaheulbookDataApi(naheulbookHttpApi);
+        return new NaheulbookApi(naheulbookWebsocket, naheulbookHttpApi, naheulbookDataApi);
     }
 }

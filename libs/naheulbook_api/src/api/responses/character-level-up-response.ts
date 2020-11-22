@@ -1,9 +1,8 @@
-import {ActiveStatsModifier} from '../../shared';
 import {Guid} from '../shared/util';
 import {SpecialityResponse} from './speciality-response';
 
 export interface CharacterLevelUpResponse {
-    newModifiers: ActiveStatsModifier[];
+    newModifiers: any[];
     newSkillIds: Guid[];
     newSpecialities: SpecialityResponse[];
     newLevel: number;

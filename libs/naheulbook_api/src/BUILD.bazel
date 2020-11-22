@@ -4,18 +4,20 @@ load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 ts_project(
     name = "src",
-    srcs = ["naheulbook-api.ts"],
+    srcs = glob(["**/*.ts"]),
     tsconfig = {
         "compilerOptions": {
             "declaration": True,
             "module": "ESNext",
             "moduleResolution": "node",
-            "lib": ["es6", "dom"]
+            "lib": ["es6", "dom"],
+            "target": "es6"
         },
     },
     deps = [
         "@npm//@microsoft/signalr",
-        "@npm//@types/node"
+        "@npm//@types/node",
+        "@npm//rxjs",
     ],
     out_dir = "dist"
 )
