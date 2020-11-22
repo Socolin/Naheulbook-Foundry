@@ -1,0 +1,23 @@
+variables:
+  BAZEL_DIGEST_VERSION: "f670e9aec235aa23a5f068566352c5850a67eb93de8d7a2350240c68fcec3b25" # Bazel 3.4.1
+
+build:
+  image:
+    name: gcr.io/cloud-marketplace-containers/google/bazel@sha256:$BAZEL_DIGEST_VERSION
+    entrypoint: [""]
+  stage: build
+  script:
+    - bazel --output_base output build //:main
+  artifacts:
+    paths:
+      - dist/bin/*.json
+      - dist/bin/templates/**",
+      - dist/bin/assets/**",
+      - dist/bin/modules/**",
+      - dist/bin/styles/**/*.css",
+      - dist/bin/system.json",
+      - dist/bin/template.json"
+  cache:
+    key: $BAZEL_DIGEST_VERSION
+    paths:
+      - output

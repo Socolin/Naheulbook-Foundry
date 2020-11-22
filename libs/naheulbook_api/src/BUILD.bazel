@@ -1,6 +1,4 @@
 load("@npm//@bazel/typescript:index.bzl", "ts_project")
-load("@npm//@bazel/rollup:index.bzl", "rollup_bundle")
-load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 ts_project(
     name = "src",
@@ -19,24 +17,7 @@ ts_project(
         "@npm//@types/node",
         "@npm//rxjs",
     ],
-    out_dir = "dist"
+    out_dir = "dist",
+    visibility = ["//visibility:public"],
 )
 
-copy_to_bin(
-    name = "index",
-    srcs = ["index.js"]
-)
-
-rollup_bundle(
-    name = "bundle",
-    srcs = [":src"],
-    deps = [
-        "@npm//@rollup/plugin-commonjs",
-        "@npm//@rollup/plugin-node-resolve",
-        "@npm//@rollup/plugin-json",
-        "//src:src",
-    ],
-    format = "esm",
-    entry_point = "index",
-    config_file = "rollup.config.js",
-)

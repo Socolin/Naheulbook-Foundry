@@ -1,1 +1,1 @@
-../libs/naheulbook_api/dist/bin/src/bundle.js
+../dist/bin/libs/naheulbook_api/naheulbook-api.js

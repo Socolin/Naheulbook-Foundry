@@ -1,3 +1,8 @@
+dist
+bazel-out
+node_modules
+output/
+
 foundry.js
 jsconfig.json
 
