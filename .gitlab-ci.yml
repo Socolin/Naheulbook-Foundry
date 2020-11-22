@@ -10,6 +10,8 @@ build:
   stage: build
   script:
     - bazel --output_base output build //:main
+    - ls dist
+    - ls dist/bin
   artifacts:
     paths:
       - dist/bin/*.json
