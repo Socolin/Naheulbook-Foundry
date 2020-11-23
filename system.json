@@ -1,8 +1,8 @@
 {
   "name": "naheulbook",
   "title": "Naheulbeuk",
-  "description": "Many details here.",
-  "version": "0.0.5",
+  "description": "Système de jeu pour Naheulbeuk. Fonctionne avec Naheulbook",
+  "version": "0.0.6",
   "templateVersion": 2,
   "author": "Socolin",
   "minimumCoreVersion": "0.7.7",
@@ -30,5 +30,5 @@
   "secondaryTokenAttribute": "resources.ea",
   "url": "https://gitlab.socolin.fr/naheulbook/FoundryVTT",
   "manifest": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/raw/master/system.json",
-  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.5/download?job=build"
+  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.6/download?job=build"
 }
