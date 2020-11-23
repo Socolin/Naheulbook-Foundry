@@ -23,4 +23,5 @@ build:
   cache:
     key: $BAZEL_DIGEST_VERSION
     paths:
+      - node_modules
       - output
