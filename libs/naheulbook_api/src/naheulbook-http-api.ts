@@ -1,5 +1,5 @@
 export class NaheulbookHttpApi {
-    public static readonly naheulbookHost = "http://local.naheulbook.fr";
+    public static readonly naheulbookHost = "https://naheulbook.fr";
 
     public async get<T>(path: string): Promise<T> {
         return NaheulbookHttpApi.sendRequest<T>('GET', path);

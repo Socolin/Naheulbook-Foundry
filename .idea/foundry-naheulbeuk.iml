@@ -3,6 +3,8 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/bazel-out" />
+      <excludeFolder url="file://$MODULE_DIR$/dist" />
       <excludeFolder url="file://$MODULE_DIR$/libs/naheulbook_api/bazel-out" />
       <excludeFolder url="file://$MODULE_DIR$/libs/naheulbook_api/dist" />
       <excludeFolder url="file://$MODULE_DIR$/output" />
