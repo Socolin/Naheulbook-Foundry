@@ -1,4 +1,5 @@
 const fs = require('fs');
+const {spawn} = require('child_process');
 
 function incrementVersion(version, type) {
     const splitVersion = version.split('.');
@@ -22,3 +23,5 @@ let newVersion = incrementVersion(system.version, process.argv.slice(2)[0]);
 system.download = system.download.replace(system.version, newVersion);
 system.version = newVersion;
 fs.writeFileSync('system.json', JSON.stringify(system, null, '  '));
+spawn('git', ['commit', '-am', 'Update to version ' + newVersion]);
+spawn('git', ['tag', newVersion]);
