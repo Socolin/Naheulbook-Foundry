@@ -36,6 +36,8 @@ export class NaheulbookHttpApi {
         let result = await fetch(this.naheulbookHost + path, requestInit);
 
         if (result.ok) {
+            if (result.status === 204)
+                return;
             return await result.json();
         }
 
