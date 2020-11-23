@@ -52,6 +52,10 @@ export class NaheulbookApi {
         });
     }
 
+    updateMonsterData(monsterId: number, data: any): Promise<any> {
+        return this.naheulbookHttpApi.put(`/api/v2/monsters/${monsterId}/data`, data);
+    }
+
     private async loadMonsterData(monsterId: number): Promise<Monster> {
         let monsterResponse = await this.naheulbookHttpApi.get<MonsterResponse>(`/api/v2/monsters/${monsterId}`);
         let skillsById = await this.naheulbookDataApi.getSkillsById();

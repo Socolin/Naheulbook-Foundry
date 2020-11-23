@@ -2,6 +2,7 @@ import {NaheulbookApi} from "./naheulbook-api.js";
 
 export class NaheulbookConnector {
     updatableStats = ['ev', 'ea'];
+    monstersById = {};
 
     async connect(naheulbookHost) {
         // FIXME: If no GM is connected connect anyway for owned character.
@@ -33,17 +34,28 @@ export class NaheulbookConnector {
                 return;
             if (options.fromNaheulbook)
                 return;
+            let monsterId = actor.getFlag('naheulbook', 'monsterId');
+            if (monsterId) {
+                let keys = Object.keys(data.data);
+                for (let key of keys) {
+                    if (!('value' in data.data[key]))
+                        continue;
+                    if (this.updatableStats.indexOf(key) === -1)
+                        continue;
+                    let monster = this.monstersById[monsterId];
+                    this.nhbkApi.updateMonsterData(monsterId, {...monster.data, [key]: data.data[key].value});
+                }
+            }
             let characterId = actor.getFlag('naheulbook', 'characterId');
-            if (!characterId)
-                return;
-
-            let keys = Object.keys(data.data);
-            for (let key of keys) {
-                if (!('value' in data.data[key]))
-                    continue;
-                if (this.updatableStats.indexOf(key) === -1)
-                    continue;
-                this.updateCharacterStat(characterId, key, data.data[key].value)
+            if (characterId) {
+                let keys = Object.keys(data.data);
+                for (let key of keys) {
+                    if (!('value' in data.data[key]))
+                        continue;
+                    if (this.updatableStats.indexOf(key) === -1)
+                        continue;
+                    this.updateCharacterStat(characterId, key, data.data[key].value)
+                }
             }
         })
     }
@@ -52,7 +64,6 @@ export class NaheulbookConnector {
         await this.nhbkApi.changeCharacterStat(characterId, statName, value);
     }
 
-
     async syncMonsterActorWithNaheulbook(actor) {
         let naheulbookMonsterId = actor?.data?.data['naheulbookMonsterId'];
         if (!naheulbookMonsterId) {
@@ -60,9 +71,8 @@ export class NaheulbookConnector {
         }
         console.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
         await actor.setFlag('naheulbook', 'monsterId', naheulbookMonsterId);
-        await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, async (monster) => {
+        let monster = await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, async (monster) => {
             console.info(`Received monster data change from naheulbook: ${monster.name} (${monster.id})`);
-            console.warn(monster, actor);
             await actor.update({
                 name: monster.name,
                 data: {
@@ -86,6 +96,7 @@ export class NaheulbookConnector {
                 }
             }, {fromNaheulbook: true})
         });
+        this.monstersById[monster.id] = monster;
     }
 
     async syncCharacterActorWithNaheulbook(actor) {

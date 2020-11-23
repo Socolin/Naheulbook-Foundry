@@ -10,6 +10,10 @@ export class NaheulbookHttpApi {
         return this.sendRequest<T>('PATCH', url, data);
     }
 
+    public async put<T>(url: string, data: any): Promise<T> {
+        return this.sendRequest<T>('PUT', url, data);
+    }
+
     private async sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
         let authorizationToken = NaheulbookHttpApi.getAuthorizationToken();
         if (!authorizationToken) {
