@@ -9,6 +9,7 @@ build:
     entrypoint: [""]
   stage: build
   script:
+    - bazel --output_base output build //:copy-naheulbook-api
     - bazel --output_base output build //:system-files-bin
     - cp dist/bin/modules/naheulbook-api.js modules/naheulbook-api.js
   artifacts:

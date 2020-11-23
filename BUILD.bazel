@@ -13,7 +13,7 @@ filegroup(
 )
 
 genrule(
-    name = "copy",
+    name = "copy-naheulbook-api",
     srcs = ["//libs/naheulbook_api:naheulbook-api"],
     outs = ["modules/naheulbook-api.js"],
     output_to_bindir = 1,
