@@ -1,5 +1,3 @@
-import {debug} from "@bazel/typescript";
-
 export async function createNaheulbeukDefaultMacros() {
     let isNewUser = game.user?.getHotbarMacros(1).filter(x => x.macro !== null).length === 0;
 
