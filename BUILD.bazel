@@ -2,14 +2,24 @@ load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
 
 filegroup(
     name = "system-files",
-    srcs = glob([
-        "templates/**",
-        "assets/**",
-        "modules/**",
-        "styles/**/*.css",
-        "system.json",
-        "template.json"
-    ])
+    srcs = glob(
+        include = [
+            "templates/**",
+            "assets/**",
+            "modules/**",
+            "styles/**/*.css",
+            "system.json",
+            "template.json"
+        ],
+        exclude = [
+            "modules/naheulbook-api.js"
+        ]
+    )
+)
+
+copy_to_bin(
+    name = "system-files-bin",
+    srcs = [":system-files"]
 )
 
 genrule(
@@ -20,17 +30,13 @@ genrule(
     cmd = "cp $< $@",
 )
 
-copy_to_bin(
-    name = "system-files-bin",
-    srcs = [":system-files"]
-)
-
 load("@rules_pkg//:pkg.bzl", "pkg_zip")
 
 pkg_zip(
     name = "package",
     strip_prefix = ".",
     srcs = [
-        ":system-files"
+        ":system-files-bin",
+        ":copy-naheulbook-api"
     ]
 )
