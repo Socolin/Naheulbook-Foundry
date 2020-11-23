@@ -28,7 +28,7 @@
   "gridUnits": "m",
   "primaryTokenAttribute": "resources.ev",
   "secondaryTokenAttribute": "resources.ea",
-  "url": "https://your/hosted/system/repo/",
-  "manifest": "https://your/hosted/system/repo/system.json",
-  "download": "https://your/packaged/download/archive.zip"
+  "url": "https://gitlab.socolin.fr/naheulbook/FoundryVTT",
+  "manifest": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/raw/master/system.json",
+  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.1/download?job=build"
 }
