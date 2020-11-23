@@ -10,6 +10,7 @@ build:
   stage: build
   script:
     - bazel --output_base output build //:package
+    - rm modules/naheulbook-api.js
     - cp dist/bin/modules/naheulbook-api.js modules/naheulbook-api.js
   artifacts:
     paths:
