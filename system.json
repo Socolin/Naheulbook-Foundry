@@ -30,5 +30,5 @@
   "secondaryTokenAttribute": "resources.ea",
   "url": "https://gitlab.socolin.fr/naheulbook/FoundryVTT",
   "manifest": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/raw/master/system.json",
-  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.4/download?job=build"
+  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.5/download?job=build"
 }
