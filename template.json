@@ -37,6 +37,20 @@
           "min": 0,
           "value": 0
         },
+        "pr_magic": {
+          "min": 0,
+          "value": 0
+        },
+        "esq": {
+          "min": 0,
+          "value": 0
+        },
+        "resm": {
+          "min": 0,
+          "value": 0
+        }
+      },
+      "characterStats": {
         "cou": {
           "min": 0,
           "value": 10
@@ -57,20 +71,31 @@
           "min": 0,
           "value": 10
         }
+      },
+      "monsterStats": {
+        "cou": {
+          "min": 0,
+          "value": 10
+        },
+        "chercheNoise": {
+          "value": false
+        }
       }
     },
     "character": {
       "templates": [
         "background",
         "resources",
-        "naheulbookCharacter"
+        "naheulbookCharacter",
+        "characterStats"
       ]
     },
     "monster": {
       "templates": [
         "background",
         "resources",
-        "naheulbookMonster"
+        "naheulbookMonster",
+        "monsterStats"
       ]
     }
   },

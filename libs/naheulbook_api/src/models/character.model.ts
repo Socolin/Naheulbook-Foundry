@@ -12,7 +12,7 @@ import {ItemSlot, ItemTemplate} from './item-template.model';
 import {ActiveStatsModifier, formatModifierValue, ItemStatModifier, StatModifier} from './stat-modifier.model';
 import {FlagData} from './flag.model';
 import {Origin} from './origin.model';
-import {Job} from './job.model';
+import {Job, JobDictionary} from './job.model';
 import {Speciality} from './speciality.model';
 import {Subject} from 'rxjs';
 
@@ -1304,7 +1304,7 @@ export class Character {
         this.active = isActive;
     }
 
-    handleWebsocketEvent(opcode: string, data: any) {
+    handleWebsocketEvent(opcode: string, data: any, database: {skillsById: SkillDictionary, jobsById: JobDictionary}) {
         switch (opcode) {
             case 'update': {
                 this.onChangeCharacterStat(data);
@@ -1315,11 +1315,7 @@ export class Character {
                 break;
             }
             case 'levelUp': {
-                // FIXME
-                console.error('FIXME');
-                // services['skill'].getSkillsById().subscribe(skillsById => {
-                //     this.onLevelUp(data, skillsById);
-                // });
+                this.onLevelUp(data, database.skillsById);
                 break;
             }
             case 'equipItem': {
@@ -1327,11 +1323,7 @@ export class Character {
                 break;
             }
             case 'addJob': {
-                // FIXME
-                console.error('FIXME');
-                // services.job.getJobsById().subscribe(jobsById => {
-                //     this.onAddJob(jobsById[data.jobId]);
-                // });
+                this.onAddJob(database.jobsById[data.jobId]);
                 break;
             }
             case 'removeJob': {
@@ -1339,11 +1331,7 @@ export class Character {
                 break;
             }
             case 'addItem': {
-                // FIXME
-                console.error('FIXME');
-                // services.skill.getSkillsById().subscribe(skillsById => {
-                //     this.onAddItem(Item.fromResponse(data, skillsById));
-                // });
+                this.onAddItem(Item.fromResponse(data, database.skillsById));
                 break;
             }
             case 'deleteItem': {

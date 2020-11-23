@@ -15,11 +15,11 @@ export class NaheulbookActorSheet extends ActorSheet {
 
     getData(options) {
         let naheulbookData = {naheulbook: {isGm: false}};
-
         if (game.user.role === USER_ROLES.GAMEMASTER) {
             naheulbookData.naheulbook.accessKey = this.getAccessKey();
             naheulbookData.naheulbook.isGm = true;
         }
+            console.log({HERE: super.getData(options)})
         return mergeObject(super.getData(options), naheulbookData);
     }
 

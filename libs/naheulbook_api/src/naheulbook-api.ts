@@ -2,7 +2,8 @@ import {Character} from './models/character.model';
 import {NaheulbookWebsocket} from './naheulbook-websocket';
 import {NaheulbookHttpApi} from './naheulbook-http-api';
 import {NaheulbookDataApi} from './naheulbook-data-api';
-import {CharacterResponse} from './api/responses';
+import {CharacterResponse, MonsterResponse} from './api/responses';
+import {Monster} from './models/monster.model';
 
 export interface WsMessage {
     opcode: string;
@@ -37,10 +38,24 @@ export class NaheulbookApi {
         return character;
     }
 
+    async synchronizeMonster(monsterId: number, onChange: (monster: Monster) => void): Promise<Monster> {
+        let monster = await this.loadMonsterData(monsterId);
+        await this.naheulbookWebsocket.synchronizeMonster(monster);
+        monster.onUpdate.subscribe(onChange);
+        monster.update();
+        return monster;
+    }
+
     changeCharacterStat(characterId: number, stat: string, value: any): Promise<any> {
         return this.naheulbookHttpApi.patch(`/api/v2/characters/${characterId}/`, {
             [stat]: value
         });
+    }
+
+    private async loadMonsterData(monsterId: number): Promise<Monster> {
+        let monsterResponse = await this.naheulbookHttpApi.get<MonsterResponse>(`/api/v2/monsters/${monsterId}`);
+        let skillsById = await this.naheulbookDataApi.getSkillsById();
+        return Monster.fromResponse(monsterResponse, skillsById);
     }
 
     private async loadCharacterData(characterId: number): Promise<Character> {
@@ -52,9 +67,9 @@ export class NaheulbookApi {
     }
 
     public static create(naheulbookHost: string): NaheulbookApi {
-        const naheulbookWebsocket = new NaheulbookWebsocket(naheulbookHost);
         const naheulbookHttpApi = new NaheulbookHttpApi(naheulbookHost);
         const naheulbookDataApi = new NaheulbookDataApi(naheulbookHttpApi);
+        const naheulbookWebsocket = new NaheulbookWebsocket(naheulbookHost, naheulbookDataApi);
         return new NaheulbookApi(naheulbookWebsocket, naheulbookHttpApi, naheulbookDataApi);
     }
 }

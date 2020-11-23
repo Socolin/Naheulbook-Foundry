@@ -1,25 +1,34 @@
 import {NaheulbookApi} from "./naheulbook-api.js";
 
 export class NaheulbookConnector {
-    actorsIdByNaheulbookId = {};
     updatableStats = ['ev', 'ea'];
 
     async connect(naheulbookHost) {
+        // FIXME: If no GM is connected connect anyway for owned character.
         if (game.user.role !== USER_ROLES.GAMEMASTER) {
             console.info('Naheulbook connection skipped. Only available for GM');
             return;
         }
+
         console.info('Connecting to Naheulbook');
         this.nhbkApi = NaheulbookApi.create(naheulbookHost);
         await this.nhbkApi.init();
         console.info('Connected to Naheulbook, updating actors');
         for (let actor of game.actors) {
-            if ('naheulbookCharacterId' in actor.data.data) {
-                await this.syncActorWithNaheulbook(actor);
+            switch (actor.data.type) {
+                case 'monster':
+                    if ('naheulbookMonsterId' in actor.data.data) {
+                        await this.syncMonsterActorWithNaheulbook(actor);
+                    }
+                    break;
+                case 'character':
+                    if ('naheulbookCharacterId' in actor.data.data) {
+                        await this.syncCharacterActorWithNaheulbook(actor);
+                    }
+                    break;
             }
         }
         Hooks.on('updateActor', (actor, data, options, id) => {
-            console.log('options');
             if ('flags' in data)
                 return;
             if (options.fromNaheulbook)
@@ -43,18 +52,50 @@ export class NaheulbookConnector {
         await this.nhbkApi.changeCharacterStat(characterId, statName, value);
     }
 
-    getNaheulbookId(actor) {
-        return actor?.data?.data['naheulbookCharacterId'];
+
+    async syncMonsterActorWithNaheulbook(actor) {
+        let naheulbookMonsterId = actor?.data?.data['naheulbookMonsterId'];
+        if (!naheulbookMonsterId) {
+            return;
+        }
+        console.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
+        await actor.setFlag('naheulbook', 'monsterId', naheulbookMonsterId);
+        await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, async (monster) => {
+            console.info(`Received monster data change from naheulbook: ${monster.name} (${monster.id})`);
+            console.warn(monster, actor);
+            await actor.update({
+                name: monster.name,
+                data: {
+                    at: {value: monster.computedData.at},
+                    prd: {value: monster.computedData.prd},
+                    esq: {value: monster.computedData.esq},
+                    pr: {value: monster.computedData.pr},
+                    pr_magic: {value: monster.computedData.pr_magic},
+                    dmg: monster.computedData.dmg,
+                    cou: {value: monster.computedData.cou},
+                    chercheNoise: {value: monster.computedData.chercheNoise},
+                    resm: {value: monster.computedData.resm},
+                    ev: {
+                        value: monster.data.ev,
+                        max: monster.data.maxEv
+                    },
+                    ea: {
+                        value: monster.data.ea,
+                        max: monster.data.maxEa
+                    }
+                }
+            }, {fromNaheulbook: true})
+        });
     }
 
-    async syncActorWithNaheulbook(actor) {
-        let naheulbookCharacterId = this.getNaheulbookId(actor);
+    async syncCharacterActorWithNaheulbook(actor) {
+        let naheulbookCharacterId = actor?.data?.data['naheulbookCharacterId'];
         if (!naheulbookCharacterId) {
             return;
         }
         console.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
         await actor.setFlag('naheulbook', 'characterId', naheulbookCharacterId);
-        const character = await this.nhbkApi.synchronizeCharacter(naheulbookCharacterId, async (character) => {
+        await this.nhbkApi.synchronizeCharacter(naheulbookCharacterId, async (character) => {
             console.info(`Received character data change from naheulbook: ${character.name} (${character.id})`);
             await actor.update({
                 name: character.name,
@@ -79,7 +120,5 @@ export class NaheulbookConnector {
                 }
             }, {fromNaheulbook: true})
         });
-
-        this.actorsIdByNaheulbookId[character.id] = actor.id;
     }
 }
