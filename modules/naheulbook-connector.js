@@ -3,33 +3,28 @@ import {NaheulbookApi} from "./naheulbook-api.js";
 export class NaheulbookConnector {
     updatableStats = ['ev', 'ea'];
     monstersById = {};
+    isSynchronizing = false;
+    naheulbookHost;
 
-    async connect(naheulbookHost) {
-        // FIXME: If no GM is connected connect anyway for owned character.
-        if (game.user.role !== USER_ROLES.GAMEMASTER) {
-            console.info('Naheulbook connection skipped. Only available for GM');
-            return;
-        }
-
-        console.info('Connecting to Naheulbook');
-        this.nhbkApi = NaheulbookApi.create(naheulbookHost);
-        await this.nhbkApi.init();
-        console.info('Connected to Naheulbook, updating actors');
-        for (let actor of game.actors) {
-            switch (actor.data.type) {
-                case 'monster':
-                    if ('naheulbookMonsterId' in actor.data.data) {
-                        await this.syncMonsterActorWithNaheulbook(actor);
-                    }
-                    break;
-                case 'character':
-                    if ('naheulbookCharacterId' in actor.data.data) {
-                        await this.syncCharacterActorWithNaheulbook(actor);
-                    }
-                    break;
+    init() {
+        Hooks.on('renderPlayerList', (playerList, div, userData) => {
+            if (game.user.role === USER_ROLES.GAMEMASTER) {
+                return;
             }
-        }
+            const gameMasterOnline = userData.users.find(u => u.role === USER_ROLES.GAMEMASTER && u.active)
+            if (this.isSynchronizing && gameMasterOnline) {
+                // Game master just connect, disconnect to avoid duplicate notification
+                this.disconnect();
+            } else if (!this.isSynchronizing && !gameMasterOnline) {
+                // Game master disconnected, let's connect
+                this.connect(this.naheulbookHost, this.groupId, this.accessKey);
+            }
+        });
+
+
         Hooks.on('updateActor', (actor, data, options, id) => {
+            if (!this.isSynchronizing)
+                return;
             if ('flags' in data)
                 return;
             if (options.fromNaheulbook)
@@ -38,6 +33,8 @@ export class NaheulbookConnector {
             if (monsterId) {
                 let keys = Object.keys(data.data);
                 for (let key of keys) {
+                    if ((typeof data.data) !== 'object')
+                        continue;
                     if (!('value' in data.data[key]))
                         continue;
                     if (this.updatableStats.indexOf(key) === -1)
@@ -50,6 +47,8 @@ export class NaheulbookConnector {
             if (characterId) {
                 let keys = Object.keys(data.data);
                 for (let key of keys) {
+                    if ((typeof data.data) !== 'object')
+                        continue;
                     if (!('value' in data.data[key]))
                         continue;
                     if (this.updatableStats.indexOf(key) === -1)
@@ -58,6 +57,56 @@ export class NaheulbookConnector {
                 }
             }
         })
+    }
+
+    async disconnect() {
+        if (!this.isSynchronizing) {
+            return;
+        }
+
+        if (this.nhbkApi.init()) {
+            this.nhbkApi.disconnect();
+            this.nhbkApi = undefined;
+            this.isSynchronizing = false;
+        }
+    }
+
+    async connect(naheulbookHost, groupId, accessKey) {
+        this.naheulbookHost = naheulbookHost;
+        this.groupId = groupId;
+        this.accessKey = accessKey;
+        if (this.isSynchronizing) {
+            return;
+        }
+        if (game.user.role !== USER_ROLES.GAMEMASTER) {
+            if (game.users.entities.find(u => u.role === USER_ROLES.GAMEMASTER && u.active)) {
+                console.info('A GM is already connected, skip naheulbook sync');
+                return;
+            }
+        }
+
+        console.info('Connecting to Naheulbook');
+        this.nhbkApi = NaheulbookApi.create(naheulbookHost, accessKey);
+        await this.nhbkApi.init();
+        this.isSynchronizing = true;
+        console.info('Connected to Naheulbook, updating actors');
+        await this.syncGroup(groupId);
+        for (let actor of game.actors) {
+            if (!actor.hasPerm(game.user, "OWNER"))
+                continue;
+            switch (actor.data.type) {
+                case 'monster':
+                    if ('naheulbookMonsterId' in actor.data.data) {
+                        this.syncMonsterActorWithNaheulbook(actor);
+                    }
+                    break;
+                case 'character':
+                    if ('naheulbookCharacterId' in actor.data.data) {
+                        this.syncCharacterActorWithNaheulbook(actor);
+                    }
+                    break;
+            }
+        }
     }
 
     async updateCharacterStat(characterId, statName, value) {
@@ -131,5 +180,12 @@ export class NaheulbookConnector {
                 }
             }, {fromNaheulbook: true})
         });
+    }
+
+    async syncGroup(groupId) {
+        if (!groupId) {
+            return;
+        }
+        // FIXME
     }
 }

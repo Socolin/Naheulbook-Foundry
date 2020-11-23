@@ -1,5 +1,8 @@
 export class NaheulbookHttpApi {
-    public constructor(private readonly naheulbookHost: string) {
+    public constructor(
+        private readonly naheulbookHost: string,
+        private readonly accessKey: string
+    ) {
     }
 
     public async get<T>(path: string): Promise<T> {
@@ -15,7 +18,7 @@ export class NaheulbookHttpApi {
     }
 
     private async sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
-        let authorizationToken = NaheulbookHttpApi.getAuthorizationToken();
+        let authorizationToken = this.getAuthorizationToken();
         if (!authorizationToken) {
             throw new Error('Missing authorization token');
         }
@@ -39,11 +42,9 @@ export class NaheulbookHttpApi {
         throw new Error(`Failed to fetch from ${path}: ` + result.status +  ' ' + await result.text());
     }
 
-
-    public static getAuthorizationToken(): string | undefined {
-        let accessToken = localStorage.getItem('naheulbookAccessKey');
-        if (!accessToken)
+    public getAuthorizationToken(): string | undefined {
+        if (!this.accessKey)
             return;
-        return `userAccessToken:${accessToken}`;
+        return `userAccessToken:${this.accessKey}`;
     }
 }

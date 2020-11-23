@@ -13,7 +13,8 @@ export class NaheulbookWebsocket {
 
     public constructor(
         private readonly naheulbookHost: string,
-        private readonly naheulbookDataApi: NaheulbookDataApi
+        private readonly naheulbookDataApi: NaheulbookDataApi,
+        private readonly accessKey: string,
     ) {
     }
 
@@ -29,8 +30,15 @@ export class NaheulbookWebsocket {
             await this.sendSyncMessage('Monster', monster.id);
     }
 
+    public async disconnect() {
+        if (this.connection) {
+            await this.connection.stop()
+            this.connection = undefined;
+        }
+    }
+
     public async connectToNaheulbookWebsocket() {
-        let authorizationHeader = NaheulbookHttpApi.getAuthorizationToken();
+        let authorizationHeader = this.getAuthorizationToken();
         if (!authorizationHeader) {
             return;
         }
@@ -71,5 +79,11 @@ export class NaheulbookWebsocket {
 
     private async sendSyncMessage(type: string, id: number): Promise<any> {
         await this.connection.send('Subscribe' + type, id);
+    }
+
+    public getAuthorizationToken(): string | undefined {
+        if (!this.accessKey)
+            return;
+        return `userAccessToken:${this.accessKey}`;
     }
 }

@@ -89,13 +89,6 @@
                     <input type="text" name="data.naheulbookCharacterId" value="{{data.naheulbookCharacterId}}" data-dtype="Number" {{#unless naheulbook.isGm}}disabled{{/unless}} />
                 </div>
             {{/ifeq}}
-
-            {{#if naheulbook.isGm}}
-                <div class="attribute">
-                    <span>Clé d'accès naheulbook <a href="https://naheulbook.fr/profile" target="_blank">Obtenir</a></span>
-                    <input type="text" name="naheulbook.accessKey" value="{{naheulbook.accessKey}}" data-dtype="String" />
-                </div>
-            {{/if}}
         </div>
     </section>
 

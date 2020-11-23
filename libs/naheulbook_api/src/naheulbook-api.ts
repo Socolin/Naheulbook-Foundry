@@ -29,6 +29,9 @@ export class NaheulbookApi {
     async init() {
         await this.naheulbookWebsocket.connectToNaheulbookWebsocket();
     }
+    async disconnect() {
+        await this.naheulbookWebsocket.disconnect();
+    }
 
     async synchronizeCharacter(characterId: number, onChange: (character: Character) => void): Promise<Character> {
         let character = await this.loadCharacterData(characterId);
@@ -70,10 +73,10 @@ export class NaheulbookApi {
         return Character.fromResponse(characterResponse, origins, jobs, skillsById);
     }
 
-    public static create(naheulbookHost: string): NaheulbookApi {
-        const naheulbookHttpApi = new NaheulbookHttpApi(naheulbookHost);
+    public static create(naheulbookHost: string, accessKey: string): NaheulbookApi {
+        const naheulbookHttpApi = new NaheulbookHttpApi(naheulbookHost, accessKey);
         const naheulbookDataApi = new NaheulbookDataApi(naheulbookHttpApi);
-        const naheulbookWebsocket = new NaheulbookWebsocket(naheulbookHost, naheulbookDataApi);
+        const naheulbookWebsocket = new NaheulbookWebsocket(naheulbookHost, naheulbookDataApi, accessKey);
         return new NaheulbookApi(naheulbookWebsocket, naheulbookHttpApi, naheulbookDataApi);
     }
 }

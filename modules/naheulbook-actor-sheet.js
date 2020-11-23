@@ -16,29 +16,8 @@ export class NaheulbookActorSheet extends ActorSheet {
     getData(options) {
         let naheulbookData = {naheulbook: {isGm: false}};
         if (game.user.role === USER_ROLES.GAMEMASTER) {
-            naheulbookData.naheulbook.accessKey = this.getAccessKey();
             naheulbookData.naheulbook.isGm = true;
         }
-            console.log({HERE: super.getData(options)})
         return mergeObject(super.getData(options), naheulbookData);
     }
-
-    _getSubmitData(updateData = {}) {
-        let data = super._getSubmitData(updateData);
-        if ('naheulbook.accessKey' in data) {
-            this.saveAccessKey(data['naheulbook.accessKey']);
-            delete data['naheulbook.accessKey'];
-        }
-        return data;
-    }
-
-    saveAccessKey(key) {
-        if (key !== undefined)
-            localStorage.setItem('naheulbookAccessKey', key);
-    }
-
-    getAccessKey() {
-        return localStorage.getItem("naheulbookAccessKey");
-    }
-
 }
