@@ -9,12 +9,22 @@ Hooks.once("init", async function() {
 
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("naheulbook", NaheulbookActorSheet, { makeDefault: true });
+
+    game.settings.register("naheulbook", "naheulbookHost", {
+        name: "Naheulbook url",
+        hint: "L'adresse du site à utiliser. Par exemple: https://naheulbook.fr",
+        scope: "world",
+        config: true,
+        type: String,
+        default: "https://naheulbook.fr",
+        onChange: value => console.log(value)
+    });
 });
 
 let naheulbookConnector = new NaheulbookConnector();
 
 Hooks.once("ready", async function() {
     await createNaheulbeukDefaultMacros();
-    await naheulbookConnector.connect()
+    await naheulbookConnector.connect(game.settings.get("naheulbook", "naheulbookHost"))
 });
 

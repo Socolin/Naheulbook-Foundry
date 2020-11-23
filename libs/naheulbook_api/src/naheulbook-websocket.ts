@@ -8,6 +8,9 @@ export class NaheulbookWebsocket {
     private connection?: HubConnection;
     private synchronizedCharacters: { [id: number]: Character } = {};
 
+    public constructor(private readonly naheulbookHost: string) {
+    }
+
     async synchronizeCharacter(character: Character) {
         this.synchronizedCharacters[character.id] = character;
         if (this.connection)
@@ -21,7 +24,7 @@ export class NaheulbookWebsocket {
         }
 
         let connection = new signalR.HubConnectionBuilder()
-            .withUrl(NaheulbookHttpApi.naheulbookHost + "/ws/listen", {
+            .withUrl(this.naheulbookHost + "/ws/listen", {
                 accessTokenFactory: () => authorizationHeader,
                 withCredentials: false
             })

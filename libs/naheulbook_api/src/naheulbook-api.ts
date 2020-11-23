@@ -51,9 +51,9 @@ export class NaheulbookApi {
         return Character.fromResponse(characterResponse, origins, jobs, skillsById);
     }
 
-    public static create(): NaheulbookApi {
-        const naheulbookWebsocket = new NaheulbookWebsocket();
-        const naheulbookHttpApi = new NaheulbookHttpApi();
+    public static create(naheulbookHost: string): NaheulbookApi {
+        const naheulbookWebsocket = new NaheulbookWebsocket(naheulbookHost);
+        const naheulbookHttpApi = new NaheulbookHttpApi(naheulbookHost);
         const naheulbookDataApi = new NaheulbookDataApi(naheulbookHttpApi);
         return new NaheulbookApi(naheulbookWebsocket, naheulbookHttpApi, naheulbookDataApi);
     }

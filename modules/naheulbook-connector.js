@@ -4,13 +4,13 @@ export class NaheulbookConnector {
     actorsIdByNaheulbookId = {};
     updatableStats = ['ev', 'ea'];
 
-    async connect() {
+    async connect(naheulbookHost) {
         if (game.user.role !== USER_ROLES.GAMEMASTER) {
             console.info('Naheulbook connection skipped. Only available for GM');
             return;
         }
         console.info('Connecting to Naheulbook');
-        this.nhbkApi = NaheulbookApi.create();
+        this.nhbkApi = NaheulbookApi.create(naheulbookHost);
         await this.nhbkApi.init();
         console.info('Connected to Naheulbook, updating actors');
         for (let actor of game.actors) {
@@ -49,6 +49,9 @@ export class NaheulbookConnector {
 
     async syncActorWithNaheulbook(actor) {
         let naheulbookCharacterId = this.getNaheulbookId(actor);
+        if (!naheulbookCharacterId) {
+            return;
+        }
         console.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
         await actor.setFlag('naheulbook', 'characterId', naheulbookCharacterId);
         const character = await this.nhbkApi.synchronizeCharacter(naheulbookCharacterId, async (character) => {

@@ -1,15 +1,16 @@
 export class NaheulbookHttpApi {
-    public static readonly naheulbookHost = "https://naheulbook.fr";
+    public constructor(private readonly naheulbookHost: string) {
+    }
 
     public async get<T>(path: string): Promise<T> {
-        return NaheulbookHttpApi.sendRequest<T>('GET', path);
+        return this.sendRequest<T>('GET', path);
     }
 
     public async patch<T>(url: string, data: any): Promise<T> {
-        return NaheulbookHttpApi.sendRequest<T>('PATCH', url, data);
+        return this.sendRequest<T>('PATCH', url, data);
     }
 
-    private static async sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
+    private async sendRequest<T>(method: string, path: string, body?: any): Promise<T> {
         let authorizationToken = NaheulbookHttpApi.getAuthorizationToken();
         if (!authorizationToken) {
             throw new Error('Missing authorization token');
@@ -25,7 +26,7 @@ export class NaheulbookHttpApi {
             requestInit.body = JSON.stringify(body);
             requestInit.headers['Content-Type'] = 'application/json';
         }
-        let result = await fetch(NaheulbookHttpApi.naheulbookHost + path, requestInit);
+        let result = await fetch(this.naheulbookHost + path, requestInit);
 
         if (result.ok) {
             return await result.json();
