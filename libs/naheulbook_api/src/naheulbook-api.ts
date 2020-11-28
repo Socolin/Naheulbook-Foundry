@@ -2,7 +2,7 @@ import {Character} from './models/character.model';
 import {NaheulbookWebsocket} from './naheulbook-websocket';
 import {NaheulbookHttpApi} from './naheulbook-http-api';
 import {NaheulbookDataApi} from './naheulbook-data-api';
-import {CharacterResponse, MonsterResponse} from './api/responses';
+import {CharacterResponse, GroupResponse, MonsterResponse} from './api/responses';
 import {Monster} from './models/monster.model';
 
 export interface WsMessage {
@@ -57,6 +57,27 @@ export class NaheulbookApi {
 
     updateMonsterData(monsterId: number, data: any): Promise<any> {
         return this.naheulbookHttpApi.put(`/api/v2/monsters/${monsterId}/data`, data);
+    }
+
+    async loadGroupMonsters(groupId): Promise<Monster[]> {
+        let skillsById = await this.naheulbookDataApi.getSkillsById();
+        let monstersResponses = await this.naheulbookHttpApi.get<MonsterResponse[]>(`/api/v2/groups/${groupId}/monsters`)
+        return monstersResponses.map(monsterResponse => Monster.fromResponse(monsterResponse, skillsById));
+    }
+
+    async listenToGroupEvent(groupId: number, onEvent: {
+        addMonster: (monster: Monster) => void
+    }): Promise<any> {
+        let skillsById = await this.naheulbookDataApi.getSkillsById();
+        return this.naheulbookWebsocket.listenForGroupEvents(groupId, ((opcode, data) => {
+            switch (opcode) {
+                case 'addMonster':
+                    let monster = Monster.fromResponse(data, skillsById);
+                    monster.update();
+                    onEvent.addMonster(monster);
+                    break;
+            }
+        }));
     }
 
     private async loadMonsterData(monsterId: number): Promise<Monster> {

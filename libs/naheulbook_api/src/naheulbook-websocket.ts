@@ -10,6 +10,7 @@ export class NaheulbookWebsocket {
     private connection?: HubConnection;
     private synchronizedCharacters: { [id: number]: Character } = {};
     private synchronizedMonsters: { [id: number]: Monster } = {};
+    private synchronizedGroup: { [id: number]: (opcode: string, data: any) => void } = {};
 
     public constructor(
         private readonly naheulbookHost: string,
@@ -30,10 +31,19 @@ export class NaheulbookWebsocket {
             await this.sendSyncMessage('Monster', monster.id);
     }
 
+    async listenForGroupEvents(groupId: number, onEvent: (opcode: string, data: any) => void) {
+        this.synchronizedGroup[groupId] = onEvent;
+        if (this.connection)
+            await this.sendSyncMessage('Group', groupId);
+    }
+
     public async disconnect() {
         if (this.connection) {
             await this.connection.stop()
             this.connection = undefined;
+            this.synchronizedCharacters = {};
+            this.synchronizedMonsters = {};
+            this.synchronizedGroup = {};
         }
     }
 
@@ -67,6 +77,8 @@ export class NaheulbookWebsocket {
                     skillsById,
                     jobsById
                 });
+            } else if (message.type === 'group' && message.id in this.synchronizedGroup) {
+                this.synchronizedGroup[message.id](message.opcode, message.data);
             }
         });
 
@@ -74,6 +86,12 @@ export class NaheulbookWebsocket {
         this.connection = connection;
         for (let characterId of Object.keys(this.synchronizedCharacters)) {
             await this.sendSyncMessage('Character', +characterId);
+        }
+        for (let groupId of Object.keys(this.synchronizedGroup)) {
+            await this.sendSyncMessage('Group', +groupId);
+        }
+        for (let monsterId of Object.keys(this.synchronizedMonsters)) {
+            await this.sendSyncMessage('Monster', +monsterId);
         }
     }
 

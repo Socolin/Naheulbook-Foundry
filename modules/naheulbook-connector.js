@@ -7,6 +7,9 @@ export class NaheulbookConnector {
     naheulbookHost;
 
     init() {
+        this.img = new Image();
+        this.img.src = 'systems/naheulbook/assets/images/monster.svg';
+
         Hooks.on('renderPlayerList', (playerList, div, userData) => {
             if (game.user.role === USER_ROLES.GAMEMASTER) {
                 return;
@@ -124,25 +127,7 @@ export class NaheulbookConnector {
             console.info(`Received monster data change from naheulbook: ${monster.name} (${monster.id})`);
             await actor.update({
                 name: monster.name,
-                data: {
-                    at: {value: monster.computedData.at},
-                    prd: {value: monster.computedData.prd},
-                    esq: {value: monster.computedData.esq},
-                    pr: {value: monster.computedData.pr},
-                    pr_magic: {value: monster.computedData.pr_magic},
-                    dmg: monster.computedData.dmg,
-                    cou: {value: monster.computedData.cou},
-                    chercheNoise: {value: monster.computedData.chercheNoise},
-                    resm: {value: monster.computedData.resm},
-                    ev: {
-                        value: monster.data.ev,
-                        max: monster.data.maxEv
-                    },
-                    ea: {
-                        value: monster.data.ea,
-                        max: monster.data.maxEa
-                    }
-                }
+                data: this.convertMonsterTokActorData(monster)
             }, {fromNaheulbook: true})
         });
         this.monstersById[monster.id] = monster;
@@ -186,6 +171,96 @@ export class NaheulbookConnector {
         if (!groupId) {
             return;
         }
-        // FIXME
+
+        let folder = ui.actors.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'currentFight');
+        if (!folder) {
+            folder = await Folder.create({name: 'Combat courant', type: "Actor", parent: null, flags: {"naheulbook.specialFolder": "currentFight"}});
+        }
+
+        console.info(`Synchronizing group with naheulbook group: ${groupId}`);
+
+        let monsters = await this.nhbkApi.loadGroupMonsters(groupId);
+        for(let monster of monsters) {
+            let monsterActor = game.actors.find((actor) => actor.getFlag('naheulbook', 'monsterId') === monster.id);
+            if (monsterActor) {
+                monsterActor.update({
+                    img: this.createImage(monster.data.color, monster.data.number)
+                }, {fromNaheulbook: true});
+                continue;
+            }
+            this.createMonsterActorAndSyncIt(monster, folder);
+        }
+
+        await this.nhbkApi.listenToGroupEvent(groupId, {
+            addMonster: (monster) => {
+                this.createMonsterActorAndSyncIt(monster, folder);
+            }
+        });
+    }
+
+    createMonsterActorAndSyncIt(monster, folder) {
+        Actor.create({
+            name: monster.name,
+            type: 'monster',
+            img: this.createImage(monster.data.color, monster.data.number),
+            data: mergeObject(this.convertMonsterTokActorData(monster), {naheulbookMonsterId: monster.id}),
+            folder: folder.data._id,
+            token: {
+                actorLink: true,
+                bar1: {attribute: 'ev'},
+                bar2: {attribute: 'ea'},
+            },
+            items: [],
+            flags: {"naheulbook.monsterId": monster.id}
+        }).then((actor) => {
+            this.syncMonsterActorWithNaheulbook(actor)
+        });
+    }
+
+    createImage(color, number) {
+        let canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+
+        ui.sidebar.activateTab('actors');
+        let ctx = canvas.getContext("2d");
+        ctx.fillStyle = color ? '#' + color : 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = "destination-in";
+        ctx.drawImage(this.img, 0, 0, canvas.width, canvas.height);
+        ctx.globalCompositeOperation = "source-over";
+        if (number) {
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = '100px serif';
+            ctx.fillText(number, 50, 50);
+            ctx.strokeText(number, 50, 50);
+        }
+        return canvas.toDataURL("image/png");
+    }
+
+    convertMonsterTokActorData(monster) {
+        console.log({monster});
+        return {
+            at: {value: monster.computedData.at},
+            prd: {value: monster.computedData.prd},
+            esq: {value: monster.computedData.esq},
+            pr: {value: monster.computedData.pr},
+            pr_magic: {value: monster.computedData.pr_magic},
+            dmg: monster.computedData.dmg,
+            cou: {value: monster.computedData.cou},
+            chercheNoise: {value: monster.computedData.chercheNoise},
+            resm: {value: monster.computedData.resm},
+            ev: {
+                value: monster.data.ev,
+                max: monster.data.maxEv
+            },
+            ea: {
+                value: monster.data.ea,
+                max: monster.data.maxEa
+            }
+        };
     }
 }
