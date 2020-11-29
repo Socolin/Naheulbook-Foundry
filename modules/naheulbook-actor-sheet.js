@@ -1,5 +1,4 @@
 export class NaheulbookActorSheet extends ActorSheet {
-
     /** @override */
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
@@ -13,6 +12,7 @@ export class NaheulbookActorSheet extends ActorSheet {
         });
     }
 
+    /** @override */
     getData(options) {
         let naheulbookData = {naheulbook: {isGm: false}};
         if (game.user.role === USER_ROLES.GAMEMASTER) {

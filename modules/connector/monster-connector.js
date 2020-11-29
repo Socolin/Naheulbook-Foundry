@@ -53,6 +53,8 @@ export class MonsterConnector {
         this._updateActorHook = Hooks.on('updateActor', async (actor, data, options, id) => {
             if (options.fromNaheulbook)
                 return;
+            if (!data.data)
+                return;
 
             let monsterId = actor.getFlag('naheulbook', 'monsterId');
             if (monsterId) {
@@ -71,6 +73,8 @@ export class MonsterConnector {
         });
         this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, id) => {
             if (options.fromNaheulbook)
+                return;
+            if (!data.data)
                 return;
 
             if (!('naheulbookMonsterId' in data.data))

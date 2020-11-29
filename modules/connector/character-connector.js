@@ -33,6 +33,8 @@ export class CharacterConnector {
         this._updateActorHook = Hooks.on('updateActor', (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
+            if (!data.data)
+                return;
 
             let characterId = actor.getFlag('naheulbook', 'characterId');
             if (characterId) {
@@ -50,6 +52,8 @@ export class CharacterConnector {
         });
         this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
+                return;
+            if (!data.data)
                 return;
 
             if (!('naheulbookCharacterId' in data.data))
