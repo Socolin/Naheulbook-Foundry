@@ -1,0 +1,1 @@
+../../dist/bin/libs/naheulbook_api/naheulbook-api.js

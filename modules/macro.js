@@ -15,7 +15,6 @@ async function getOrCreateMacro(flagDomain, flagKey, flagValue, createCb) {
     return await createCb();
 }
 
-
 async function createSampleAttackMacro() {
     const command = `if (!token) {
   ui.notifications.warn("Sélectionner un token avant d'exécuter cette macro");
@@ -57,5 +56,4 @@ async function addMacroIfNewUser(isNewUser, macro, slot) {
         return;
 
     await game.user?.assignHotbarMacro(macro, slot);
-
 }

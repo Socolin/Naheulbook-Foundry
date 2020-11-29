@@ -1,12 +1,9 @@
 import {NaheulbookApi} from "./naheulbook-api.js";
 import {MonsterConnector} from "./monster-connector.js";
-import {NaheulbookLogger} from "./naheulbook-logger.js";
+import {NaheulbookLogger} from "../utils/naheulbook-logger.js";
 import {CharacterConnector} from "./character-connector.js";
 
 export class NaheulbookConnector {
-    updatableStats = ['ev', 'ea'];
-    isSynchronizing = false;
-
     /**
      * @type NaheulbookLogger
      * @private
@@ -48,8 +45,10 @@ export class NaheulbookConnector {
     init() {
         Hooks.on('naheulbookConfig', async (config) => {
             this._config = config;
-            await this.disconnect();
-            await this.connect();
+            if (this._nhbkApi) {
+                await this.disconnect();
+                await this.connect();
+            }
         })
 
         Hooks.on('renderPlayerList', (playerList, div, userData) => {
@@ -62,7 +61,7 @@ export class NaheulbookConnector {
                 this.disconnect();
             } else if (!this.isSynchronizing && !gameMasterOnline) {
                 // Game master disconnected, let's connect
-                this.connect(this.naheulbookHost, this.groupId, this.accessKey);
+                this.connect();
             }
         });
     }

@@ -12,7 +12,7 @@ filegroup(
             "template.json"
         ],
         exclude = [
-            "modules/naheulbook-api.js"
+            "modules/connector/naheulbook-api.js"
         ]
     )
 )
@@ -25,7 +25,7 @@ copy_to_bin(
 genrule(
     name = "copy-naheulbook-api",
     srcs = ["//libs/naheulbook_api:naheulbook-api"],
-    outs = ["modules/naheulbook-api.js"],
+    outs = ["modules/connector/naheulbook-api.js"],
     output_to_bindir = 1,
     cmd = "cp $< $@",
 )
