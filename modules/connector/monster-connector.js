@@ -132,6 +132,9 @@ export class MonsterConnector {
         await this._nhbkApi.listenToGroupEvent(groupId, {
             addMonster: (monster) => {
                 this.createMonsterActorAndSyncIt(monster, currentFightFolder);
+            },
+            killMonster: (monsterId) => {
+                this.killMonster(monsterId);
             }
         });
     }
@@ -216,6 +219,26 @@ export class MonsterConnector {
             data: this._convertMonsterTokActorData(monster),
             img: await this._monsterIconGenerator.createMonsterIcon(monster)
         }, {fromNaheulbook: true})
+    }
+
+    /**
+     * @param {number} monsterId
+     * @return {Promise<void>}
+     */
+    async killMonster(monsterId) {
+        let monsterActor = game.actors.entities.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
+        if (!monsterActor)
+            return;
+
+        let effectData = window.CONFIG.statusEffects.find(e => e.id === 'dead');
+        const createData = duplicate(effectData);
+        createData.label = game.i18n.localize(effectData.label);
+        createData["flags.core.statusId"] = effectData.id;
+        createData["flags.core.overlay"] = true;
+        delete createData.id;
+
+        const effect = ActiveEffect.create(createData, monsterActor);
+        await effect.create({});
     }
 
     /**

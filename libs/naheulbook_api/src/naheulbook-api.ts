@@ -73,7 +73,8 @@ export class NaheulbookApi {
     }
 
     async listenToGroupEvent(groupId: number, onEvent: {
-        addMonster: (monster: Monster) => void
+        addMonster: (monster: Monster) => void,
+        killMonster: (monsterId: number) => void,
     }): Promise<any> {
         let skillsById = await this.naheulbookDataApi.getSkillsById();
         return this.naheulbookWebsocket.listenForGroupEvents(groupId, ((opcode, data) => {
@@ -82,6 +83,9 @@ export class NaheulbookApi {
                     let monster = Monster.fromResponse(data, skillsById);
                     monster.update();
                     onEvent.addMonster(monster);
+                    break;
+                case 'killMonster':
+                    onEvent.killMonster(data);
                     break;
             }
         }));
