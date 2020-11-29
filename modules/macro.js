@@ -37,7 +37,7 @@ async function createSampleParryMacro() {
     const command = `if (!token) {
   ui.notifications.warn("Sélectionner un token avant d'exécuter cette macro");
 } else {
-  nhbkMacroHelper.rollSkillCheck("Exemple de parade", token.actor.data.data.prd.value);
+  nhbkMacroHelper.rollParry("Parade", token.actor.data.data.prd.value);
 }`;
 
     return await Macro.create({
