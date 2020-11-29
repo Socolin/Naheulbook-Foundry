@@ -33,12 +33,15 @@ export class NaheulbookApi {
         await this.naheulbookWebsocket.disconnect();
     }
 
-    async synchronizeCharacter(characterId: number, onChange: (character: Character) => void): Promise<Character> {
-        let character = await this.loadCharacterData(characterId);
+    async synchronizeCharacter(character: Character, onChange: (character: Character) => void): Promise<Character> {
         await this.naheulbookWebsocket.synchronizeCharacter(character);
         character.onUpdate.subscribe(onChange);
         character.update();
         return character;
+    }
+
+    async stopSynchronizeCharacter(characterId: number): Promise<void> {
+        await this.naheulbookWebsocket.stopSynchronizeCharacter(characterId)
     }
 
     async synchronizeMonster(monsterId: number, onChange: (monster: Monster) => void): Promise<Monster> {
@@ -65,6 +68,10 @@ export class NaheulbookApi {
         return monstersResponses.map(monsterResponse => Monster.fromResponse(monsterResponse, skillsById));
     }
 
+    loadGroupData(groupId): Promise<GroupResponse> {
+        return this.naheulbookHttpApi.get<GroupResponse>(`/api/v2/groups/${groupId}`)
+    }
+
     async listenToGroupEvent(groupId: number, onEvent: {
         addMonster: (monster: Monster) => void
     }): Promise<any> {
@@ -80,13 +87,13 @@ export class NaheulbookApi {
         }));
     }
 
-    private async loadMonsterData(monsterId: number): Promise<Monster> {
+    public async loadMonsterData(monsterId: number): Promise<Monster> {
         let monsterResponse = await this.naheulbookHttpApi.get<MonsterResponse>(`/api/v2/monsters/${monsterId}`);
         let skillsById = await this.naheulbookDataApi.getSkillsById();
         return Monster.fromResponse(monsterResponse, skillsById);
     }
 
-    private async loadCharacterData(characterId: number): Promise<Character> {
+    public async loadCharacterData(characterId: number): Promise<Character> {
         let origins = await this.naheulbookDataApi.getOrigins();
         let jobs = await this.naheulbookDataApi.getJobs();
         let skillsById = await this.naheulbookDataApi.getSkillsById();

@@ -25,6 +25,11 @@ export class NaheulbookWebsocket {
             await this.sendSyncMessage('Character', character.id);
     }
 
+    async stopSynchronizeCharacter(characterId: number) {
+        delete this.synchronizedCharacters[characterId];
+        await this.sendUnsubscribeMessage('Character', characterId);
+    }
+
     async synchronizeMonster(monster: Monster) {
         this.synchronizedMonsters[monster.id] = monster;
         if (this.connection)
@@ -97,6 +102,10 @@ export class NaheulbookWebsocket {
 
     private async sendSyncMessage(type: string, id: number): Promise<any> {
         await this.connection.send('Subscribe' + type, id);
+    }
+
+    private async sendUnsubscribeMessage(type: string, id: number): Promise<any> {
+        await this.connection.send('Unsubscribe' + type, id);
     }
 
     public getAuthorizationToken(): string | undefined {

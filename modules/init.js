@@ -2,11 +2,11 @@ import {NaheulbeukMacroHelper} from './naheulbeuk-macro-helper.js';
 import {createNaheulbeukDefaultMacros} from "./macro.js";
 import {NaheulbookActorSheet} from "./naheulbook-actor-sheet.js";
 import {NaheulbookConnector} from "./naheulbook-connector.js";
+import {NaheulbookConfig} from "./naheulbook-config.js";
 
-let naheulbookConnector = new NaheulbookConnector();
-naheulbookConnector.init();
 
 CONFIG.debug.hooks = true;
+
 Hooks.once("init", async function () {
     window['nhbkMacroHelper'] = new NaheulbeukMacroHelper();
 
@@ -20,14 +20,7 @@ Hooks.once("init", async function () {
         config: true,
         type: String,
         default: "https://naheulbook.fr",
-        onChange: async value => {
-            await naheulbookConnector.disconnect();
-            await naheulbookConnector.connect(
-                game.settings.get("naheulbook", "naheulbookHost"),
-                +value,
-                game.settings.get("naheulbook", "accessKey")
-            );
-        }
+        onChange: value => NaheulbookConfig.instance.changeValue('naheulbookHost', value)
     });
 
     game.settings.register("naheulbook", "groupId", {
@@ -37,14 +30,7 @@ Hooks.once("init", async function () {
         config: true,
         type: Number,
         default: "",
-        onChange: async value => {
-            await naheulbookConnector.disconnect();
-            await naheulbookConnector.connect(
-                value,
-                +game.settings.get("naheulbook", "groupId"),
-                game.settings.get("naheulbook", "accessKey")
-            );
-        }
+        onChange: value => NaheulbookConfig.instance.changeValue('groupId', value)
     });
 
     game.settings.register("naheulbook", "accessKey", {
@@ -54,20 +40,16 @@ Hooks.once("init", async function () {
         config: true,
         type: String,
         default: "",
-        onChange: async value => {
-            await naheulbookConnector.disconnect();
-            await naheulbookConnector.connect(
-                game.settings.get("naheulbook", "naheulbookHost"),
-                game.settings.get("naheulbook", "groupId"),
-                value
-            );
-        }
+        onChange: value => NaheulbookConfig.instance.changeValue('accessKey', value)
     });
 });
 
 
 Hooks.once("ready", async function () {
+    await ui.sidebar.activateTab('actors');
     await createNaheulbeukDefaultMacros();
+    let naheulbookConnector = new NaheulbookConnector(NaheulbookConfig.instance);
+    naheulbookConnector.init();
     await naheulbookConnector.connect(
         game.settings.get("naheulbook", "naheulbookHost"),
         +game.settings.get("naheulbook", "groupId"),
