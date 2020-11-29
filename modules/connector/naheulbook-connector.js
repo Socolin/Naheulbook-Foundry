@@ -56,10 +56,10 @@ export class NaheulbookConnector {
                 return;
             }
             const gameMasterOnline = userData.users.find(u => u.role === USER_ROLES.GAMEMASTER && u.active)
-            if (this.isSynchronizing && gameMasterOnline) {
+            if (this._nhbkApi && gameMasterOnline) {
                 // Game master just connect, disconnect to avoid duplicate notification
                 this.disconnect();
-            } else if (!this.isSynchronizing && !gameMasterOnline) {
+            } else if (!this._nhbkApi && !gameMasterOnline) {
                 // Game master disconnected, let's connect
                 this.connect();
             }

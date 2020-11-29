@@ -30,7 +30,7 @@ export class CharacterConnector {
     enable() {
         // When an actor is updated (like when updating HP / Mana on a token linked to an actor) send this to naheulbook
         // to keep the actor sync with the monster. This allow to edit monster health/mana inside foundry.
-        this._updateActorHook = Hooks.on('updateActor', (actor, data, options, id) => {
+        this._updateActorHook = Hooks.on('updateActor', (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
 
@@ -44,11 +44,11 @@ export class CharacterConnector {
                         continue;
                     if (!('value' in data.data[key]))
                         continue;
-                    this._nhbkApi.changeCharacterStat(characterId, key, data.data[key].value);
+                    this._nhbkApi.changeCharacterStat(characterId, key, data.data[key].value).then();
                 }
             }
         });
-        this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, id) => {
+        this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
 
@@ -105,7 +105,7 @@ export class CharacterConnector {
             character.update();
             let actor = await this._createCharacterActor(character, playersFolder);
             await this._nhbkApi.synchronizeCharacter(character, async (character) => {
-                this._updateActor(actor, character);
+                this._updateActor(actor, character).then();
             });
         }
     }
@@ -118,7 +118,7 @@ export class CharacterConnector {
             if (!actor.hasPerm(game.user, "OWNER"))
                 continue;
             if (actor instanceof Actor)
-                this._syncCharacterActorWithNaheulbook(actor);
+                this._syncCharacterActorWithNaheulbook(actor).then();
             break;
         }
     }
@@ -204,7 +204,7 @@ export class CharacterConnector {
      * @private
      */
     async _stopSyncCharacter(characterId) {
-        this._nhbkApi.stopSynchronizeCharacter(characterId)
+        this._nhbkApi.stopSynchronizeCharacter(characterId).then();
     }
 
 

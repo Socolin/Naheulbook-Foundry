@@ -8,6 +8,8 @@
     "@rollup/plugin-commonjs": "^15.0.0",
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^9.0.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.14.0",
     "handlebars": "^4.7.6",
     "pixi.js": "^5.3.3",
     "rollup": "^2.33.3",
@@ -16,7 +18,8 @@
   "scripts": {
     "serve": "ibazel build //libs/naheulbook_api:naheulbook-api",
     "build": "bazel build //...",
-    "test": "bazel test //..."
+    "test": "bazel test //...",
+    "lint": "eslint modules"
   },
   "dependencies": {
     "@microsoft/signalr": "^5.0.0",
