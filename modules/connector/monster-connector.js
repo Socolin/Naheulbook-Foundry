@@ -219,6 +219,35 @@ export class MonsterConnector {
             data: this._convertMonsterTokActorData(monster),
             img: await this._monsterIconGenerator.createMonsterIcon(monster)
         }, {fromNaheulbook: true})
+
+        await this._replaceEffect(actor, 'naheulbookMonsterColor', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
+        await this._replaceEffect(actor, 'naheulbookMonsterNumber', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
+    }
+
+    /**
+     * @param {Actor} actor
+     * @param {string} effectId
+     * @param {string} icon
+     * @return {Promise<void>}
+     * @private
+     */
+    async _replaceEffect(actor, effectId, icon)
+    {
+        /** @type ActiveEffect */
+        let colorEffect = actor.effects.find(e => e.getFlag('core', 'statusId') === effectId);
+        if (colorEffect) {
+            await colorEffect.delete({});
+        }
+        if (!icon)
+            return;
+        const effectData = {
+            icon: icon,
+            flags: {
+                "core.statusId": effectId
+            }
+        };
+        const effect = ActiveEffect.create(effectData, actor);
+        await effect.create({});
     }
 
     /**
@@ -284,6 +313,7 @@ export class MonsterConnector {
                 attribute: 'ea'
             }
         }
+
         return tokenData;
     }
 }

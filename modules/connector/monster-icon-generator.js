@@ -47,4 +47,49 @@ export class MonsterIconGenerator {
         return canvas.toDataURL("image/png");
     }
 
+    /**
+     * @param {string} color
+     * @returns {Promise<string>}
+     */
+    async createMonsterEffectIconColor(color) {
+        let monsterColor = color ? `#${color}` : 'black';
+
+        let canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+
+        let ctx = canvas.getContext("2d");
+        ctx.fillStyle = monsterColor;
+
+        let circle = new Path2D();
+        circle.arc(50, 50, 50, 0, 2 * Math.PI);
+        ctx.fill(circle);
+
+        return canvas.toDataURL("image/png");
+    }
+
+    /**
+     * @param {number} monsterNumber
+     * @returns {Promise<string>}
+     */
+    async createMonsterEffectIconNumber(monsterNumber) {
+        if (!monsterNumber)
+            return undefined;
+
+        let canvas = document.createElement("canvas");
+        canvas.width = 100;
+        canvas.height = 100;
+
+        let ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'black';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = '100px serif';
+        ctx.fillText(monsterNumber.toString(), 50, 50);
+        ctx.strokeText(monsterNumber.toString(), 50, 50);
+
+        return canvas.toDataURL("image/png");
+    }
 }
