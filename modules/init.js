@@ -19,7 +19,7 @@ Hooks.once("init", async function () {
 
 Hooks.once("ready", async function () {
     // FOR DEBUG
-    // await ui.sidebar.activateTab('actors');
+    await ui.sidebar.activateTab('actors');
 
     await createNaheulbeukDefaultMacros();
 
