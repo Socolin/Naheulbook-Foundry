@@ -39,9 +39,12 @@ export class MonsterIconGenerator {
             ctx.strokeStyle = 'black';
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.font = '100px serif';
-            ctx.fillText(monsterNumber.toString(), 50, 50);
-            ctx.strokeText(monsterNumber.toString(), 50, 50);
+            ctx.font = '120px Roboto, "Helvetica Neue", sans-serif';
+            ctx.globalAlpha = 0.7;
+            ctx.fillText(monsterNumber.toString(), 50, 60);
+            ctx.globalAlpha = 1;
+            ctx.lineWidth = 3;
+            ctx.strokeText(monsterNumber.toString(), 50, 60);
         }
 
         return canvas.toDataURL("image/png");
@@ -86,9 +89,10 @@ export class MonsterIconGenerator {
         ctx.strokeStyle = 'black';
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.font = '100px serif';
-        ctx.fillText(monsterNumber.toString(), 50, 50);
-        ctx.strokeText(monsterNumber.toString(), 50, 50);
+        ctx.font = '120px serif';
+        ctx.fillText(monsterNumber.toString(), 50, 60);
+        ctx.lineWidth = 3;
+        ctx.strokeText(monsterNumber.toString(), 50, 60);
 
         return canvas.toDataURL("image/png");
     }
