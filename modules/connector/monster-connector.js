@@ -214,11 +214,15 @@ export class MonsterConnector {
      */
     async _updateActor(actor, monster) {
         this._logger.info(`Updating actor ${actor.name} (${actor.id}) with monster data from naheulbook: ${monster.name} (${monster.id})`);
-        await actor.update({
+        let data = {
             name: monster.name,
             data: this._convertMonsterTokActorData(monster),
-            img: await this._monsterIconGenerator.createMonsterIcon(monster)
-        }, {fromNaheulbook: true})
+        };
+
+        if (actor.data.img?.indexOf('data:') === 0)
+            data.img = await this._monsterIconGenerator.createMonsterIcon(monster);
+
+        await actor.update(data, {fromNaheulbook: true})
 
         await this._replaceEffect(actor, 'naheulbookMonsterColor', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
         await this._replaceEffect(actor, 'naheulbookMonsterNumber', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
