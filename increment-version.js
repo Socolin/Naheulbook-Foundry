@@ -19,7 +19,8 @@ function incrementVersion(version, type) {
 
 let systemJson = fs.readFileSync('system.json').toString("utf-8");
 let system = JSON.parse(systemJson);
-let newVersion = incrementVersion(system.version, process.argv.slice(2)[0]);
+let type = process.argv.slice(2)[0] || 'patch';
+let newVersion = incrementVersion(system.version, type);
 system.download = system.download.replace(system.version, newVersion);
 system.version = newVersion;
 fs.writeFileSync('system.json', JSON.stringify(system, null, '  '));
