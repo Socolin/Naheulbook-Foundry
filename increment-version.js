@@ -24,5 +24,7 @@ let newVersion = incrementVersion(system.version, type);
 system.download = system.download.replace(system.version, newVersion);
 system.version = newVersion;
 fs.writeFileSync('system.json', JSON.stringify(system, null, '  '));
-spawn('git', ['commit', '-am', 'Update to version ' + newVersion]);
-spawn('git', ['tag', newVersion]);
+const gitCommit = spawn('git', ['commit', '-am', 'Update to version ' + newVersion]);
+gitCommit.on('close', (data) => {
+    spawn('git', ['tag', newVersion]);
+});
