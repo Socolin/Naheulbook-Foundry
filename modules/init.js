@@ -18,9 +18,6 @@ Hooks.once("init", async function () {
 
 
 Hooks.once("ready", async function () {
-    // FOR DEBUG
-    await ui.sidebar.activateTab('actors');
-
     await createNaheulbeukDefaultMacros();
 
     let naheulbookConnector = new NaheulbookConnector(NaheulbookConfig.instance);
