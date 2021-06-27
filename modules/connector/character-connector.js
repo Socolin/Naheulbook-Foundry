@@ -123,7 +123,6 @@ export class CharacterConnector {
                 continue;
             if (actor instanceof Actor)
                 this._syncCharacterActorWithNaheulbook(actor).then();
-            break;
         }
     }
 
