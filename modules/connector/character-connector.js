@@ -197,7 +197,11 @@ export class CharacterConnector {
                 ea: {
                     value: character.ea,
                     max: character.computedData.stats['EA']
-                }
+                },
+                weaponDamages: character.computedData.weaponsDamages.reduce((previousValue, currentValue) => {
+                    previousValue[currentValue.name] = currentValue.damage;
+                    return previousValue;
+                }, {})
             }
         };
     }
