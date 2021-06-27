@@ -5,7 +5,7 @@ import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
 
 
-CONFIG.debug.hooks = true;
+// CONFIG.debug.hooks = true;
 
 Hooks.once("init", async function () {
     window['nhbkMacroHelper'] = new NaheulbeukMacroHelper();
