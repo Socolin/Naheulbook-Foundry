@@ -1,0 +1,39 @@
+<form class="naheulbook-monster-sheet" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
+            <div class="resource health">
+                <span>Énergie vitale</span>
+                <input type="text" name="data.ev.value" value="{{actor.data.data.ev.value}}" data-dtype="Number"/>
+                <span> / </span>
+                <input type="text" name="data.ev.max" value="{{actor.data.data.ev.max}}" data-dtype="Number"
+                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+            </div>
+            <div class="resource mana">
+                <span>Énergie astrale</span>
+                <input type="text" name="data.ea.value" value="{{actor.data.data.ea.value}}" data-dtype="Number"/>
+                <span> / </span>
+                <input type="text" name="data.ea.max" value="{{actor.data.data.ea.max}}" data-dtype="Number"
+                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+            </div>
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="items">Inventaires</a>
+        <a class="item" data-tab="naheulbook">Naheulbook</a>
+    </nav>
+
+
+    <section class="sheet-body">
+        <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">
+            <div class="attribute">
+                <span>Naheulbook Id (Monstre):</span>
+                <input type="text" name="data.naheulbookMonsterId" value="{{actor.data.data.naheulbookMonsterId}}"
+                       data-dtype="Number" {{#unless isGm}}disabled{{/unless}} />
+            </div>
+        </div>
+    </section>
+</form>

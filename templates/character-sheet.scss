@@ -1,8 +1,8 @@
-.naheulbook {
-  .actor-sheet {
-    display: grid;
-    grid-template-rows: auto auto 1fr;
-  }
+.naheulbook-character-sheet {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+
+
   .sheet-header {
     display: grid;
     grid-template-areas: "img header-fields";
@@ -23,15 +23,19 @@
       height: 100px;
       display: grid;
       column-gap: 16px;
+
       .charname {
         grid-area: charname;
       }
+
       .health {
         grid-area: health;
       }
+
       .mana {
         grid-area: mana;
       }
+
       .resource {
         display: grid;
         align-items: center;
@@ -44,15 +48,18 @@
 
   .sheet-body {
     overflow: hidden;
+
     .tab {
       padding-top: 10px;
       height: 100%;
       overflow-y: auto;
     }
+
     .combat {
       display: grid;
       grid-template-columns: auto auto auto;
     }
+
     .attributes {
       .attribute {
         display: grid;
@@ -64,5 +71,6 @@
 
   .editor, .editor-content {
     height: 100%;
+
   }
 }

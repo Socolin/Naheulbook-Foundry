@@ -1,9 +1,10 @@
 import {NaheulbeukMacroHelper} from './naheulbeuk-macro-helper.js';
 import {createNaheulbeukDefaultMacros} from "./macro.js";
-import {NaheulbookActorSheet} from "./naheulbook-actor-sheet.js";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
 import {NaheulbookActor} from './models/actor/naheulbook-actor';
+import {MonsterActorSheet} from './sheets/monster-actor-sheet';
+import {CharacterActorSheet} from './sheets/character-actor-sheet';
 
 console.warn('Naheulbook | Starting')
 
@@ -19,7 +20,8 @@ Hooks.once("init", async function () {
     CONFIG.Actor.documentClass = NaheulbookActor;
 
     Actors.unregisterSheet("core", ActorSheet);
-    Actors.registerSheet("naheulbook", NaheulbookActorSheet, {makeDefault: true});
+    Actors.registerSheet("naheulbook", CharacterActorSheet, {types: ['character'], makeDefault: true, label: 'Personnage'});
+    Actors.registerSheet("naheulbook", MonsterActorSheet, {types: ['monster'], makeDefault: true, label: 'Monstre'});
 
     (window as any).nhbkMacroHelper = new NaheulbeukMacroHelper();
 

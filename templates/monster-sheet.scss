@@ -1,0 +1,49 @@
+.naheulbook-monster-sheet {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+
+
+  .sheet-header {
+    display: grid;
+    grid-template-areas: "img header-fields";
+    grid-template-columns: 100px 1fr;
+    gap: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+
+    .profile-img {
+      grid-area: img;
+      width: 100px;
+      height: 100px;
+    }
+
+    .header-fields {
+      grid-area: header-fields;
+      grid-template-areas: "charname charname" "health mana";
+      height: 100px;
+      display: grid;
+      column-gap: 16px;
+
+      .charname {
+        grid-area: charname;
+      }
+
+      .health {
+        grid-area: health;
+      }
+
+      .mana {
+        grid-area: mana;
+      }
+
+      .resource {
+        display: grid;
+        align-items: center;
+        margin: 0 10px;
+        gap: 4px;
+        grid-template-columns: auto 1fr auto 1fr;
+      }
+    }
+  }
+
+}

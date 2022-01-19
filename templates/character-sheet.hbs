@@ -1,0 +1,96 @@
+<form class="naheulbook-character-sheet" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
+            <div class="resource health">
+                <span>Énergie vitale</span>
+                <input type="text" name="data.ev.value" value="{{actor.data.data.ev.value}}" data-dtype="Number"/>
+                <span> / </span>
+                <input type="text" name="data.ev.max" value="{{actor.data.data.ev.max}}" data-dtype="Number"
+                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+            </div>
+            <div class="resource mana">
+                <span>Énergie astrale</span>
+                <input type="text" name="data.ea.value" value="{{actor.data.data.ea.value}}" data-dtype="Number"/>
+                <span> / </span>
+                <input type="text" name="data.ea.max" value="{{actor.data.data.ea.max}}" data-dtype="Number"
+                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+            </div>
+        </div>
+    </header>
+
+    <nav class="sheet-tabs tabs" data-group="primary">
+        <a class="item" data-tab="attributes">Attributes</a>
+        <a class="item" data-tab="items">Inventaires</a>
+        <a class="item" data-tab="naheulbook">Naheulbook</a>
+    </nav>
+
+    <section class="sheet-body">
+        <div class="tab biography" data-group="primary" data-tab="description">
+            {{editor content=data.biography target="data.biography" button=true owner=owner editable=editable}}
+        </div>
+
+        <div class="tab items" data-group="primary" data-tab="items">
+        </div>
+
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            <section class="combat">
+                <div class="attribute">
+                    <span>AT:</span>
+                    <input type="text" name="data.at.value" value="{{actor.data.data.at.value}}" data-dtype="Number"
+                           {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                </div>
+                <div class="attribute">
+                    <span>PRD:</span>
+                    <input type="text" name="data.prd.value" value="{{actor.data.data.prd.value}}" data-dtype="Number"
+                           {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                </div>
+                <div class="attribute">
+                    <span>PR:</span>
+                    <input type="text" name="data.pr.value" value="{{actor.data.data.pr.value}}" data-dtype="Number"
+                           {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                </div>
+            </section>
+
+            {{#ifeq actor.type "character"}}
+                <section class="stats">
+                    <div class="attribute">
+                        <span>COU:</span>
+                        <input type="text" name="data.cou.value" value="{{actor.data.data.cou.value}}"
+                               data-dtype="Number" {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                    </div>
+                    <div class="attribute">
+                        <span>INT:</span>
+                        <input type="text" name="data.int.value" value="{{actor.data.data.int.value}}"
+                               data-dtype="Number" {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                    </div>
+                    <div class="attribute">
+                        <span>CHA:</span>
+                        <input type="text" name="data.cha.value" value="{{actor.data.data.cha.value}}"
+                               data-dtype="Number" {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                    </div>
+                    <div class="attribute">
+                        <span>AD:</span>
+                        <input type="text" name="data.ad.value" value="{{actor.data.data.ad.value}}" data-dtype="Number"
+                               {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                    </div>
+                    <div class="attribute">
+                        <span>FO:</span>
+                        <input type="text" name="data.fo.value" value="{{actor.data.data.fo.value}}" data-dtype="Number"
+                               {{#if data.naheulbookCharacterId}}disabled{{/if}}/>
+                    </div>
+                </section>
+            {{/ifeq}}
+        </div>
+
+        <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">
+            <div class="attribute">
+                <span>Naheulbook Id (Personnage):</span>
+                <input type="text" name="data.naheulbookCharacterId"
+                       value="{{actor.data.data.naheulbookCharacterId}}" data-dtype="Number"
+                       {{#unless isGm}}disabled{{/unless}} />
+            </div>
+        </div>
+    </section>
+</form>
