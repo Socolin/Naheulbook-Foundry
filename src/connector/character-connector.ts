@@ -1,11 +1,12 @@
+import {NaheulbookLogger} from '../utils/naheulbook-logger';
+import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
+import {TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import {
+    TokenBarData
+} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
+
 export class CharacterConnector {
     _updatableStats = ['ev', 'ea'];
-
-    /**
-     * @type {NaheulbookApi}
-     * @private
-     */
-    _nhbkApi;
 
     /**
      * @type number
@@ -19,9 +20,10 @@ export class CharacterConnector {
      */
     _updateActorIdHook;
 
-    constructor(nhbkApi, logger) {
-        this._nhbkApi = nhbkApi;
-        this._logger = logger;
+    constructor(
+        private readonly nhbkApi: NaheulbookApi,
+        private readonly logger: NaheulbookLogger
+    ) {
     }
 
     /**
@@ -46,7 +48,7 @@ export class CharacterConnector {
                         continue;
                     if (!('value' in data.data[key]))
                         continue;
-                    this._nhbkApi.changeCharacterStat(characterId, key, data.data[key].value).then();
+                    this.nhbkApi.changeCharacterStat(characterId, key, data.data[key].value).then();
                 }
             }
         });
@@ -71,7 +73,7 @@ export class CharacterConnector {
             await actor.setFlag('naheulbook', 'characterId', newCharacterId);
 
             if (newCharacterId) {
-                await this._syncCharacterActorWithNaheulbook(actor);
+                await this.syncCharacterActorWithNaheulbook(actor);
             }
         });
     }
@@ -93,52 +95,50 @@ export class CharacterConnector {
             return;
         }
 
-        this._logger.info(`Synchronizing Naheulbook group characters: ${groupId}`);
+        this.logger.info(`Synchronizing Naheulbook group characters: ${groupId}`);
 
         let playersFolder = await this._getOrCreatePlayersFolder();
 
-        let group = await this._nhbkApi.loadGroupData(groupId);
+        let group = await this.nhbkApi.loadGroupData(groupId);
 
         for (let characterId of group.characterIds) {
-            let characterActor = game.actors.entities.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
+            let characterActor = game.actors!.contents.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
             if (characterActor) {
                 continue;
             }
 
-            let character = await this._nhbkApi.loadCharacterData(characterId);
+            let character = await this.nhbkApi.loadCharacterData(characterId);
             character.update();
             let actor = await this._createCharacterActor(character, playersFolder);
-            await this._nhbkApi.synchronizeCharacter(character, async (character) => {
-                this._updateActor(actor, character).then();
+            await this.nhbkApi.synchronizeCharacter(character, async (character) => {
+                await this._updateActor(actor, character);
             });
         }
     }
 
-    /**
-     * @return void
-     */
-    synchronizeExistingCharactersActors() {
-        for (let actor of game.actors.filter(a => a.data.type === 'character')) {
-            if (!actor.hasPerm(game.user, "OWNER"))
+    async synchronizeExistingCharactersActors(): Promise<void> {
+        if (!game.actors)
+            throw new Error('game.actors is not ready yet');
+
+        for (let actor of game.actors.contents.filter(a => a.data.type === 'character')) {
+            if (!actor.testUserPermission(game.user!, "OWNER"))
                 continue;
-            if (actor instanceof Actor)
-                this._syncCharacterActorWithNaheulbook(actor).then();
+            await this.syncCharacterActorWithNaheulbook(actor);
         }
     }
 
-
-    async _syncCharacterActorWithNaheulbook(actor) {
+    private async syncCharacterActorWithNaheulbook(actor) {
         const naheulbookCharacterId = actor.getFlag('naheulbook', 'characterId') || actor.data?.data['naheulbookCharacterId'];
         if (!naheulbookCharacterId) {
             return;
         }
 
-        console.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
+        this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
 
         await actor.setFlag('naheulbook', 'characterId', naheulbookCharacterId);
 
-        let character = await this._nhbkApi.loadCharacterData(naheulbookCharacterId);
-        await this._nhbkApi.synchronizeCharacter(character, async (character) => this._updateActor(actor, character));
+        let character = await this.nhbkApi.loadCharacterData(naheulbookCharacterId);
+        await this.nhbkApi.synchronizeCharacter(character, async (character) => this._updateActor(actor, character));
     }
 
 
@@ -152,7 +152,7 @@ export class CharacterConnector {
         return Actor.create({
             name: character.name,
             type: 'character',
-            data: mergeObject(this._convertCharacterToActorData(character), {naheulbookCharacterId: character.id}),
+            data: foundry.utils.mergeObject(this._convertCharacterToActorData(character), {naheulbookCharacterId: character.id}),
             folder: folder.data._id,
             token: this._createTokenData(character),
             items: [],
@@ -167,7 +167,7 @@ export class CharacterConnector {
      * @private
      */
     async _updateActor(actor, character) {
-        this._logger.info(`Received character data change from naheulbook: ${character.name} (${character.id})`);
+        this.logger.info(`Received character data change from naheulbook: ${character.name} (${character.id})`);
         await actor.update(this._convertCharacterToActorData(character), {fromNaheulbook: true})
     }
 
@@ -211,16 +211,15 @@ export class CharacterConnector {
      * @private
      */
     async _stopSyncCharacter(characterId) {
-        this._nhbkApi.stopSynchronizeCharacter(characterId).then();
+        this.nhbkApi.stopSynchronizeCharacter(characterId).then();
     }
-
 
     /**
      * @return Folder
      * @private
      */
     async _getOrCreatePlayersFolder() {
-        let folder = ui.actors.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'players');
+        let folder = ui.actors?.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'players');
         if (!folder) {
             folder = await Folder.create({
                 name: 'Joueurs',
@@ -243,12 +242,14 @@ export class CharacterConnector {
             actorLink: true,
             displayBars: CONST.TOKEN_DISPLAY_MODES.OWNER,
             bar1: {attribute: 'ev'}
-        };
+        } as TokenData;
+
         if (character.computedData.stats['EA']) {
             tokenData.bar2 = {
                 attribute: 'ea'
-            }
+            } as TokenBarData;
         }
+
         return tokenData;
     }
 }

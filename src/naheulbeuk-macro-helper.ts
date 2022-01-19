@@ -53,24 +53,19 @@ export class NaheulbeukMacroHelper {
         return status === 'success' || status === 'epic-success';
     }
 
-    /**
-     * @param {string} skillName
-     * @param {number} targetScore
-     * @param {Object.<number, 'epic-success'|'epic-fail'>} criticsScoresDefinition
-     * @return {Promise<"success"|"fail"|"epic-success"|"epic-fail">}
-     */
-    async rollSkillCheck(skillName, targetScore, criticsScoresDefinition = this._defaultCriticsScoresDefinition) {
+    async rollSkillCheck(skillName: string, targetScore: number, criticsScoresDefinition = this._defaultCriticsScoresDefinition): Promise<"success" | "fail" | "epic-success" | "epic-fail"> {
         const roll = new Roll(`1d20`);
-        roll.roll();
+        await roll.roll({async: true});
 
-        let rollResult = roll.results[0];
+        let rollResult = roll.total;
         let resultState = this.getRollState(rollResult, targetScore, criticsScoresDefinition);
         let rollTestTextResult = this.formatTestResult(skillName, resultState);
 
         const messageData = roll.toMessage({}, {create: false});
-        messageData.content = `<p>${skillName}: ${rollTestTextResult} (${rollResult} / ${targetScore})</p> ${await roll.render()}`;
-        messageData.speaker = ChatMessage.getSpeaker({token: game.token});
-        await ChatMessage.create(messageData);
+        let content = `<p>${skillName}: ${rollTestTextResult} (${rollResult} / ${targetScore})</p> ${await roll.render()}`;
+        let activeToken = game.canvas.tokens?._controlled[0]?.document;
+        let speaker = ChatMessage.getSpeaker({token: activeToken});
+        await ChatMessage.create({messageData, content, speaker});
         setTimeout(() => {
             this.playEpicSoundIfNeeded(resultState);
         }, 1000);
@@ -84,10 +79,10 @@ export class NaheulbeukMacroHelper {
      */
     async rollDamage(dice) {
         const roll = new Roll(dice);
-        roll.roll();
+        await roll.roll({async: true});
         const messageData = roll.toMessage({}, {create: false});
-        messageData.content = `<p>Dégâts: ${roll.results[0]}</p> ${await roll.render()}`
-        await ChatMessage.create(messageData);
+        let content = `<p>Dégâts: ${roll.total}</p> ${await roll.render()}`
+        await ChatMessage.create({...messageData, content});
         return roll;
     }
 
@@ -119,10 +114,19 @@ export class NaheulbeukMacroHelper {
      */
     playEpicSoundIfNeeded(resultState) {
         if (resultState === 'epic-success') {
-            AudioHelper.play({src: 'systems/naheulbook/assets/sounds/critical-success.mp3', volume: 0.33, loop: false, autoplay: true}, true);
-        }
-        else if (resultState === 'epic-fail') {
-            AudioHelper.play({src: 'systems/naheulbook/assets/sounds/epic-fail.mp3', volume: 0.33, loop: false, autoplay: true}, true);
+            AudioHelper.play({
+                src: 'systems/naheulbook/assets/sounds/critical-success.mp3',
+                volume: 0.33,
+                loop: false,
+                autoplay: true
+            }, true);
+        } else if (resultState === 'epic-fail') {
+            AudioHelper.play({
+                src: 'systems/naheulbook/assets/sounds/epic-fail.mp3',
+                volume: 0.33,
+                loop: false,
+                autoplay: true
+            }, true);
         }
     }
 }

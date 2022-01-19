@@ -1,7 +1,7 @@
-import {NaheulbookApi} from "./naheulbook-api.js";
 import {MonsterConnector} from "./monster-connector.js";
 import {NaheulbookLogger} from "../utils/naheulbook-logger.js";
 import {CharacterConnector} from "./character-connector.js";
+import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
 
 export class NaheulbookConnector {
     /**
@@ -52,10 +52,10 @@ export class NaheulbookConnector {
         })
 
         Hooks.on('renderPlayerList', (playerList, div, userData) => {
-            if (game.user.role === USER_ROLES.GAMEMASTER) {
+            if (game.user!.role === CONST.USER_ROLES.GAMEMASTER) {
                 return;
             }
-            const gameMasterOnline = userData.users.find(u => u.role === USER_ROLES.GAMEMASTER && u.active)
+            const gameMasterOnline = userData.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)
             if (this._nhbkApi && gameMasterOnline) {
                 // Game master just connect, disconnect to avoid duplicate notification
                 this.disconnect();
@@ -81,8 +81,8 @@ export class NaheulbookConnector {
             return;
         }
 
-        if (game.user.role !== USER_ROLES.GAMEMASTER) {
-            if (game.users.entities.find(u => u.role === USER_ROLES.GAMEMASTER && u.active)) {
+        if (game.user!.role !== CONST.USER_ROLES.GAMEMASTER) {
+            if (game.users!.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
                 this._logger.info('A GM is already connected, skip naheulbook sync');
                 return;
             }

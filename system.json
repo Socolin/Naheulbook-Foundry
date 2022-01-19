@@ -5,14 +5,14 @@
   "version": "0.0.20",
   "templateVersion": 2,
   "author": "Socolin",
-  "minimumCoreVersion": "0.7.7",
-  "compatibleCoreVersion": "0.7.7",
+  "minimumCoreVersion": "0.8.9",
+  "compatibleCoreVersion": "0.8.9",
   "scripts": [],
   "esmodules": [
-    "modules/init.js"
+    "src/init.js"
   ],
   "styles": [
-    "styles/actor-sheet.css"
+    "templates/style.css"
   ],
   "packs": [],
   "languages": [

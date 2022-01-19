@@ -3,15 +3,25 @@ import {createNaheulbeukDefaultMacros} from "./macro.js";
 import {NaheulbookActorSheet} from "./naheulbook-actor-sheet.js";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
+import {NaheulbookActor} from './models/actor/naheulbook-actor';
 
+console.warn('Naheulbook | Starting')
+
+declare global {
+    interface LenientGlobalVariableTypes {
+        game: never; // the type doesn't matter
+    }
+}
 
 // CONFIG.debug.hooks = true;
 
 Hooks.once("init", async function () {
-    window['nhbkMacroHelper'] = new NaheulbeukMacroHelper();
+    CONFIG.Actor.documentClass = NaheulbookActor;
 
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("naheulbook", NaheulbookActorSheet, {makeDefault: true});
+
+    (window as any).nhbkMacroHelper = new NaheulbeukMacroHelper();
 
     NaheulbookConfig.registerConfigs();
 });

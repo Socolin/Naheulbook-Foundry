@@ -1,4 +1,13 @@
 import {MonsterIconGenerator} from "./monster-icon-generator.js";
+import {NaheulbookActor} from '../models/actor/naheulbook-actor';
+import {MonsterActorData} from '../models/actor/monster-actor-properties';
+import {Monster} from '../naheulbook-api/models/monster.model';
+import {ActorData, TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import {
+    TokenBarData
+} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
+import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
+import {NaheulbookLogger} from '../utils/naheulbook-logger';
 
 export class MonsterConnector {
     _updatableStats = ['ev', 'ea'];
@@ -26,21 +35,11 @@ export class MonsterConnector {
      */
     _monstersById = {};
 
-    /**
-     * @type {NaheulbookApi}
-     * @private
-     */
-    _nhbkApi;
 
-    /**
-     * @type NaheulbookLogger
-     * @private
-     */
-    _logger;
-
-    constructor(nhbkApi, logger) {
-        this._nhbkApi = nhbkApi;
-        this._logger = logger;
+    constructor(
+        private readonly nhbkApi: NaheulbookApi,
+        private readonly logger: NaheulbookLogger
+    ) {
         this._monsterIconGenerator = new MonsterIconGenerator();
     }
 
@@ -67,7 +66,7 @@ export class MonsterConnector {
                     if (!('value' in data.data[key]))
                         continue;
                     let monster = this._monstersById[monsterId];
-                    await this._nhbkApi.updateMonsterData(monsterId, {...monster.data, [key]: data.data[key].value});
+                    await this.nhbkApi.updateMonsterData(monsterId, {...monster.data, [key]: data.data[key].value});
                 }
             }
         });
@@ -115,21 +114,21 @@ export class MonsterConnector {
             return;
         }
 
-        this._logger.info(`Synchronizing Naheulbook group: ${groupId}`);
+        this.logger.info(`Synchronizing Naheulbook group: ${groupId}`);
 
         const currentFightFolder = await this._getOrCreateCurrentFightFolder()
 
-        let monsters = await this._nhbkApi.loadGroupMonsters(groupId);
+        let monsters = await this.nhbkApi.loadGroupMonsters(groupId);
         for (let monster of monsters) {
-            let monsterActor = game.actors.entities.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
+            let monsterActor = game.actors?.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
             if (monsterActor instanceof Actor) {
-                this._updateActor(monsterActor, monster);
+                await this._updateActor(monsterActor, monster);
             } else {
                 await this.createMonsterActorAndSyncIt(monster, currentFightFolder);
             }
         }
 
-        await this._nhbkApi.listenToGroupEvent(groupId, {
+        await this.nhbkApi.listenToGroupEvent(groupId, {
             addMonster: (monster) => {
                 this.createMonsterActorAndSyncIt(monster, currentFightFolder);
             },
@@ -139,18 +138,16 @@ export class MonsterConnector {
         });
     }
 
-    /**
-     * @return void
-     */
-    synchronizeExistingMonstersActors() {
+    async synchronizeExistingMonstersActors(): Promise<void> {
+        if (!game.actors)
+            throw new Error('game.actors is undefined');
+
         for (let actor of game.actors.filter(a => a.data.type === 'monster')) {
-            if (!actor.hasPerm(game.user, "OWNER"))
+            if (!actor.testUserPermission(game.user!, "OWNER"))
                 continue;
-            if (actor instanceof Actor)
-                this.syncMonsterActorWithNaheulbook(actor);
+            await this.syncMonsterActorWithNaheulbook(actor);
         }
     }
-
 
     /**
      * @param {Actor} actor
@@ -162,9 +159,9 @@ export class MonsterConnector {
             return;
         }
 
-        this._logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
+        this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
 
-        let monster = await this._nhbkApi.synchronizeMonster(naheulbookMonsterId, (monster) => this._updateActor(actor, monster));
+        let monster = await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, (monster) => this._updateActor(actor, monster));
         this._monstersById[monster.id] = monster;
     }
 
@@ -178,9 +175,9 @@ export class MonsterConnector {
             name: monster.name,
             type: 'monster',
             img: await this._monsterIconGenerator.createMonsterIcon(monster),
-            data: mergeObject(this._convertMonsterTokActorData(monster), {naheulbookMonsterId: monster.id}),
+            data: foundry.utils.mergeObject(this.convertMonsterTokActorData(monster), {naheulbookMonsterId: monster.id}),
             folder: folder.data._id,
-            token: this._createTokenData(monster),
+            token: this.createTokenData(monster),
             items: [],
             flags: {"naheulbook.monsterId": monster.id}
         }).then((actor) => {
@@ -193,7 +190,7 @@ export class MonsterConnector {
      * @private
      */
     async _getOrCreateCurrentFightFolder() {
-        let folder = ui.actors.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'currentFight');
+        let folder = ui.actors?.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'currentFight');
         if (!folder) {
             folder = await Folder.create({
                 name: 'Combat courant',
@@ -213,35 +210,27 @@ export class MonsterConnector {
      * @private
      */
     async _updateActor(actor, monster) {
-        this._logger.info(`Updating actor ${actor.name} (${actor.id}) with monster data from naheulbook: ${monster.name} (${monster.id})`);
+        this.logger.info(`Updating actor ${actor.name} (${actor.id}) with monster data from naheulbook: ${monster.name} (${monster.id})`);
         let data = {
             name: monster.name,
-            data: this._convertMonsterTokActorData(monster),
-        };
+            data: this.convertMonsterTokActorData(monster),
+        } as ActorData;
 
         if (actor.data.img?.indexOf('data:') === 0)
             data.img = await this._monsterIconGenerator.createMonsterIcon(monster);
 
         await actor.update(data, {fromNaheulbook: true})
 
-        await this._replaceEffect(actor, 'naheulbookMonsterColor', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
-        await this._replaceEffect(actor, 'naheulbookMonsterNumber', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
+        await this.replaceEffect(actor, 'naheulbookMonsterColor', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
+        await this.replaceEffect(actor, 'naheulbookMonsterNumber', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
     }
 
-    /**
-     * @param {Actor} actor
-     * @param {string} effectId
-     * @param {string} icon
-     * @return {Promise<void>}
-     * @private
-     */
-    async _replaceEffect(actor, effectId, icon)
-    {
-        /** @type ActiveEffect */
+    private async replaceEffect(actor: NaheulbookActor, effectId: string, icon: string): Promise<void> {
         let colorEffect = actor.effects.find(e => e.getFlag('core', 'statusId') === effectId);
         if (colorEffect) {
             await colorEffect.delete({});
         }
+
         if (!icon)
             return;
         const effectData = {
@@ -250,8 +239,7 @@ export class MonsterConnector {
                 "core.statusId": effectId
             }
         };
-        const effect = ActiveEffect.create(effectData, actor);
-        await effect.create({});
+        await ActiveEffect.create(effectData, {parent: actor})
     }
 
     /**
@@ -259,27 +247,23 @@ export class MonsterConnector {
      * @return {Promise<void>}
      */
     async killMonster(monsterId) {
-        let monsterActor = game.actors.entities.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
+        let monsterActor = game.actors?.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
         if (!monsterActor)
             return;
 
-        let effectData = window.CONFIG.statusEffects.find(e => e.id === 'dead');
+        let effectData = CONFIG.statusEffects.find(e => e.id === 'dead');
+        if (!effectData)
+            return;
+
         const createData = duplicate(effectData);
         createData.label = game.i18n.localize(effectData.label);
         createData["flags.core.statusId"] = effectData.id;
         createData["flags.core.overlay"] = true;
-        delete createData.id;
 
-        const effect = ActiveEffect.create(createData, monsterActor);
-        await effect.create({});
+        await ActiveEffect.create(effectData, {parent: monsterActor})
     }
 
-    /**
-     * @param {Monster} monster
-     * @return {Object}
-     * @private
-     */
-    _convertMonsterTokActorData(monster) {
+    private convertMonsterTokActorData(monster: Monster): MonsterActorData {
         return {
             at: {value: monster.computedData.at},
             prd: {value: monster.computedData.prd},
@@ -301,21 +285,16 @@ export class MonsterConnector {
         };
     }
 
-    /**
-     * @param {Monster} monster
-     * @return {*}
-     * @private
-     */
-    _createTokenData(monster) {
+    private createTokenData(monster: Monster): TokenData {
         let tokenData = {
             actorLink: true,
             displayBars: CONST.TOKEN_DISPLAY_MODES.ALWAYS,
             bar1: {attribute: 'ev'}
-        };
+        } as TokenData;
         if (monster.data.maxEa) {
             tokenData.bar2 = {
                 attribute: 'ea'
-            }
+            } as TokenBarData
         }
 
         return tokenData;

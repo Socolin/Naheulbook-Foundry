@@ -5,16 +5,13 @@
       "monster"
     ],
     "templates": {
-      "background": {
-        "biography": ""
-      },
       "naheulbookCharacter": {
         "naheulbookCharacterId": 0
       },
       "naheulbookMonster": {
         "naheulbookMonsterId": 0
       },
-      "resources": {
+      "baseStats": {
         "ev": {
           "min": 0,
           "value": 10,
@@ -26,55 +23,43 @@
           "max": 3
         },
         "at": {
-          "min": 0,
           "value": 8
         },
         "prd": {
-          "min": 0,
           "value": 10
         },
         "pr": {
-          "min": 0,
           "value": 0
         },
         "pr_magic": {
-          "min": 0,
           "value": 0
         },
         "esq": {
-          "min": 0,
           "value": 0
         },
         "resm": {
-          "min": 0,
           "value": 0
         }
       },
       "characterStats": {
         "cou": {
-          "min": 0,
           "value": 10
         },
         "int": {
-          "min": 0,
           "value": 10
         },
         "cha": {
-          "min": 0,
           "value": 10
         },
         "ad": {
-          "min": 0,
           "value": 10
         },
         "fo": {
-          "min": 0,
           "value": 10
         }
       },
       "monsterStats": {
         "cou": {
-          "min": 0,
           "value": 10
         },
         "chercheNoise": {
@@ -84,8 +69,7 @@
     },
     "character": {
       "templates": [
-        "background",
-        "resources",
+        "baseStats",
         "naheulbookCharacter",
         "characterStats"
       ],
@@ -93,8 +77,7 @@
     },
     "monster": {
       "templates": [
-        "background",
-        "resources",
+        "baseStats",
         "naheulbookMonster",
         "monsterStats"
       ]

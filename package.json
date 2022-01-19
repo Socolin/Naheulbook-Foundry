@@ -1,29 +1,22 @@
 {
+  "type": "module",
   "devDependencies": {
-    "@bazel/bazelisk": "latest",
-    "@bazel/buildifier": "latest",
-    "@bazel/ibazel": "latest",
-    "@bazel/rollup": "^2.3.0",
-    "@bazel/typescript": "latest",
-    "@rollup/plugin-commonjs": "^15.0.0",
-    "@rollup/plugin-json": "^4.1.0",
-    "@rollup/plugin-node-resolve": "^9.0.0",
-    "babel-eslint": "^10.1.0",
-    "eslint": "^7.14.0",
+    "typescript": "^4.5.4",
+    "@league-of-foundry-developers/foundry-vtt-types": "^0.8.9-10",
+    "esbuild": "^0.14.11",
+    "esbuild-sass-plugin": "^2.0.3",
+    "glob": "^7.2.0",
     "handlebars": "^4.7.6",
-    "pixi.js": "^5.3.3",
-    "rollup": "^2.33.3",
-    "typescript": "^4.0.5"
+    "jquery": "^3.5.1",
+    "node-sass": "^7.0.1"
   },
   "scripts": {
-    "serve": "ibazel build //libs/naheulbook_api:naheulbook-api",
-    "build": "bazel build //...",
-    "test": "bazel test //...",
-    "lint": "eslint modules"
+    "esbuild": "esbuild",
+    "dev": "node ./build.js --watch",
+    "build": "node ./build.js"
   },
   "dependencies": {
     "@microsoft/signalr": "^5.0.0",
-    "@types/node": "^14.14.8",
     "rxjs": "^6.6.3"
   }
 }

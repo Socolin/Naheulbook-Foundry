@@ -8,10 +8,9 @@ export async function createNaheulbeukDefaultMacros() {
 }
 
 async function getOrCreateMacro(flagDomain, flagKey, flagValue, createCb) {
-    let macro = game.macros.entities.find(x => x.getFlag('naheulbook', 'sampleMacro') === flagValue);
-    if (macro !== undefined)
-        if (macro.hasPerm(game.user, 'OWNER'))
-            return macro;
+    let macro = game.macros?.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === flagValue);
+    if (macro && game.user && macro.testUserPermission(game.user, 'OWNER'))
+        return macro;
     return await createCb();
 }
 

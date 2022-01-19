@@ -28,6 +28,9 @@ export class MonsterIconGenerator {
         let monsterNumber = monster.data.number;
 
         let ctx = canvas.getContext("2d");
+        if (!ctx) {
+            throw new Error('Failed to get 2d context from canvas');
+        }
         ctx.fillStyle = monsterColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalCompositeOperation = "destination-in";
@@ -62,6 +65,9 @@ export class MonsterIconGenerator {
         canvas.height = 100;
 
         let ctx = canvas.getContext("2d");
+        if (!ctx) {
+            throw new Error('Failed to get 2d context from canvas');
+        }
         ctx.fillStyle = monsterColor;
 
         let circle = new Path2D();
@@ -84,6 +90,9 @@ export class MonsterIconGenerator {
         canvas.height = 100;
 
         let ctx = canvas.getContext("2d");
+        if (!ctx) {
+            throw new Error('Failed to get 2d context from canvas');
+        }
 
         ctx.fillStyle = 'white';
         ctx.strokeStyle = 'black';
