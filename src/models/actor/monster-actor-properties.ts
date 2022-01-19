@@ -9,4 +9,5 @@ export interface MonsterActorData extends BaseStatsActorProperties {
     naheulbookMonsterId: number;
     cou: { value: number },
     chercheNoise: { value: boolean }
+    dmg: { name: string, damage: string, incompatible?: boolean }[];
 }

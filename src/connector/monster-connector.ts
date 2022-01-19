@@ -265,6 +265,7 @@ export class MonsterConnector {
 
     private convertMonsterTokActorData(monster: Monster): MonsterActorData {
         return {
+            naheulbookMonsterId: monster.id,
             at: {value: monster.computedData.at},
             prd: {value: monster.computedData.prd},
             esq: {value: monster.computedData.esq},

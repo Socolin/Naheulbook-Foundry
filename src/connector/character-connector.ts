@@ -1,9 +1,11 @@
 import {NaheulbookLogger} from '../utils/naheulbook-logger';
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
-import {TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import {ActorData, TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import {
     TokenBarData
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
+import {Character} from '../naheulbook-api/models/character.model';
+import {CharacterActorData} from '../models/actor/character-actor-properties';
 
 export class CharacterConnector {
     _updatableStats = ['ev', 'ea'];
@@ -67,7 +69,7 @@ export class CharacterConnector {
                 return;
 
             if (oldCharacterId) {
-                await this._stopSyncCharacter(oldCharacterId);
+                await this.stopSyncCharacter(oldCharacterId);
             }
 
             await actor.setFlag('naheulbook', 'characterId', newCharacterId);
@@ -97,7 +99,7 @@ export class CharacterConnector {
 
         this.logger.info(`Synchronizing Naheulbook group characters: ${groupId}`);
 
-        let playersFolder = await this._getOrCreatePlayersFolder();
+        let playersFolder = await this.getOrCreatePlayersFolder();
 
         let group = await this.nhbkApi.loadGroupData(groupId);
 
@@ -154,7 +156,7 @@ export class CharacterConnector {
             type: 'character',
             data: foundry.utils.mergeObject(this._convertCharacterToActorData(character), {naheulbookCharacterId: character.id}),
             folder: folder.data._id,
-            token: this._createTokenData(character),
+            token: this.createTokenData(character),
             items: [],
             flags: {"naheulbook.characterId": character.id}
         })
@@ -171,24 +173,11 @@ export class CharacterConnector {
         await actor.update(this._convertCharacterToActorData(character), {fromNaheulbook: true})
     }
 
-    /**
-     * @param {Character} character
-     * @return {Object}
-     * @private
-     */
-    _convertCharacterToActorData(character) {
+    _convertCharacterToActorData(character: Character) {
         return {
             name: character.name,
             data: {
-                at: {value: character.computedData.stats['AT']},
-                prd: {value: character.computedData.stats['PRD']},
-
-                ad: {value: character.computedData.stats['AD']},
-                int: {value: character.computedData.stats['INT']},
-                cha: {value: character.computedData.stats['CHA']},
-                fo: {value: character.computedData.stats['FO']},
-                cou: {value: character.computedData.stats['COU']},
-
+                naheulbookCharacterId: character.id,
                 ev: {
                     value: character.ev,
                     max: character.computedData.stats['EV']
@@ -197,29 +186,35 @@ export class CharacterConnector {
                     value: character.ea,
                     max: character.computedData.stats['EA']
                 },
+
+                at: {value: character.computedData.stats['AT']},
+                prd: {value: character.computedData.stats['PRD']},
+                pr: {value: character.computedData.stats['PR']},
+                pr_magic: {value: character.computedData.stats['PR_MAGIC']},
+                esq: {value: character.computedData.stats['ESQ']},
+                resm: {value: character.computedData.stats['RESM']},
+
+                ad: {value: character.computedData.stats['AD']},
+                int: {value: character.computedData.stats['INT']},
+                cha: {value: character.computedData.stats['CHA']},
+                fo: {value: character.computedData.stats['FO']},
+                cou: {value: character.computedData.stats['COU']},
+
                 weaponDamages: character.computedData.weaponsDamages.reduce((previousValue, currentValue) => {
                     previousValue[currentValue.name] = currentValue.damage;
                     return previousValue;
                 }, {})
-            }
+            } as CharacterActorData
         };
     }
 
-    /**
-     * @param {number} characterId
-     * @return {Promise<void>}
-     * @private
-     */
-    async _stopSyncCharacter(characterId) {
-        this.nhbkApi.stopSynchronizeCharacter(characterId).then();
+    private async stopSyncCharacter(characterId: number): Promise<void> {
+        await this.nhbkApi.stopSynchronizeCharacter(characterId);
     }
 
-    /**
-     * @return Folder
-     * @private
-     */
-    async _getOrCreatePlayersFolder() {
+    private async getOrCreatePlayersFolder(): Promise<Folder> {
         let folder = ui.actors?.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'players');
+
         if (!folder) {
             folder = await Folder.create({
                 name: 'Joueurs',
@@ -227,17 +222,15 @@ export class CharacterConnector {
                 parent: null,
                 flags: {"naheulbook.specialFolder": "players"}
             });
+            if (!folder) {
+                throw new Error('Failed to create folder `Joueurs`');
+            }
         }
 
         return folder;
     }
 
-    /**
-     * @param {Character} character
-     * @return {*}
-     * @private
-     */
-    _createTokenData(character) {
+    private createTokenData(character: Character): TokenData {
         let tokenData = {
             actorLink: true,
             displayBars: CONST.TOKEN_DISPLAY_MODES.OWNER,
