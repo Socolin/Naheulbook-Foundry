@@ -9,7 +9,7 @@ export class MonsterActorSheet<Options extends ActorSheet.Options = ActorSheet.O
     static get defaultOptions(): ActorSheet.Options {
         return {
             ...super.defaultOptions,
-            template: "systems/naheulbook/templates/monster-sheet.hbs",
+            template: "systems/naheulbook/ui/sheets/monster-actor-sheet.hbs",
             width: 600,
             height: 600,
             tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}],
