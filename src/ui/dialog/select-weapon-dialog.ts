@@ -13,7 +13,7 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
     override getData(options?: Partial<Application.Options>): object | Promise<object> {
         return {
             ...super.getData(options),
-            weapons: this.data.weapons,
+            weapons: this.dialogData.weapons,
             ready: !!this.selectedWeaponId,
             selectedWeaponId: this.selectedWeaponId
         };
@@ -30,12 +30,8 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
         })
     }
 
-    override getResult(): CharacterWeaponDamage {
-        let weapon = this.data.weapons.find(w => w.itemId == this.selectedWeaponId);
-        if (!weapon) {
-            throw new Error('Unable to find weapon with id ' + this.selectedWeaponId);
-        }
-        return weapon;
+    override getResult(): CharacterWeaponDamage | undefined {
+        return this.dialogData.weapons.find(w => w.itemId == this.selectedWeaponId);
     }
 
     static get defaultOptions(): Application.Options {
