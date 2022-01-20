@@ -5,9 +5,17 @@ export interface MonsterActorProperties {
     data: MonsterActorData;
 }
 
+export interface MonsterDamage {
+    itemId: number;
+    name: string;
+    damage: string;
+    rollFormula: string;
+    damageType?: string;
+}
+
 export interface MonsterActorData extends BaseStatsActorProperties {
     naheulbookMonsterId: number;
     cou: { value: number },
     chercheNoise: { value: boolean }
-    dmg: { name: string, damage: string, incompatible?: boolean }[];
+    damages: MonsterDamage[];
 }

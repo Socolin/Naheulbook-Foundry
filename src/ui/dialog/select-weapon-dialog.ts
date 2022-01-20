@@ -1,12 +1,13 @@
-import {DialogBase, DialogResultCallback} from './dialog-base';
+import {DialogBase} from './dialog-base';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
 import ChangeEvent = JQuery.ChangeEvent;
+import {MonsterDamage} from '../../models/actor/monster-actor-properties';
 
 export interface SelectWeaponDialogData {
-    weapons: CharacterWeaponDamage[]
+    weapons: CharacterWeaponDamage[] | MonsterDamage[]
 }
 
-export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, CharacterWeaponDamage> {
+export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, CharacterWeaponDamage | MonsterDamage> {
     private selectedWeaponId: number | undefined;
 
     override getData(options?: Partial<Application.Options>): object | Promise<object> {

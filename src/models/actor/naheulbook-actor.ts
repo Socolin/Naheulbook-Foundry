@@ -1,5 +1,5 @@
 import {CharacterActorProperties} from './character-actor-properties';
-import {MonsterActorProperties} from './monster-actor-properties';
+import {MonsterActorProperties, MonsterDamage} from './monster-actor-properties';
 import {RollHelper} from '../../utils/roll-helper';
 import {RollMessageHelper} from '../../utils/roll-message-helper';
 import {DialogAwaiter} from '../../utils/dialog-awaiter';
@@ -24,7 +24,7 @@ export class NaheulbookActor extends Actor {
     }
 
     async rollAttack(): Promise<void> {
-        let weapon: CharacterWeaponDamage | undefined;
+        let weapon: CharacterWeaponDamage | MonsterDamage | undefined;
         if (this.data.type === 'character') {
             if (this.data.data.weapons.length === 1) {
                 weapon = this.data.data.weapons[0];
@@ -34,7 +34,12 @@ export class NaheulbookActor extends Actor {
             }
         }
         else if (this.data.type === 'monster') {
-
+            if (this.data.data.damages.length === 1) {
+                weapon = this.data.data.damages[0];
+            }
+            else if (this.data.data.damages.length > 1) {
+                weapon = await DialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: this.data.data.damages}) ;
+            }
         }
 
         if (!weapon) {

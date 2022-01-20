@@ -1,6 +1,6 @@
 import {MonsterIconGenerator} from "./monster-icon-generator.js";
 import {NaheulbookActor} from '../models/actor/naheulbook-actor';
-import {MonsterActorData} from '../models/actor/monster-actor-properties';
+import {MonsterActorData, MonsterDamage} from '../models/actor/monster-actor-properties';
 import {Monster} from '../naheulbook-api/models/monster.model';
 import {ActorData, TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import {
@@ -264,6 +264,7 @@ export class MonsterConnector {
     }
 
     private convertMonsterTokActorData(monster: Monster): MonsterActorData {
+
         return {
             naheulbookMonsterId: monster.id,
             at: {value: monster.computedData.at},
@@ -271,7 +272,7 @@ export class MonsterConnector {
             esq: {value: monster.computedData.esq},
             pr: {value: monster.computedData.pr},
             pr_magic: {value: monster.computedData.pr_magic},
-            dmg: monster.computedData.dmg,
+            damages: this.parseDamages(monster),
             cou: {value: monster.computedData.cou},
             chercheNoise: {value: monster.computedData.chercheNoise},
             resm: {value: monster.computedData.resm},
@@ -284,6 +285,37 @@ export class MonsterConnector {
                 max: monster.data.maxEa
             }
         };
+    }
+
+    private parseDamages(monster: Monster): MonsterDamage[] {
+        let damages: MonsterDamage[] = []
+        let id = 1;
+        for (let dmgElement of monster.computedData.dmg) {
+            for (let damage of dmgElement.damage.split(';')) {
+                let [rollFormula, name] = this.parseMonsterDamage(damage);
+                damages.push({
+                    itemId: id++,
+                    name: name || dmgElement.name,
+                    damage: damage,
+                    rollFormula: rollFormula
+                })
+            }
+        }
+        return damages;
+    }
+
+    private readonly rollWithNameRegex = /^(?<rollFormula>\d+\s*D\s*(?:\+\s*\d+))\s*\(\s*(?<name>[\w\s]+)\s*\)$/;
+    private parseMonsterDamage(damage: string): [rollFormula: string, name?: string] {
+        if (damage.match(/^\d+\s*D\s*(\+\s*\d+)$/))
+            return [damage.replace('D', 'd6')];
+        let matchRollWithName = damage.match(this.rollWithNameRegex)
+        if (matchRollWithName) {
+            let rollFormula = matchRollWithName[1].replace('D', 'd6');
+            let name = matchRollWithName[2].trim()
+            return [rollFormula, name];
+        }
+        console.error('Unsupported monster damage form: ' + damage);
+        return ['1d6'];
     }
 
     private createTokenData(monster: Monster): TokenData {
