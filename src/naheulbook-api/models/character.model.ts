@@ -162,6 +162,15 @@ export class TacticalMovementInfo {
     sprintMaxDuration: number;
 }
 
+export interface CharacterWeaponDamage {
+    itemId: number;
+    name: string;
+    damage: string;
+    incompatible?: boolean;
+    rollFormula: string;
+    damageType?: string;
+}
+
 export class CharacterComputedData {
     baseStat: {[statName: string]: number} = {};
     stats: {[statName: string]: number} = {};
@@ -184,7 +193,7 @@ export class CharacterComputedData {
 
     countExceptionalStats = 0;
     countActiveEffect = 0;
-    weaponsDamages: {name: string, damage: string, incompatible?: boolean}[] = [];
+    weaponsDamages: CharacterWeaponDamage[] = [];
     flags: {[flagName: string]: FlagData[]} = {};
     shownItemsToGm: Item[] = [];
 
@@ -1101,27 +1110,33 @@ export class Character {
     }
 
     updateWeaponsDamages() {
-        let weaponDamages: {name: string, damage: string, incompatible?: boolean}[] = [];
+        let weaponDamages: CharacterWeaponDamage[] = [];
         for (let item of this.items) {
             if (!item.data.equiped) {
                 continue;
             }
             if (ItemTemplate.hasSlot(item.template, 'WEAPON')) {
                 let damage = item.getDamageString();
+                let rollFormula = item.getRollFormula();
                 let impactDamageItemBonus = item.computedData.modifierBonusDamage || 0;
                 let impactDamageCharacterBonus = this.computedData.stats['PI'] || 0;
                 let weaponBonusDamage = impactDamageItemBonus + impactDamageCharacterBonus;
                 if (damage && weaponBonusDamage) {
                     if (weaponBonusDamage > 0) {
                         damage += ' (+' + weaponBonusDamage + ')';
+                        rollFormula += '+' + weaponBonusDamage.toString()
                     }
                     else {
                         damage += ' (' + weaponBonusDamage + ')';
+                        rollFormula += weaponBonusDamage.toString()
                     }
                 }
                 weaponDamages.push({
+                    itemId: item.id,
                     name: item.data.name || item.template.name,
                     damage: damage,
+                    rollFormula: rollFormula,
+                    damageType: item.template.data.damageType,
                     incompatible: item.computedData.incompatible
                 });
             }

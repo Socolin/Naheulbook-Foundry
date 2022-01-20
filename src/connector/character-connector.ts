@@ -200,10 +200,7 @@ export class CharacterConnector {
                 fo: {value: character.computedData.stats['FO']},
                 cou: {value: character.computedData.stats['COU']},
 
-                weaponDamages: character.computedData.weaponsDamages.reduce((previousValue, currentValue) => {
-                    previousValue[currentValue.name] = currentValue.damage;
-                    return previousValue;
-                }, {})
+                weapons: character.computedData.weaponsDamages
             } as CharacterActorData
         };
     }

@@ -1,0 +1,42 @@
+.roll-result-chat {
+  display: flex;
+  flex-direction: column;
+
+  .header {
+    display: grid;
+    grid-template-columns: 48px 1fr 48px;
+    grid-template-areas: "icon label";
+    align-items: center;
+
+    .label {
+      grid-area: label;
+      font-size: 20px;
+      text-align: center;
+      justify-self: center;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      grid-area: icon;
+    }
+  }
+
+  .roll-result {
+    font-size: 15px;
+    text-align: center;
+  }
+
+  .additional-roll {
+
+    .label {;
+      font-size: 17px;
+      text-align: center;
+    }
+
+    .item {
+      font-size: 15px;
+      text-align: center;
+    }
+  }
+}

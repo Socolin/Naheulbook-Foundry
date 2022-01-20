@@ -101,6 +101,20 @@ export class Item {
         }
         return damage;
     }
+
+    public getRollFormula(): string {
+        let formula = '';
+        if (this.template.data.damageDice) {
+            formula += this.template.data.damageDice + 'd6';
+        }
+        if (this.template.data.bonusDamage) {
+            if (formula) {
+                formula += '+';
+            }
+            formula += this.template.data.bonusDamage;
+        }
+        return formula;
+    }
 }
 
 export class PartialItem {

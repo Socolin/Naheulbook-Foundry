@@ -1,4 +1,5 @@
 import {BaseStatsActorProperties} from './base-stats-actor-properties';
+import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
 
 export interface CharacterActorProperties {
     type: 'character';
@@ -12,5 +13,5 @@ export interface CharacterActorData extends BaseStatsActorProperties {
     cha: { value: number }
     ad: { value: number }
     fo: { value: number }
-    weaponDamages: { [weaponName: string]: string };
+    weapons: CharacterWeaponDamage[];
 }

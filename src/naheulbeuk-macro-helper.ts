@@ -1,20 +1,20 @@
 export class NaheulbeukMacroHelper {
     _defaultCriticsScoresDefinition = {
-        1: 'epic-success',
-        20: 'epic-fail'
+        1: 'criticalSuccess',
+        20: 'epicFail'
     };
 
     _parryCriticsScoresDefinition = {
-        1: 'epic-success',
-        2: 'epic-success',
-        20: 'epic-fail'
+        1: 'criticalSuccess',
+        2: 'criticalSuccess',
+        20: 'epicFail'
     }
 
     /**
      * @param {number} rollResult
      * @param {number}  targetScore
-     * @param {Object.<number, 'epic-success'|'epic-fail'>} criticsScoresDefinition
-     * @return {'success'|'fail'|'epic-success'|'epic-fail'}
+     * @param {Object.<number, 'criticalSuccess'|'epicFail'>} criticsScoresDefinition
+     * @return {'success'|'fail'|'criticalSuccess'|'epicFail'}
      */
     getRollState(rollResult, targetScore, criticsScoresDefinition) {
         if (rollResult in criticsScoresDefinition)
@@ -29,7 +29,7 @@ export class NaheulbeukMacroHelper {
 
     /**
      * @param {string} skillName
-     * @param {('success'|'fail'|'epic-success'|'epic-fail')} status
+     * @param {('success'|'fail'|'criticalSuccess'|'epicFail')} status
      * @return {string}
      */
     formatTestResult(skillName, status) {
@@ -38,22 +38,22 @@ export class NaheulbeukMacroHelper {
                 return '<span style="color: darkgreen; font-weight: bold">Succès</span>';
             case 'fail':
                 return '<span style="color: darkred; font-weight: bold">Échec</span>';
-            case 'epic-fail':
+            case 'epicFail':
                 return '<span style="color: darkred; font-weight: bold">Échec critique</span>';
-            case 'epic-success':
+            case 'criticalSuccess':
                 return '<span style="color: darkgreen; font-weight: bold">Succès critique</span>';
         }
     }
 
     /**
-     * @param {('success'|'fail'|'epic-success'|'epic-fail')} status
+     * @param {('success'|'fail'|'criticalSuccess'|'epicFail')} status
      * @return {boolean}
      */
     isSuccess(status) {
-        return status === 'success' || status === 'epic-success';
+        return status === 'success' || status === 'criticalSuccess';
     }
 
-    async rollSkillCheck(skillName: string, targetScore: number, criticsScoresDefinition = this._defaultCriticsScoresDefinition): Promise<"success" | "fail" | "epic-success" | "epic-fail"> {
+    async rollSkillCheck(skillName: string, targetScore: number, criticsScoresDefinition = this._defaultCriticsScoresDefinition): Promise<"success" | "fail" | "criticalSuccess" | "epicFail"> {
         const roll = new Roll(`1d20`);
         await roll.roll({async: true});
 
@@ -89,7 +89,7 @@ export class NaheulbeukMacroHelper {
     /**
      * @param {string} parryMessage
      * @param {number} targetScore
-     * @return {Promise<"success"|"fail"|"epic-success"|"epic-fail">}
+     * @return {Promise<"success"|"fail"|"criticalSuccess"|"epicFail">}
      */
     rollParry(parryMessage, targetScore) {
         return this.rollSkillCheck(parryMessage, targetScore, this._parryCriticsScoresDefinition);
@@ -99,7 +99,7 @@ export class NaheulbeukMacroHelper {
      * @param {string} attackName
      * @param {number} targetScore
      * @param {string} damageDice
-     * @return {Promise<"success"|"fail"|"epic-success"|"epic-fail">}
+     * @return {Promise<"success"|"fail"|"criticalSuccess"|"epicFail">}
      */
     async rollAttack(attackName, targetScore, damageDice) {
         const actionResult = await this.rollSkillCheck(attackName, targetScore);
@@ -110,20 +110,20 @@ export class NaheulbeukMacroHelper {
     }
 
     /**
-     * @param {('success'|'fail'|'epic-success'|'epic-fail')} resultState
+     * @param {('success'|'fail'|'criticalSuccess'|'epicFail')} resultState
      */
     playEpicSoundIfNeeded(resultState) {
-        if (resultState === 'epic-success') {
+        if (resultState === 'criticalSuccess') {
             AudioHelper.play({
                 src: 'systems/naheulbook/assets/sounds/critical-success.mp3',
-                volume: 0.33,
+                volume: 0.20,
                 loop: false,
                 autoplay: true
             }, true);
-        } else if (resultState === 'epic-fail') {
+        } else if (resultState === 'epicFail') {
             AudioHelper.play({
                 src: 'systems/naheulbook/assets/sounds/epic-fail.mp3',
-                volume: 0.33,
+                volume: 0.20,
                 loop: false,
                 autoplay: true
             }, true);

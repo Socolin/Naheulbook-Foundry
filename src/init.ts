@@ -3,8 +3,8 @@ import {createNaheulbeukDefaultMacros} from "./macro.js";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
 import {NaheulbookActor} from './models/actor/naheulbook-actor';
-import {MonsterActorSheet} from './sheets/monster-actor-sheet';
-import {CharacterActorSheet} from './sheets/character-actor-sheet';
+import {MonsterActorSheet} from './ui/sheets/monster-actor-sheet';
+import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 
 console.warn('Naheulbook | Starting')
 
