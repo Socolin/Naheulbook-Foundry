@@ -50,7 +50,7 @@ export class NaheulbookActor extends Actor {
         await this.rollSkill(
             'Attaque',
             'systems/naheulbook/assets/macro-icons/saber-slash.svg',
-            this.data.data.at.value,
+            this.data.data.at,
             {
                 label: 'Dégâts: ' + damageRoll.total! + (weapon.damageType ? `(${weapon.damageType})` : ''),
                 item: weapon.name,
@@ -60,20 +60,27 @@ export class NaheulbookActor extends Actor {
     }
 
     async rollParry() {
-        await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.data.data.prd.value)
+        await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.data.data.prd)
     }
 
-    async rollCustomSkill(name: string, icon: string, statName: string, testModifier: number, damage?: {rollFormula: string, item: string, label: string}) {
-        if (!damage) {
-            return this.rollSkill(name, icon, this.data.data[statName].value);
+    async rollCustomSkill(name: string, icon: string | undefined, statName: string, testModifier: number, extra?: { rollFormula: string, item: string, label: string }) {
+        icon = icon || 'systems/naheulbook/assets/macro-icons/dice20.svg';
+
+        if (!(statName in this.data.data))
+            throw new Error(`Stat ${statName} is not available for actor data ${this.name} (${this.id}). Available are: ${Object.keys(this.data.data).join(',')}`);
+
+        let successValue = +this.data.data[statName] + testModifier;
+
+        if (!extra) {
+            return this.rollSkill(name, icon, successValue);
         }
 
-        let damageRoll = new Roll(damage.rollFormula);
+        let damageRoll = new Roll(extra.rollFormula);
         await damageRoll.roll({async: true});
 
-        await this.rollSkill(name, icon, this.data.data[statName].value, {
-            label: damage.label + damageRoll.total!,
-            item: damage.item,
+        await this.rollSkill(name, icon, successValue, {
+            label: extra.label + damageRoll.total!,
+            item: extra.item,
             roll: damageRoll
         })
     }

@@ -35,53 +35,29 @@
         </div>
 
         <div class="tab attributes" data-group="primary" data-tab="attributes">
-            <section class="combat">
-                <div class="attribute">
-                    <span>AT:</span>
-                    <input type="text" name="data.at.value" value="{{actor.data.data.at.value}}" data-dtype="Number"
-                           {{#if isSynced}}disabled{{/if}}/>
-                </div>
-                <div class="attribute">
-                    <span>PRD:</span>
-                    <input type="text" name="data.prd.value" value="{{actor.data.data.prd.value}}" data-dtype="Number"
-                           {{#if isSynced}}disabled{{/if}}/>
-                </div>
-                <div class="attribute">
-                    <span>PR:</span>
-                    <input type="text" name="data.pr.value" value="{{actor.data.data.pr.value}}" data-dtype="Number"
-                           {{#if isSynced}}disabled{{/if}}/>
-                </div>
-            </section>
-
-            {{#ifeq actor.type "character"}}
-                <section class="stats">
-                    <div class="attribute">
-                        <span>COU:</span>
-                        <input type="text" name="data.cou.value" value="{{actor.data.data.cou.value}}"
-                               data-dtype="Number" {{#if isSynced}}disabled{{/if}}/>
-                    </div>
-                    <div class="attribute">
-                        <span>INT:</span>
-                        <input type="text" name="data.int.value" value="{{actor.data.data.int.value}}"
-                               data-dtype="Number" {{#if isSynced}}disabled{{/if}}/>
-                    </div>
-                    <div class="attribute">
-                        <span>CHA:</span>
-                        <input type="text" name="data.cha.value" value="{{actor.data.data.cha.value}}"
-                               data-dtype="Number" {{#if isSynced}}disabled{{/if}}/>
-                    </div>
-                    <div class="attribute">
-                        <span>AD:</span>
-                        <input type="text" name="data.ad.value" value="{{actor.data.data.ad.value}}"
-                               data-dtype="Number" {{#if isSynced}}disabled{{/if}}/>
-                    </div>
-                    <div class="attribute">
-                        <span>FO:</span>
-                        <input type="text" name="data.fo.value" value="{{actor.data.data.fo.value}}"
-                               data-dtype="Number" {{#if isSynced}}disabled{{/if}}/>
-                    </div>
+            {{#each statsByGroup as |statGroup|}}
+                <section class="{{@key}}">
+                    <h3>{{statGroup.label}}</h3>
+                    <section class="stats">
+                        {{#each statGroup.stats as |stat|}}
+                            <div class="attribute" data-stat-display-name="{{stat.name}}" data-stat-name="{{stat.stat}}">
+                                <span class="label">{{stat.name}} <span class="shortName">({{stat.stat}})</span></span>
+                                <input class="value" type="text" name="data.at" value="{{lookup ../../actor.data.data stat.stat}}"
+                                       data-dtype="Number" {{#if ../../isSynced}}disabled{{/if}}/>
+                                {{#if stat.canUseForSkill}}
+                                    <span class="actions">
+                                        <a data-stat-action="test" title="Lancer les dé"><i class="fa fa-dice"></i></a>
+                                        <a data-stat-action="macro" title="Créer une macro"><i class="fa fa-cog"></i></a>
+                                    </span>
+                                {{/if}}
+                            </div>
+                        {{/each}}
+                    </section>
                 </section>
-            {{/ifeq}}
+                {{#if (not @last)}}
+                    <div class="separator"></div>
+                {{/if}}
+            {{/each}}
         </div>
 
         <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">

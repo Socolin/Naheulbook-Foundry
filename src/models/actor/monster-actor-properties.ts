@@ -17,8 +17,8 @@ export interface MonsterDamage {
 
 export interface MonsterActorData extends BaseStatsActorProperties {
     naheulbookMonsterId: number;
-    cou: { value: number },
-    chercheNoise: { value: boolean }
+    cou: number;
+    chercheNoise: boolean;
     damages: MonsterDamage[];
 }
 

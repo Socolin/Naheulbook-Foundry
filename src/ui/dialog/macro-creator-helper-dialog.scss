@@ -1,0 +1,28 @@
+.macro-creator-helper-dialog {
+
+  .test-action {
+    margin-block: 8px;
+  }
+
+  .content {
+    .header {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: flex-start;
+      column-gap: 8px;
+    }
+    .field {
+      display: grid;
+      grid-template-rows:auto auto;
+      align-items: center;
+    }
+
+    .field-checkbox {
+      margin-block: 4px;
+      display: grid;
+      grid-template-columns: auto auto;
+      align-items: center;
+      justify-content: flex-start;
+    }
+  }
+}

@@ -187,18 +187,21 @@ export class CharacterConnector {
                     max: character.computedData.stats['EA']
                 },
 
-                at: {value: character.computedData.stats['AT']},
-                prd: {value: character.computedData.stats['PRD']},
-                pr: {value: character.computedData.stats['PR']},
-                pr_magic: {value: character.computedData.stats['PR_MAGIC']},
-                esq: {value: character.computedData.stats['ESQ']},
-                resm: {value: character.computedData.stats['RESM']},
+                at: character.computedData.stats['AT'],
+                prd: character.computedData.stats['PRD'],
+                pr: character.computedData.stats['PR'],
+                pr_magic: character.computedData.stats['PR_MAGIC'],
+                esq: character.computedData.stats['ESQ'],
 
-                ad: {value: character.computedData.stats['AD']},
-                int: {value: character.computedData.stats['INT']},
-                cha: {value: character.computedData.stats['CHA']},
-                fo: {value: character.computedData.stats['FO']},
-                cou: {value: character.computedData.stats['COU']},
+                resm: character.computedData.stats['RESM'],
+                mpsy: character.computedData.stats['MPSY'],
+                mphys: character.computedData.stats['MPHYS'],
+
+                ad: character.computedData.stats['AD'],
+                int: character.computedData.stats['INT'],
+                cha: character.computedData.stats['CHA'],
+                fo: character.computedData.stats['FO'],
+                cou: character.computedData.stats['COU'],
 
                 weapons: character.computedData.weaponsDamages
             } as CharacterActorData

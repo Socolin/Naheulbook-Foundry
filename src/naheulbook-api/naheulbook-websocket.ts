@@ -1,8 +1,7 @@
 import * as signalR from '@microsoft/signalr';
 import {WsMessage} from './naheulbook-api';
-import {NaheulbookHttpApi} from './naheulbook-http-api';
 import {Character} from './models/character.model';
-import {HubConnection} from '@microsoft/signalr';
+import {HubConnection, IHttpConnectionOptions} from '@microsoft/signalr';
 import {Monster} from './models/monster.model';
 import {NaheulbookDataApi} from './naheulbook-data-api';
 
@@ -64,8 +63,8 @@ export class NaheulbookWebsocket {
         let connection = new signalR.HubConnectionBuilder()
             .withUrl(this.naheulbookHost + "/ws/listen", {
                 accessTokenFactory: () => authorizationHeader,
-                withCredentials: false
-            })
+                withCredentials: false,
+            } as IHttpConnectionOptions)
             .withAutomaticReconnect()
             .configureLogging(signalR.LogLevel.Information)
             .build()
@@ -101,11 +100,11 @@ export class NaheulbookWebsocket {
     }
 
     private async sendSyncMessage(type: string, id: number): Promise<any> {
-        await this.connection.send('Subscribe' + type, id);
+        await this.connection!.send('Subscribe' + type, id);
     }
 
     private async sendUnsubscribeMessage(type: string, id: number): Promise<any> {
-        await this.connection.send('Unsubscribe' + type, id);
+        await this.connection!.send('Unsubscribe' + type, id);
     }
 
     public getAuthorizationToken(): string | undefined {

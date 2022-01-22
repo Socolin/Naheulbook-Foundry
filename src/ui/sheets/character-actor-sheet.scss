@@ -55,18 +55,35 @@
       overflow-y: auto;
     }
 
-    .combat {
-      display: grid;
-      grid-template-columns: auto auto auto;
-    }
-
     .attributes {
       .attribute {
         display: grid;
         align-items: center;
-        grid-template-columns: 50px 50px;
+        grid-template-columns: 250px 50px auto;
+        margin-bottom: 4px;
+
+        .actions {
+          > a > i {
+            font-size: 20px;
+            opacity: 0.7;
+          }
+        }
+      }
+
+      .shortName {
+        text-transform: uppercase;
+      }
+
+      .separator {
+        margin-top: 4px;
+        height: 1px;
+        background-color: black;
+        opacity: 0.25;
+        width: 480px;
+        margin-bottom: 4px;
       }
     }
+
   }
 
   .editor, .editor-content {

@@ -32,6 +32,7 @@ export class NaheulbookDataApi {
             dict[job.id] = job;
             return dict
         }, {} as JobDictionary);
+        return this.jobsById;
     }
 
     async getJobs(): Promise<Job[]> {

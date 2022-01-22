@@ -1,9 +1,9 @@
-import {createNaheulbeukDefaultMacros} from "./macro.js";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
 import {NaheulbookActor} from './models/actor/naheulbook-actor';
 import {MonsterActorSheet} from './ui/sheets/monster-actor-sheet';
 import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
+import {MacroUtil} from './utils/macro-util';
 
 console.warn('Naheulbook | Starting')
 
@@ -27,7 +27,7 @@ Hooks.once("init", async function () {
 
 
 Hooks.once("ready", async function () {
-    await createNaheulbeukDefaultMacros();
+    await MacroUtil.createNaheulbeukDefaultMacros();
 
     let naheulbookConnector = new NaheulbookConnector(NaheulbookConfig.instance);
     naheulbookConnector.init();

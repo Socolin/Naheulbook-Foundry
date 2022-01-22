@@ -22,46 +22,22 @@
           "value": 1,
           "max": 3
         },
-        "at": {
-          "value": 8
-        },
-        "prd": {
-          "value": 10
-        },
-        "pr": {
-          "value": 0
-        },
-        "pr_magic": {
-          "value": 0
-        },
-        "esq": {
-          "value": 0
-        },
-        "resm": {
-          "value": 0
-        }
+        "at": 8,
+        "prd": 10,
+        "pr": 0,
+        "pr_magic": 0,
+        "esq": 0,
+        "resm": 0
       },
       "characterStats": {
-        "cou": {
-          "value": 10
-        },
-        "int": {
-          "value": 10
-        },
-        "cha": {
-          "value": 10
-        },
-        "ad": {
-          "value": 10
-        },
-        "fo": {
-          "value": 10
-        }
+        "cou": 10,
+        "int": 10,
+        "cha": 10,
+        "ad": 10,
+        "fo": 10
       },
       "monsterStats": {
-        "cou": {
-          "value": 10
-        },
+        "cou": 10,
         "chercheNoise": {
           "value": false
         }

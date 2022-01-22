@@ -1,0 +1,52 @@
+<div class="naheulbook-dialog macro-creator-helper-dialog">
+    <h2>
+        Création d'une macro
+    </h2>
+    <div class="content">
+        <div class="header">
+            <img src="{{data.icon}}" data-action="selectImg" title="Icône" height="100" width="100"/>
+            <div>
+                <div class="field">
+                    <label class="label">Nom de la macro</label>
+                    <input type="text" data-field-edit value="{{data.name}}" name="name">
+                </div>
+            </div>
+        </div>
+        <div class="field">
+            <label class="label">Statistique</label>
+            <input type="text" data-field-edit value="{{data.stat}}" name="stat">
+        </div>
+        <div class="field">
+            <label class="label">Message</label>
+            <input type="text" data-field-edit value="{{data.label}}" name="label">
+        </div>
+        <div class="field">
+            <label class="label">Modificateur (pour les tests du style AD+2 / AD-5, écrire 2 ou -5)</label>
+            <input type="number" data-dtype="number" data-field-edit value="{{data.testModifier}}" name="testModifier">
+        </div>
+        <label class="field-checkbox" data-action="enableExtraRoll">
+            <input type="checkbox" {{#if data.extraRoll}}checked{{/if}} />
+            Dégâts / soin ou autre jet additionnel
+        </label>
+
+        {{#if data.extraRoll}}
+            <div class="field">
+                <label class="label">Formule (ex: 1d6+2)</label>
+                <input type="text" data-field-edit value="{{data.extraRoll.rollFormula}}" name="extraRoll.rollFormula">
+            </div>
+            <div class="field">
+                <label class="label">Titre</label>
+                <input type="text" data-field-edit value="{{data.extraRoll.label}}" name="extraRoll.label">
+            </div>
+            <div class="field">
+                <label class="label">Description</label>
+                <input type="text" data-field-edit value="{{data.extraRoll.item}}" name="extraRoll.item">
+            </div>
+        {{/if}}
+    </div>
+    <button class="test-action" data-action="test">Tester</button>
+    <div class="actions">
+        <button data-dialog-action="cancel">Annuler</button>
+        <button data-dialog-action="confirm" {{#if (not ready)}}disabled{{/if}}>Valider</button>
+    </div>
+</div>

@@ -8,10 +8,12 @@ export interface BaseStatsActorProperties {
         max: number;
     },
 
-    at: { value: number; },
-    prd: { value: number; },
-    pr: { value: number; },
-    pr_magic: { value: number; },
-    esq: { value: number; },
-    resm: { value: number; }
+    at: number;
+    prd: number;
+    pr: number;
+    pr_magic: number;
+    esq: number;
+    resm: number;
+    mpsy: number;
+    mphys: number;
 }

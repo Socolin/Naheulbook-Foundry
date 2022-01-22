@@ -267,15 +267,17 @@ export class MonsterConnector {
 
         return {
             naheulbookMonsterId: monster.id,
-            at: {value: monster.computedData.at},
-            prd: {value: monster.computedData.prd},
-            esq: {value: monster.computedData.esq},
-            pr: {value: monster.computedData.pr},
-            pr_magic: {value: monster.computedData.pr_magic},
+            at: monster.computedData.at,
+            prd: monster.computedData.prd,
+            esq: monster.computedData.esq,
+            pr: monster.computedData.pr,
+            pr_magic: monster.computedData.pr_magic,
             damages: this.parseDamages(monster),
-            cou: {value: monster.computedData.cou},
-            chercheNoise: {value: monster.computedData.chercheNoise},
-            resm: {value: monster.computedData.resm},
+            cou: monster.computedData.cou,
+            chercheNoise: monster.computedData.chercheNoise,
+            mphys: 0,
+            mpsy: 0,
+            resm: monster.computedData.resm,
             ev: {
                 value: monster.data.ev,
                 max: monster.data.maxEv

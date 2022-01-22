@@ -10,11 +10,11 @@ export interface CharacterActorProperties {
 
 export interface CharacterActorData extends BaseStatsActorProperties {
     naheulbookCharacterId?: number;
-    cou: { value: number }
-    int: { value: number }
-    cha: { value: number }
-    ad: { value: number }
-    fo: { value: number }
+    cou: number;
+    int: number;
+    cha: number;
+    ad: number;
+    fo: number;
     weapons: CharacterWeaponDamage[];
 }
 

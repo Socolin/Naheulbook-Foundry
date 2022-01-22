@@ -31,13 +31,13 @@ export class NaheulbookHttpApi {
         };
         if (body !== undefined) {
             requestInit.body = JSON.stringify(body);
-            requestInit.headers['Content-Type'] = 'application/json';
+            requestInit.headers!['Content-Type'] = 'application/json';
         }
         let result = await fetch(this.naheulbookHost + path, requestInit);
 
         if (result.ok) {
             if (result.status === 204)
-                return;
+                return undefined as any;
             return await result.json();
         }
 

@@ -27,7 +27,7 @@ export class StatModifier {
     }
 }
 
-export function formatModifierValue(modifier) {
+export function formatModifierValue(modifier: StatModifier) {
     if (modifier.type === undefined || modifier.type === 'ADD') {
         if (modifier.value <= 0) {
             return modifier.value;
