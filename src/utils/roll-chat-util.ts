@@ -1,9 +1,9 @@
 import {inject, singleton} from 'tsyringe';
-import {RollUtil, RollResult} from './roll-util';
-import {RolledRoll} from './roll-factory';
+import {RollResult, RollUtil} from './roll-util';
+import {Evaluated} from './roll-factory';
 
-export type AdditionalRoll = { label: string, item?: string, roll: RolledRoll };
-export type TestRoll = { result: RollResult, total: number, successValue: number, roll: RolledRoll };
+export type AdditionalRoll = { label: string, item?: string, roll: Evaluated<Roll> };
+export type TestRoll = { result: RollResult, total: number, successValue: number, roll: Evaluated<Roll> };
 
 @singleton()
 export class RollChatUtil {

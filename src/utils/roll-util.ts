@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import {RolledRoll} from './roll-factory';
+import {Evaluated} from './roll-factory';
 
 export type RollResult = 'epicFail' | 'fail' | 'success' | 'criticalSuccess';
 
@@ -79,7 +79,7 @@ export class RollUtil {
         return result.substring(0, totalIndex) + result.substring(endTotalIndex);
     }
 
-    mergeRolls(rolls: RolledRoll[]): Roll {
+    mergeRolls(rolls: Evaluated<Roll>[]): Roll {
         let groupedRoll = new Roll('').toJSON();
         groupedRoll.terms = [PoolTerm.fromRolls(rolls)];
         groupedRoll.dice = []
