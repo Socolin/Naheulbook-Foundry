@@ -308,8 +308,10 @@ export class MonsterConnector {
 
     private readonly rollWithNameRegex = /^(?<rollFormula>\d+\s*D\s*(?:\+\s*\d+))\s*\(\s*(?<name>[\w\s]+)\s*\)$/;
     private parseMonsterDamage(damage: string): [rollFormula: string, name?: string] {
-        if (damage.match(/^\d+\s*D\s*(\+\s*\d+)$/))
-            return [damage.replace('D', 'd6')];
+        if (damage.match(/^\d+\s*[dD]\s*(\+\s*\d+)$/))
+            return [damage.replace('d', 'd6').replace('D', 'd6')];
+        if (damage.match(/^\d+\s*d6\s*(\+\s*\d+)$/))
+            return [damage];
         let matchRollWithName = damage.match(this.rollWithNameRegex)
         if (matchRollWithName) {
             let rollFormula = matchRollWithName[1].replace('D', 'd6');
