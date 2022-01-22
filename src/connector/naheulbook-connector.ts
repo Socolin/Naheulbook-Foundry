@@ -2,64 +2,39 @@ import {MonsterConnector} from "./monster-connector.js";
 import {NaheulbookLogger} from "../utils/naheulbook-logger.js";
 import {CharacterConnector} from "./character-connector.js";
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
+import {NaheulbookConfig} from '../naheulbook-config';
+import {inject, singleton} from 'tsyringe';
 
+@singleton()
 export class NaheulbookConnector {
-    /**
-     * @type NaheulbookLogger
-     * @private
-     */
-    _logger;
+    private monsterConnector?: MonsterConnector;
+    private characterConnector?: CharacterConnector;
+    private nhbkApi?: NaheulbookApi;
 
-    /**
-     * @type {MonsterConnector|undefined}
-     * @private
-     */
-    _monsterConnector;
-
-    /**
-     * @type {CharacterConnector|undefined}
-     * @private
-     */
-    _characterConnector;
-
-    /**
-     * @type NaheulbookConfig
-     * @private
-     */
-    _config;
-
-    /**
-     * @type {NaheulbookApi|undefined}
-     * @private
-     */
-    _nhbkApi;
-
-    /**
-     * @param {NaheulbookConfig} config
-     */
-    constructor(config) {
-        this._config = config;
-        this._logger = new NaheulbookLogger();
+    constructor(
+        @inject(NaheulbookConfig) private readonly config: NaheulbookConfig,
+        @inject(NaheulbookLogger) private readonly logger: NaheulbookLogger,
+        @inject(Game) private readonly game: Game,
+    ) {
     }
 
     init() {
-        Hooks.on('naheulbookConfig', async (config) => {
-            this._config = config;
-            if (this._nhbkApi) {
+        Hooks.on('naheulbookConfig', async (_config) => {
+            if (this.nhbkApi) {
                 await this.disconnect();
                 await this.connect();
             }
         })
 
         Hooks.on('renderPlayerList', (playerList, div, userData) => {
-            if (game.user!.role === CONST.USER_ROLES.GAMEMASTER) {
+            if (this.game.user!.role === CONST.USER_ROLES.GAMEMASTER) {
                 return;
             }
             const gameMasterOnline = userData.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)
-            if (this._nhbkApi && gameMasterOnline) {
+            if (this.nhbkApi && gameMasterOnline) {
                 // Game master just connect, disconnect to avoid duplicate notification
                 this.disconnect();
-            } else if (!this._nhbkApi && !gameMasterOnline) {
+            } else if (!this.nhbkApi && !gameMasterOnline) {
                 // Game master disconnected, let's connect
                 this.connect();
             }
@@ -67,44 +42,44 @@ export class NaheulbookConnector {
     }
 
     async disconnect() {
-        this._monsterConnector?.disable();
-        this._monsterConnector = undefined;
-        this._characterConnector?.disable();
-        this._characterConnector = undefined;
-        this._nhbkApi?.disconnect();
-        this._nhbkApi = undefined;
+        this.monsterConnector?.disable();
+        this.monsterConnector = undefined;
+        this.characterConnector?.disable();
+        this.characterConnector = undefined;
+        this.nhbkApi?.disconnect();
+        this.nhbkApi = undefined;
     }
 
     async connect() {
-        this._logger.info('Connecting to naheulbook...', this._config);
-        if (this._nhbkApi) {
+        this.logger.info('Connecting to naheulbook...', this.config);
+        if (this.nhbkApi) {
             return;
         }
 
-        if (game.user!.role !== CONST.USER_ROLES.GAMEMASTER) {
-            if (game.users!.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
-                this._logger.info('A GM is already connected, skip naheulbook sync');
+        if (this.game.user!.role !== CONST.USER_ROLES.GAMEMASTER) {
+            if (this.game.users!.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
+                this.logger.info('A GM is already connected, skip naheulbook sync');
                 return;
             }
         }
 
-        this._nhbkApi = NaheulbookApi.create(this._config.naheulbookHost, this._config.accessKey);
-        await this._nhbkApi.init();
+        this.nhbkApi = NaheulbookApi.create(this.config.naheulbookHost, this.config.accessKey);
+        await this.nhbkApi.init();
 
-        this._logger.info('Connected to Naheulbook');
+        this.logger.info('Connected to Naheulbook');
 
-        this._monsterConnector = new MonsterConnector(this._nhbkApi, this._logger);
-        this._monsterConnector.enable();
+        this.monsterConnector = new MonsterConnector(this.nhbkApi, this.logger);
+        this.monsterConnector.enable();
 
-        await this._monsterConnector.synchronizeGroupMonsters(this._config.groupId);
-        await this._monsterConnector.synchronizeExistingMonstersActors();
+        await this.monsterConnector.synchronizeGroupMonsters(this.config.groupId);
+        await this.monsterConnector.synchronizeExistingMonstersActors();
 
-        this._characterConnector = new CharacterConnector(this._nhbkApi, this._logger);
-        this._characterConnector.enable();
+        this.characterConnector = new CharacterConnector(this.nhbkApi, this.logger);
+        this.characterConnector.enable();
 
-        await this._characterConnector.synchronizeGroupCharacters(this._config.groupId);
-        await this._characterConnector.synchronizeExistingCharactersActors();
+        await this.characterConnector.synchronizeGroupCharacters(this.config.groupId);
+        await this.characterConnector.synchronizeExistingCharactersActors();
 
-        this._logger.info('Sync to Naheulbook completed');
+        this.logger.info('Sync to Naheulbook completed');
     }
 }

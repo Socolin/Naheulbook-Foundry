@@ -19,6 +19,8 @@
     "@microsoft/signalr": "^5.0.0",
     "@sentry/browser": "^6.16.1",
     "@sentry/tracing": "^6.16.1",
-    "rxjs": "^6.6.3"
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^6.6.3",
+    "tsyringe": "^4.6.0"
   }
 }

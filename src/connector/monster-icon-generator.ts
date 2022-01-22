@@ -1,24 +1,18 @@
+import {Monster} from '../naheulbook-api/models/monster.model';
+
 export class MonsterIconGenerator {
-    /**
-     * @type {Promise<HTMLImageElement>}
-     * @private
-     */
-    _icon;
+    private readonly icon: Promise<HTMLImageElement>;
 
     constructor() {
         const imageElement = new Image();
-        this._icon = new Promise(((resolve, _) => {
+        this.icon = new Promise(((resolve, _) => {
             imageElement.onload = () => resolve(imageElement);
         }));
         imageElement.src = 'systems/naheulbook/assets/images/monster.svg';
     }
 
-    /**
-     * @param {Monster} monster
-     * @returns {Promise<string>}
-     */
-    async createMonsterIcon(monster) {
-        let icon = await this._icon;
+    async createMonsterIcon(monster: Monster): Promise<string> {
+        let icon = await this.icon;
 
         let canvas = document.createElement("canvas");
         canvas.width = 100;
@@ -53,11 +47,7 @@ export class MonsterIconGenerator {
         return canvas.toDataURL("image/png");
     }
 
-    /**
-     * @param {string} color
-     * @returns {Promise<string>}
-     */
-    async createMonsterEffectIconColor(color) {
+    async createMonsterEffectIconColor(color: string): Promise<string> {
         let monsterColor = color ? `#${color}` : 'black';
 
         let canvas = document.createElement("canvas");
@@ -77,11 +67,7 @@ export class MonsterIconGenerator {
         return canvas.toDataURL("image/png");
     }
 
-    /**
-     * @param {number} monsterNumber
-     * @returns {Promise<string>}
-     */
-    async createMonsterEffectIconNumber(monsterNumber) {
+    async createMonsterEffectIconNumber(monsterNumber: number): Promise<string | undefined> {
         if (!monsterNumber)
             return undefined;
 

@@ -1,7 +1,8 @@
+import {container} from "tsyringe";
 import {CharacterActorProperties} from './character-actor-properties';
 import {MonsterActorProperties, MonsterDamage} from './monster-actor-properties';
-import {RollHelper} from '../../utils/roll-helper';
-import {AdditionalRoll, RollMessageHelper} from '../../utils/roll-message-helper';
+import {RollUtil} from '../../utils/roll-util';
+import {AdditionalRoll, RollChatUtil} from '../../utils/roll-chat-util';
 import {DialogAwaiter} from '../../utils/dialog-awaiter';
 import {SelectWeaponDialog} from '../../ui/dialog/select-weapon-dialog';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
@@ -19,8 +20,15 @@ declare global {
 }
 
 export class NaheulbookActor extends Actor {
+    private readonly rollUtil: RollUtil;
+    private readonly rollChatUtil: RollChatUtil;
+    private readonly dialogAwaiter: DialogAwaiter;
+
     constructor(data, context) {
         super(data, context);
+        this.rollUtil = container.resolve(RollUtil)
+        this.rollChatUtil = container.resolve(RollChatUtil)
+        this.dialogAwaiter = container.resolve(DialogAwaiter)
     }
 
     async rollAttack(): Promise<void> {
@@ -29,13 +37,13 @@ export class NaheulbookActor extends Actor {
             if (this.data.data.weapons.length === 1) {
                 weapon = this.data.data.weapons[0];
             } else if (this.data.data.weapons.length > 1) {
-                weapon = await DialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: this.data.data.weapons});
+                weapon = await this.dialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: this.data.data.weapons});
             }
         } else if (this.data.type === 'monster') {
             if (this.data.data.damages.length === 1) {
                 weapon = this.data.data.damages[0];
             } else if (this.data.data.damages.length > 1) {
-                weapon = await DialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: this.data.data.damages});
+                weapon = await this.dialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: this.data.data.damages});
             }
         }
 
@@ -88,23 +96,23 @@ export class NaheulbookActor extends Actor {
     async rollSkill(name: string, icon: string, maxSuccessScore: number, additionalRoll?: AdditionalRoll) {
         let roll = new Roll('1d20');
         await roll.roll({async: true});
-        let result = RollHelper.getRollResult(roll.total!, maxSuccessScore);
+        let result = this.rollUtil.getRollResult(roll.total!, maxSuccessScore);
 
         let rolls = [roll];
         if (additionalRoll)
             rolls.push(additionalRoll.roll);
         let message = await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({actor: this}),
-            content: await RollMessageHelper.formatRollResult(
+            content: await this.rollChatUtil.formatRollResult(
                 name,
                 icon,
                 {roll: roll, successValue: maxSuccessScore, total: roll.total!, result: result},
                 additionalRoll
             ),
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-            roll: JSON.stringify(RollHelper.mergeRolls(rolls).toJSON()),
+            roll: JSON.stringify(this.rollUtil.mergeRolls(rolls).toJSON()),
         })
 
-        await RollHelper.playEpicSoundAfterMessage(result, message?.id);
+        await this.rollUtil.playEpicSoundAfterMessage(result, message?.id);
     }
 }

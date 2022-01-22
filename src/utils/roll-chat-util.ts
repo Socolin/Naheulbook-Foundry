@@ -1,13 +1,21 @@
-import {RollHelper, RollResult} from './roll-helper';
+import {inject, singleton} from 'tsyringe';
+import {RollUtil, RollResult} from './roll-util';
 
 export type AdditionalRoll = { label: string, item?: string, roll: Roll };
 export type TestRoll = { result: RollResult, total: number, successValue: number, roll: Roll };
 
-export class RollMessageHelper {
-    static async formatRollResult(label: string,
-                                  icon: string,
-                                  testRoll: TestRoll,
-                                  additionalRoll?: AdditionalRoll
+@singleton()
+export class RollChatUtil {
+    constructor(
+        @inject(RollUtil) private readonly rollUtil: RollUtil
+    ) {
+    }
+
+    async formatRollResult(
+        label: string,
+        icon: string,
+        testRoll: TestRoll,
+        additionalRoll?: AdditionalRoll
     ): Promise<string> {
         let message = '';
 
@@ -18,15 +26,15 @@ export class RollMessageHelper {
         message += `<img class="icon" src="${icon}" alt="icon">`;
         message += `</div>`;
 
-        message += `<div class="roll-result"><i class="fa fa-dice-d6"></i> ${testRoll.total} / ${testRoll.successValue} ${RollMessageHelper.getTestResultMessage(testRoll.result)}</div>`;
-        message += `<div class="roll">${await RollHelper.renderRollSmall(testRoll.roll)}</div>`;
+        message += `<div class="roll-result"><i class="fa fa-dice-d6"></i> ${testRoll.total} / ${testRoll.successValue} ${this.getTestResultMessage(testRoll.result)}</div>`;
+        message += `<div class="roll">${await this.rollUtil.renderRollSmall(testRoll.roll)}</div>`;
         if (additionalRoll) {
 
             message += `<div class="additional-roll">`;
             message += `<div class="label">${additionalRoll.label}</div>`;
             if (additionalRoll.item)
                 message += `<div class="item">${additionalRoll.item}</div>`;
-            message += `<div class="roll">${await RollHelper.renderRollSmall(additionalRoll.roll)}</div>`;
+            message += `<div class="roll">${await this.rollUtil.renderRollSmall(additionalRoll.roll)}</div>`;
             message += `</div>`;
         }
 
@@ -35,7 +43,7 @@ export class RollMessageHelper {
         return message;
     }
 
-    static getTestResultMessage(result: RollResult): string {
+    getTestResultMessage(result: RollResult): string {
         switch (result) {
             case 'criticalSuccess':
                 return `<span style="color: green; font-weight: bold">Succès critique</span>`;

@@ -1,3 +1,6 @@
+import {singleton} from 'tsyringe';
+
+@singleton()
 export class NaheulbookLogger {
     info(...data) {
         if (typeof data[0] === 'string') {

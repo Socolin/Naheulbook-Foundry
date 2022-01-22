@@ -1,6 +1,8 @@
 import {assertIsMonster} from '../../models/actor/monster-actor-properties';
+import {container} from 'tsyringe';
 import {MacroUtil} from '../../utils/macro-util';
 import ClickEvent = JQuery.ClickEvent;
+import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 
 export interface MonsterActorSheetData extends ActorSheet.Data {
     isGm: boolean;
@@ -11,13 +13,22 @@ export interface MonsterActorSheetData extends ActorSheet.Data {
 export class MonsterActorSheet<Options extends ActorSheet.Options = ActorSheet.Options>
     extends ActorSheet<Options, MonsterActorSheetData> {
 
+    private readonly macroUtil: MacroUtil;
+    private readonly game: Game;
+
+    constructor(actor: NaheulbookActor, options: Partial<Options>) {
+        super(actor, options);
+        this.macroUtil = container.resolve(MacroUtil);
+        this.game = container.resolve(Game)
+    }
+
     override getData(options?: Partial<Options>): Promise<MonsterActorSheetData> | MonsterActorSheetData {
         assertIsMonster(this.actor);
 
         return {
             ...super.getData(options),
             statsByGroup: statsByGroup,
-            isGm: !!game.user?.isGM,
+            isGm: !!this.game.user?.isGM,
             isSynced: !!this.actor.data.data.naheulbookMonsterId
         };
     }
@@ -36,7 +47,7 @@ export class MonsterActorSheet<Options extends ActorSheet.Options = ActorSheet.O
                     await this.actor.rollCustomSkill(stateDisplayName, undefined, stateName, 0);
                     break;
                 case 'macro':
-                    await MacroUtil.openMacroCreatorHelper(this.actor, stateName, stateDisplayName);
+                    await this.macroUtil.openMacroCreatorHelper(this.actor, stateName, stateDisplayName);
             }
         });
     }

@@ -1,14 +1,15 @@
+import './error-monitoring';
+import "reflect-metadata";
+import {container} from "tsyringe";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
 import {NaheulbookActor} from './models/actor/naheulbook-actor';
 import {MonsterActorSheet} from './ui/sheets/monster-actor-sheet';
 import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 import {MacroUtil} from './utils/macro-util';
-import {RollHelper} from './utils/roll-helper';
+import {RollUtil} from './utils/roll-util';
 
-console.info('Naheulbook | Starting')
-
-import './error-monitoring';
+console.info('Naheulbook | Starting');
 
 declare global {
     interface LenientGlobalVariableTypes {
@@ -24,34 +25,23 @@ Hooks.once("init", async function () {
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("naheulbook", CharacterActorSheet, {types: ['character'], makeDefault: true, label: 'Personnage'});
     Actors.registerSheet("naheulbook", MonsterActorSheet, {types: ['monster'], makeDefault: true, label: 'Monstre'});
-
-    NaheulbookConfig.registerConfigs();
 });
 
-
 Hooks.once("ready", async function () {
-    await MacroUtil.createNaheulbeukDefaultMacros();
+    container.register<Game>(Game, {useValue: game});
 
-    let naheulbookConnector = new NaheulbookConnector(NaheulbookConfig.instance);
+    let naheulbookConfig = container.resolve(NaheulbookConfig);
+    naheulbookConfig.registerConfigs();
+
+    let macroUtil = container.resolve(MacroUtil)
+    await macroUtil.createNaheulbeukDefaultMacros();
+
+    let naheulbookConnector = container.resolve(NaheulbookConnector)
     naheulbookConnector.init();
     await naheulbookConnector.connect();
 });
 
-Handlebars.registerHelper('ifeq', function (a, b, options) {
-    if (a == b) {
-        return options.fn(this);
-    }
-    return options.inverse(this);
-});
-
-Handlebars.registerHelper('ifnoteq', function (a, b, options) {
-    if (a != b) {
-        return options.fn(this);
-    }
-    return options.inverse(this);
-});
-
-
 Hooks.once('diceSoNiceReady', (dice3d) => {
-    RollHelper.useDiceSoNice(dice3d);
+    let rollUtil = container.resolve(RollUtil)
+    rollUtil.useDiceSoNice(dice3d);
 });
