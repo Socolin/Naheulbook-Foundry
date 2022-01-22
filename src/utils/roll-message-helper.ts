@@ -1,10 +1,13 @@
 import {RollHelper, RollResult} from './roll-helper';
 
+export type AdditionalRoll = { label: string, item?: string, roll: Roll };
+export type TestRoll = { result: RollResult, total: number, successValue: number, roll: Roll };
+
 export class RollMessageHelper {
     static async formatRollResult(label: string,
                                   icon: string,
-                                  testRoll: { result: RollResult, total: number, successValue: number, roll: Roll },
-                                  additionalRoll?: { label: string, item?: string, roll: Roll }
+                                  testRoll: TestRoll,
+                                  additionalRoll?: AdditionalRoll
     ): Promise<string> {
         let message = '';
 

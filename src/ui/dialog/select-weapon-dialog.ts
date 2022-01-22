@@ -38,7 +38,7 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
         return {
             ...super.defaultOptions,
             id: "select-weapon",
-            template: "systems/naheulbook/templates/dialog/select-weapon-dialog.hbs",
+            template: "systems/naheulbook/ui/dialog/select-weapon-dialog.hbs",
             title: "Choisir une arme",
             width: 400,
             popOut: true,

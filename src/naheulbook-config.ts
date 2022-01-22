@@ -1,16 +1,7 @@
 export class NaheulbookConfig {
-    /**
-     * @type string
-     */
-    naheulbookHost;
-    /**
-     * @type number
-     */
-    groupId;
-    /**
-     * @type string
-     */
-    accessKey;
+    naheulbookHost: string;
+    groupId: number;
+    accessKey: string;
 
     changeValue(valueName, value) {
         this[valueName] = value;
@@ -18,38 +9,24 @@ export class NaheulbookConfig {
         Hooks.call('naheulbookConfig', this);
     }
 
-    /**
-     * @return {NaheulbookConfig}
-     */
-    static loadConfiguration() {
+    static loadConfiguration(): NaheulbookConfig {
         let config = new NaheulbookConfig();
 
         config.naheulbookHost = game.settings.get("naheulbook", "naheulbookHost");
-        config.groupId = +game.settings.get("naheulbook", "groupId");
+        config.groupId = game.settings.get("naheulbook", "groupId");
         config.accessKey = game.settings.get("naheulbook", "accessKey");
 
         return config;
     }
 
-    /**
-     * @type NaheulbookConfig
-     * @private
-     */
-    static _instance;
-
-    /**
-     * @return {NaheulbookConfig}
-     */
-    static get instance() {
+    static _instance: NaheulbookConfig;
+    static get instance(): NaheulbookConfig {
         if (!NaheulbookConfig._instance)
             NaheulbookConfig._instance = NaheulbookConfig.loadConfiguration();
         return NaheulbookConfig._instance;
     }
 
-    /**
-     * @return void
-     */
-    static registerConfigs() {
+    static registerConfigs(): void {
         game.settings.register("naheulbook", "naheulbookHost", {
             name: "Naheulbook url",
             hint: "L'adresse du site à utiliser. Par exemple: https://naheulbook.fr",
@@ -66,7 +43,7 @@ export class NaheulbookConfig {
             scope: "world",
             config: true,
             type: Number,
-            default: "",
+            default: 0,
             onChange: value => NaheulbookConfig.instance.changeValue('groupId', value)
         });
 

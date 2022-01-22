@@ -38,7 +38,7 @@ async function createSampleAttackMacro() {
 }`;
 
     return await Macro.create({
-        name: 'Attaque' + game.user?.name,
+        name: 'Attaque',
         type: 'script',
         img: 'systems/naheulbook/assets/macro-icons/saber-slash.svg',
         command: command,
@@ -52,11 +52,11 @@ async function createSampleParryMacro() {
     const command = `if (!token) {
   ui.notifications.warn("Sélectionner un token avant d'exécuter cette macro");
 } else {
-  nhbkMacroHelper.rollParry("Parade", token.actor.data.data.prd.value);
+  token.actor.rollParry();
 }`;
 
     return await Macro.create({
-        name: 'Parade (exemple) ' + game.user?.name,
+        name: 'Parade',
         type: 'script',
         img: 'systems/naheulbook/assets/macro-icons/shield.svg',
         command: command,

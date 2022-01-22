@@ -1,11 +1,24 @@
+import {assertIsCharacter} from '../../models/actor/character-actor-properties';
+
 export interface CharacterActorSheetData extends ActorSheet.Data {
     isGm: boolean;
+    isSynced: boolean;
 }
 
 export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet.Options>
     extends ActorSheet<Options, CharacterActorSheetData> {
-    /** @override */
-    static get defaultOptions(): ActorSheet.Options {
+
+    override getData(options?: Partial<Options>): Promise<CharacterActorSheetData> | CharacterActorSheetData {
+        assertIsCharacter(this.actor);
+
+        return {
+            ...super.getData(options),
+            isGm: !!game.user?.isGM,
+            isSynced: !!this.actor.data.data.naheulbookCharacterId
+        };
+    }
+
+    static override get defaultOptions(): ActorSheet.Options {
         return {
             ...super.defaultOptions,
             template: "systems/naheulbook/ui/sheets/character-actor-sheet.hbs",
@@ -14,10 +27,5 @@ export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet
             tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}],
             dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
         }
-    }
-
-    /* @override */
-    getData(options?: Partial<Options>): Promise<CharacterActorSheetData> | CharacterActorSheetData {
-        return {...super.getData(options), isGm: !!game.user?.isGM};
     }
 }

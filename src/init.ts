@@ -1,4 +1,3 @@
-import {NaheulbeukMacroHelper} from './naheulbeuk-macro-helper.js';
 import {createNaheulbeukDefaultMacros} from "./macro.js";
 import {NaheulbookConnector} from "./connector/naheulbook-connector.js";
 import {NaheulbookConfig} from "./naheulbook-config.js";
@@ -22,8 +21,6 @@ Hooks.once("init", async function () {
     Actors.unregisterSheet("core", ActorSheet);
     Actors.registerSheet("naheulbook", CharacterActorSheet, {types: ['character'], makeDefault: true, label: 'Personnage'});
     Actors.registerSheet("naheulbook", MonsterActorSheet, {types: ['monster'], makeDefault: true, label: 'Monstre'});
-
-    (window as any).nhbkMacroHelper = new NaheulbeukMacroHelper();
 
     NaheulbookConfig.registerConfigs();
 });
@@ -50,3 +47,7 @@ Handlebars.registerHelper('ifnoteq', function (a, b, options) {
     }
     return options.inverse(this);
 });
+
+window.onerror = ((event, source, lineno, colno, error) => {
+    ui.notifications?.error(`Une erreur c'est produite. Voir la console [F12] pour plus d'informations: ${error?.message}`);
+})
