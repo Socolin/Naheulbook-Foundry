@@ -6,7 +6,9 @@ import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 import {MacroUtil} from './utils/macro-util';
 import {RollHelper} from './utils/roll-helper';
 
-console.warn('Naheulbook | Starting')
+console.info('Naheulbook | Starting')
+
+import './error-monitoring';
 
 declare global {
     interface LenientGlobalVariableTypes {
@@ -53,7 +55,3 @@ Handlebars.registerHelper('ifnoteq', function (a, b, options) {
 Hooks.once('diceSoNiceReady', (dice3d) => {
     RollHelper.useDiceSoNice(dice3d);
 });
-
-window.onerror = ((event, source, lineno, colno, error) => {
-    ui.notifications?.error(`Une erreur c'est produite. Voir la console [F12] pour plus d'informations: ${error?.message}`);
-})
