@@ -9,6 +9,7 @@ déjà présent dans Naheulbook.
 
 - Monstres et Personnages synchronisés entre Naheulbook et Foundry
 - Macros pour utiliser les effectuer les attaque / parade simplement
+
 ![Macro d'attaque](doc/images/macro-attack.png)
 ![Macro de parrade](doc/images/macro-parry.png)
 - Outil pour créer des macros simplement
