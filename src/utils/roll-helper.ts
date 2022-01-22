@@ -53,4 +53,21 @@ export class RollHelper {
         let endTotalIndex = result.indexOf('</h4>', totalIndex)
         return result.substring(0, totalIndex) + result.substring(endTotalIndex);
     }
+
+    static mergeRolls(rolls: Roll[]): Roll {
+        let groupedRoll = new Roll('').toJSON();
+        groupedRoll.terms = [PoolTerm.fromRolls(rolls)];
+        groupedRoll.dice = []
+        groupedRoll.evaluated = true;
+        groupedRoll.total = 0;
+
+        let formulas: string[] = [];
+        for (let roll of rolls) {
+            formulas.push(roll.formula);
+            groupedRoll.total += roll.total!;
+        }
+        groupedRoll.formula = `{${formulas.join(',')}}`;
+
+        return Roll.fromJSON(JSON.stringify(groupedRoll));
+    }
 }

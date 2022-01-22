@@ -90,13 +90,19 @@ export class NaheulbookActor extends Actor {
         await roll.roll({async: true});
         let result = RollHelper.getRollResult(roll.total!, maxSuccessScore);
 
+        let rolls = [roll];
+        if (additionalRoll)
+            rolls.push(additionalRoll.roll);
         await ChatMessage.create({
+            speaker: ChatMessage.getSpeaker({actor: this}),
             content: await RollMessageHelper.formatRollResult(
                 name,
                 icon,
                 {roll: roll, successValue: maxSuccessScore, total: roll.total!, result: result},
                 additionalRoll
-            )
+            ),
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            roll: JSON.stringify(RollHelper.mergeRolls(rolls).toJSON()),
         })
 
         RollHelper.playEpicSoundIfNeeded(result, 100);
