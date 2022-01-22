@@ -2,7 +2,7 @@
   "name": "naheulbook",
   "title": "Naheulbeuk",
   "description": "Système de jeu pour Naheulbeuk. Fonctionne avec Naheulbook",
-  "version": "0.0.20",
+  "version": "0.1.0",
   "templateVersion": 2,
   "author": "Socolin",
   "minimumCoreVersion": "0.8.9",
@@ -26,7 +26,9 @@
   "gridUnits": "m",
   "primaryTokenAttribute": "resources.ev",
   "secondaryTokenAttribute": "resources.ea",
-  "url": "https://gitlab.socolin.fr/naheulbook/FoundryVTT",
-  "manifest": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/raw/master/system.json",
-  "download": "https://gitlab.socolin.fr/naheulbook/FoundryVTT/-/jobs/artifacts/0.0.20/download?job=build"
+  "url": "https://github.com/Socolin/Naheulbook-Foundry",
+  "manifest": "https://raw.githubusercontent.com/Socolin/Naheulbook-Foundry/main/system.json",
+  "download": "https://github.com/Socolin/Naheulbook-Foundry/releases/download/v0.1.0/module.zip",
+  "allowBugReporter": true,
+  "bugs": "https://github.com/Socolin/Naheulbook-Foundry/issues"
 }
