@@ -1,6 +1,8 @@
 export type RollResult = 'epicFail' | 'fail' | 'success' | 'criticalSuccess';
 
 export class RollHelper {
+    static diceSoNiceReady: boolean = false;
+
     private static readonly defaultCriticsScoresDefinition = {
         1: 'criticalSuccess',
         20: 'epicFail'
@@ -27,24 +29,45 @@ export class RollHelper {
         return 'fail';
     }
 
-    static playEpicSoundIfNeeded(result: RollResult, delayInMs: number = 1000) {
-        setTimeout(async () => {
-            if (result === 'criticalSuccess') {
-                await AudioHelper.play({
-                    src: 'systems/naheulbook/assets/sounds/critical-success.mp3',
-                    volume: 0.20,
-                    loop: false,
-                    autoplay: true
-                }, true);
-            } else if (result === 'epicFail') {
-                await AudioHelper.play({
-                    src: 'systems/naheulbook/assets/sounds/epic-fail.mp3',
-                    volume: 0.20,
-                    loop: false,
-                    autoplay: true
-                }, true);
+
+    static pendingSounds: Record<string, RollResult> = {};
+    static useDiceSoNice(dice3d: any) {
+        RollHelper.diceSoNiceReady = true;
+
+        Hooks.on('diceSoNiceRollComplete', (messageId) => {
+            if (messageId in RollHelper.pendingSounds) {
+                this.playEpicSound(RollHelper.pendingSounds[messageId]).then();
+                delete RollHelper.pendingSounds[messageId];
             }
-        }, delayInMs);
+        })
+    }
+
+    static async playEpicSoundAfterMessage(result: RollResult, messageId?: string) {
+        if (!this.diceSoNiceReady || !messageId) {
+            await this.playEpicSound(result);
+            return;
+        }
+        else {
+            RollHelper.pendingSounds[messageId] = result;
+        }
+    }
+
+    private static async playEpicSound(result: RollResult) {
+        if (result === 'criticalSuccess') {
+            await AudioHelper.play({
+                src: 'systems/naheulbook/assets/sounds/critical-success.mp3',
+                volume: 0.20,
+                loop: false,
+                autoplay: true
+            }, true);
+        } else if (result === 'epicFail') {
+            await AudioHelper.play({
+                src: 'systems/naheulbook/assets/sounds/epic-fail.mp3',
+                volume: 0.20,
+                loop: false,
+                autoplay: true
+            }, true);
+        }
     }
 
     static async renderRollSmall(roll: Roll): Promise<string> {

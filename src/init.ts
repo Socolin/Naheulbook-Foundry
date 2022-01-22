@@ -4,6 +4,7 @@ import {NaheulbookActor} from './models/actor/naheulbook-actor';
 import {MonsterActorSheet} from './ui/sheets/monster-actor-sheet';
 import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 import {MacroUtil} from './utils/macro-util';
+import {RollHelper} from './utils/roll-helper';
 
 console.warn('Naheulbook | Starting')
 
@@ -46,6 +47,11 @@ Handlebars.registerHelper('ifnoteq', function (a, b, options) {
         return options.fn(this);
     }
     return options.inverse(this);
+});
+
+
+Hooks.once('diceSoNiceReady', (dice3d) => {
+    RollHelper.useDiceSoNice(dice3d);
 });
 
 window.onerror = ((event, source, lineno, colno, error) => {

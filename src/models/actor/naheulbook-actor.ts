@@ -93,7 +93,7 @@ export class NaheulbookActor extends Actor {
         let rolls = [roll];
         if (additionalRoll)
             rolls.push(additionalRoll.roll);
-        await ChatMessage.create({
+        let message = await ChatMessage.create({
             speaker: ChatMessage.getSpeaker({actor: this}),
             content: await RollMessageHelper.formatRollResult(
                 name,
@@ -105,6 +105,6 @@ export class NaheulbookActor extends Actor {
             roll: JSON.stringify(RollHelper.mergeRolls(rolls).toJSON()),
         })
 
-        RollHelper.playEpicSoundIfNeeded(result, 100);
+        await RollHelper.playEpicSoundAfterMessage(result, message?.id);
     }
 }
