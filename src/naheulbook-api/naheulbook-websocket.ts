@@ -100,11 +100,15 @@ export class NaheulbookWebsocket {
     }
 
     private async sendSyncMessage(type: string, id: number): Promise<any> {
-        await this.connection!.send('Subscribe' + type, id);
+        if (!this.connection)
+            throw new Error('connection is not initialized');
+        await this.connection.send('Subscribe' + type, id);
     }
 
     private async sendUnsubscribeMessage(type: string, id: number): Promise<any> {
-        await this.connection!.send('Unsubscribe' + type, id);
+        if (!this.connection)
+            throw new Error('connection is not initialized');
+        await this.connection.send('Unsubscribe' + type, id);
     }
 
     public getAuthorizationToken(): string | undefined {

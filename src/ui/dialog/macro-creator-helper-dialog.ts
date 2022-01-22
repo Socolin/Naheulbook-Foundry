@@ -71,8 +71,8 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
                             ev.currentTarget.src = path;
                             this.data.icon = path;
                         },
-                        top: this.position.top! + 40,
-                        left: this.position.left! + 10
+                        top: (this.position.top || 0) + 40,
+                        left: (this.position.left || 0) + 10
                     });
                     await fp.browse('');
                     break;

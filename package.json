@@ -2,8 +2,11 @@
   "type": "module",
   "devDependencies": {
     "@league-of-foundry-developers/foundry-vtt-types": "^0.8.9-10",
+    "@typescript-eslint/eslint-plugin": "^5.10.0",
+    "@typescript-eslint/parser": "^5.10.0",
     "esbuild": "^0.14.11",
     "esbuild-sass-plugin": "^2.0.3",
+    "eslint": "^8.7.0",
     "glob": "^7.2.0",
     "handlebars": "^4.7.6",
     "jquery": "^3.5.1",
@@ -13,7 +16,8 @@
   "scripts": {
     "esbuild": "esbuild",
     "dev": "node ./build.js --watch",
-    "build": "node ./build.js"
+    "build": "node ./build.js",
+    "lint": "eslint .eslintrc.json src"
   },
   "dependencies": {
     "@microsoft/signalr": "^5.0.0",

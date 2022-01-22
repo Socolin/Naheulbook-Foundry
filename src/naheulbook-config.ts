@@ -1,4 +1,5 @@
 import {inject, singleton} from 'tsyringe';
+import {InitializedGame} from './models/misc/game';
 
 @singleton()
 export class NaheulbookConfig {
@@ -7,7 +8,7 @@ export class NaheulbookConfig {
     accessKey: string;
 
     constructor(
-        @inject(Game) private readonly game: Game
+        @inject(InitializedGame) private readonly game: InitializedGame
     ) {
     }
 

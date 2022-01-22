@@ -31,7 +31,10 @@ export class NaheulbookHttpApi {
         };
         if (body !== undefined) {
             requestInit.body = JSON.stringify(body);
-            requestInit.headers!['Content-Type'] = 'application/json';
+            requestInit.headers = {
+                ...requestInit.headers,
+                ['Content-Type']: 'application/json'
+            };
         }
         let result = await fetch(this.naheulbookHost + path, requestInit);
 

@@ -8,6 +8,7 @@ import {MonsterActorSheet} from './ui/sheets/monster-actor-sheet';
 import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 import {MacroUtil} from './utils/macro-util';
 import {RollUtil} from './utils/roll-util';
+import {InitializedGame} from './models/misc/game';
 
 console.info('Naheulbook | Starting');
 
@@ -28,7 +29,7 @@ Hooks.once("init", async function () {
 });
 
 Hooks.once("ready", async function () {
-    container.register<Game>(Game, {useValue: game});
+    container.register<InitializedGame>(InitializedGame, {useValue: game as InitializedGame});
 
     let naheulbookConfig = container.resolve(NaheulbookConfig);
     naheulbookConfig.registerConfigs();
@@ -41,7 +42,7 @@ Hooks.once("ready", async function () {
     await naheulbookConnector.connect();
 });
 
-Hooks.once('diceSoNiceReady', (dice3d) => {
+Hooks.once('diceSoNiceReady', (_dice3d) => {
     let rollUtil = container.resolve(RollUtil)
-    rollUtil.useDiceSoNice(dice3d);
+    rollUtil.useDiceSoNice();
 });

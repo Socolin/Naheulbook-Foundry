@@ -3,6 +3,7 @@ import {container} from 'tsyringe';
 import ClickEvent = JQuery.ClickEvent;
 import {MacroUtil} from '../../utils/macro-util';
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
+import {InitializedGame} from '../../models/misc/game';
 
 export interface CharacterActorSheetData extends ActorSheet.Data {
     isGm: boolean;
@@ -14,12 +15,12 @@ export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet
     extends ActorSheet<Options, CharacterActorSheetData> {
 
     private readonly macroUtil: MacroUtil;
-    private readonly game: Game;
+    private readonly game: InitializedGame;
 
     constructor(object: NaheulbookActor, options: Partial<Options>) {
         super(object, options);
         this.macroUtil = container.resolve(MacroUtil)
-        this.game = container.resolve(Game)
+        this.game = container.resolve(InitializedGame)
     }
 
     override getData(options?: Partial<Options>): Promise<CharacterActorSheetData> | CharacterActorSheetData {
@@ -28,7 +29,7 @@ export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet
         return {
             ...super.getData(options),
             statsByGroup: statsByGroup,
-            isGm: !!this.game.user?.isGM,
+            isGm: this.game.user.isGM,
             isSynced: !!this.actor.data.data.naheulbookCharacterId
         };
     }

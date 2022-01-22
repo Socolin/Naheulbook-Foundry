@@ -79,11 +79,12 @@ export class NaheulbookApi {
         let skillsById = await this.naheulbookDataApi.getSkillsById();
         return this.naheulbookWebsocket.listenForGroupEvents(groupId, ((opcode, data) => {
             switch (opcode) {
-                case 'addMonster':
+                case 'addMonster': {
                     let monster = Monster.fromResponse(data, skillsById);
                     monster.update();
                     onEvent.addMonster(monster);
                     break;
+                }
                 case 'killMonster':
                     onEvent.killMonster(data);
                     break;

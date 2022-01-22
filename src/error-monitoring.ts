@@ -11,7 +11,7 @@ Sentry.init({
     tracesSampleRate: 1.0,
 });
 
-Sentry.addGlobalEventProcessor((event, hint) => {
+Sentry.addGlobalEventProcessor((event, _hint) => {
     if (event.level == 'error') {
         let message = event.exception?.values ? event.exception?.values[0].value : '';
         ui.notifications?.error(`Une erreur c'est produite. Voir la console [F12] pour plus d'informations: ${message}`);

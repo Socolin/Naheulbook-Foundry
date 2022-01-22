@@ -8,6 +8,7 @@ import {
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
 import {NaheulbookLogger} from '../utils/naheulbook-logger';
+import {InitializedGame} from '../models/misc/game';
 
 export class MonsterConnector {
     _updatableStats = ['ev', 'ea'];
@@ -38,7 +39,8 @@ export class MonsterConnector {
 
     constructor(
         private readonly nhbkApi: NaheulbookApi,
-        private readonly logger: NaheulbookLogger
+        private readonly logger: NaheulbookLogger,
+        private readonly game: InitializedGame,
     ) {
         this._monsterIconGenerator = new MonsterIconGenerator();
     }
@@ -49,7 +51,7 @@ export class MonsterConnector {
     enable() {
         // When an actor is updated (like when updating HP / Mana on a token linked to an actor) send this to naheulbook
         // to keep the actor sync with the monster. This allow to edit monster health/mana inside foundry.
-        this._updateActorHook = Hooks.on('updateActor', async (actor, data, options, id) => {
+        this._updateActorHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
             if (!data.data)
@@ -70,7 +72,7 @@ export class MonsterConnector {
                 }
             }
         });
-        this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, id) => {
+        this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
             if (!data.data)
@@ -120,7 +122,7 @@ export class MonsterConnector {
 
         let monsters = await this.nhbkApi.loadGroupMonsters(groupId);
         for (let monster of monsters) {
-            let monsterActor = game.actors?.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
+            let monsterActor = this.game.actors.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
             if (monsterActor instanceof Actor) {
                 await this._updateActor(monsterActor, monster);
             } else {
@@ -139,11 +141,8 @@ export class MonsterConnector {
     }
 
     async synchronizeExistingMonstersActors(): Promise<void> {
-        if (!game.actors)
-            throw new Error('game.actors is undefined');
-
-        for (let actor of game.actors.filter(a => a.data.type === 'monster')) {
-            if (!actor.testUserPermission(game.user!, "OWNER"))
+        for (let actor of this.game.actors.filter(a => a.data.type === 'monster')) {
+            if (!actor.testUserPermission(this.game.user, "OWNER"))
                 continue;
             await this.syncMonsterActorWithNaheulbook(actor);
         }
@@ -247,11 +246,7 @@ export class MonsterConnector {
         await ActiveEffect.create(effectData, {parent: actor})
     }
 
-    /**
-     * @param {number} monsterId
-     * @return {Promise<void>}
-     */
-    async killMonster(monsterId) {
+    async killMonster(monsterId: number): Promise<void> {
         let monsterActor = game.actors?.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
         if (!monsterActor)
             return;

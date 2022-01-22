@@ -24,4 +24,4 @@ export interface IActiveStatsModifier {
         fighterId: number;
         fighterIsMonster: boolean;
     };
-};
+}

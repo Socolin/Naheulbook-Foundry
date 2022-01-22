@@ -25,6 +25,7 @@ copyAndWatchFiles([
         bundle: true,
         minify: true,
         sourcemap: true,
+        minifyIdentifiers: false,
         logLevel: "info",
         target: ['es6'],
         watch: watch,

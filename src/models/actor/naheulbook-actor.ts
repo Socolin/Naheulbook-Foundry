@@ -6,6 +6,7 @@ import {AdditionalRoll, RollChatUtil} from '../../utils/roll-chat-util';
 import {DialogAwaiter} from '../../utils/dialog-awaiter';
 import {SelectWeaponDialog} from '../../ui/dialog/select-weapon-dialog';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
+import {RollFactory} from '../../utils/roll-factory';
 
 declare global {
     interface DataConfig {
@@ -23,12 +24,14 @@ export class NaheulbookActor extends Actor {
     private readonly rollUtil: RollUtil;
     private readonly rollChatUtil: RollChatUtil;
     private readonly dialogAwaiter: DialogAwaiter;
+    private readonly rollFactory: RollFactory;
 
     constructor(data, context) {
         super(data, context);
         this.rollUtil = container.resolve(RollUtil)
         this.rollChatUtil = container.resolve(RollChatUtil)
         this.dialogAwaiter = container.resolve(DialogAwaiter)
+        this.rollFactory = container.resolve(RollFactory)
     }
 
     async rollAttack(): Promise<void> {
@@ -52,15 +55,14 @@ export class NaheulbookActor extends Actor {
             return;
         }
 
-        let damageRoll = new Roll(weapon.rollFormula);
-        await damageRoll.roll({async: true});
+        let damageRoll = await this.rollFactory.createRoll(weapon.rollFormula);
 
         await this.rollSkill(
             'Attaque',
             'systems/naheulbook/assets/macro-icons/saber-slash.svg',
             this.data.data.at,
             {
-                label: 'Dégâts: ' + damageRoll.total! + (weapon.damageType ? `(${weapon.damageType})` : ''),
+                label: 'Dégâts: ' + damageRoll.total + (weapon.damageType ? `(${weapon.damageType})` : ''),
                 item: weapon.name,
                 roll: damageRoll
             }
@@ -83,20 +85,18 @@ export class NaheulbookActor extends Actor {
             return this.rollSkill(name, icon, successValue);
         }
 
-        let damageRoll = new Roll(extra.rollFormula);
-        await damageRoll.roll({async: true});
+        let damageRoll = await this.rollFactory.createRoll(extra.rollFormula);
 
         await this.rollSkill(name, icon, successValue, {
-            label: extra.label + damageRoll.total!,
+            label: extra.label + damageRoll.total,
             item: extra.item,
             roll: damageRoll
         })
     }
 
     async rollSkill(name: string, icon: string, maxSuccessScore: number, additionalRoll?: AdditionalRoll) {
-        let roll = new Roll('1d20');
-        await roll.roll({async: true});
-        let result = this.rollUtil.getRollResult(roll.total!, maxSuccessScore);
+        let roll = await this.rollFactory.createRoll('1d20');
+        let result = this.rollUtil.getRollResult(roll.total, maxSuccessScore);
 
         let rolls = [roll];
         if (additionalRoll)
@@ -106,7 +106,7 @@ export class NaheulbookActor extends Actor {
             content: await this.rollChatUtil.formatRollResult(
                 name,
                 icon,
-                {roll: roll, successValue: maxSuccessScore, total: roll.total!, result: result},
+                {roll: roll, successValue: maxSuccessScore, total: roll.total, result: result},
                 additionalRoll
             ),
             type: CONST.CHAT_MESSAGE_TYPES.ROLL,

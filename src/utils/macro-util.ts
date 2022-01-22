@@ -3,12 +3,13 @@ import {MacroData} from '@league-of-foundry-developers/foundry-vtt-types/src/fou
 import {NaheulbookActor} from '../models/actor/naheulbook-actor';
 import {DialogAwaiter} from './dialog-awaiter';
 import {MacroCreatorHelperDialog} from '../ui/dialog/macro-creator-helper-dialog';
+import {InitializedGame} from '../models/misc/game';
 
 @singleton()
 export class MacroUtil {
     constructor(
         @inject(DialogAwaiter) private readonly dialogAwaiter: DialogAwaiter,
-        @inject(Game) private readonly game: Game
+        @inject(InitializedGame) private readonly game: InitializedGame
     ) {
     }
 
@@ -17,7 +18,7 @@ export class MacroUtil {
         if (!macro) {
             throw new Error('Failed to create macro');
         }
-        this.game.user?.assignHotbarMacro(macro, '');
+        await this.game.user.assignHotbarMacro(macro, '');
     }
 
     guardScriptExecutionWithTokenCheck(script: string): string {
@@ -29,7 +30,7 @@ export class MacroUtil {
     }
 
     async createNaheulbeukDefaultMacros() {
-        let isNewUser = this.game.user?.getHotbarMacros(1).filter(x => x.macro != null).length === 0;
+        let isNewUser = this.game.user.getHotbarMacros(1).filter(x => x.macro != null).length === 0;
 
         if (isNewUser) {
             await this.deleteSamplesMacro();
@@ -61,14 +62,14 @@ export class MacroUtil {
     }
 
     getSampleMacro(name) {
-        let macro = this.game.macros?.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
+        let macro = this.game.macros.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
         if (macro && this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))
             return macro;
         return undefined;
     }
 
     async deleteSamplesMacro() {
-        let macros = this.game.macros?.contents.filter(x => !!x.getFlag('naheulbook', 'sampleMacro'));
+        let macros = this.game.macros.contents.filter(x => !!x.getFlag('naheulbook', 'sampleMacro'));
         if (!macros)
             return;
 

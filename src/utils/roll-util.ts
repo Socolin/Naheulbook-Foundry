@@ -1,11 +1,12 @@
 import {singleton} from 'tsyringe';
+import {RolledRoll} from './roll-factory';
 
 export type RollResult = 'epicFail' | 'fail' | 'success' | 'criticalSuccess';
 
 @singleton()
 export class RollUtil {
-    diceSoNiceReady: boolean = false;
-    pendingSounds: Record<string, RollResult> = {};
+    private diceSoNiceReady = false;
+    private pendingSounds: Record<string, RollResult> = {};
 
     private readonly defaultCriticsScoresDefinition = {
         1: 'criticalSuccess',
@@ -33,7 +34,7 @@ export class RollUtil {
         return 'fail';
     }
 
-    useDiceSoNice(dice3d: any) {
+    useDiceSoNice() {
         this.diceSoNiceReady = true;
 
         Hooks.on('diceSoNiceRollComplete', (messageId) => {
@@ -78,7 +79,7 @@ export class RollUtil {
         return result.substring(0, totalIndex) + result.substring(endTotalIndex);
     }
 
-    mergeRolls(rolls: Roll[]): Roll {
+    mergeRolls(rolls: RolledRoll[]): Roll {
         let groupedRoll = new Roll('').toJSON();
         groupedRoll.terms = [PoolTerm.fromRolls(rolls)];
         groupedRoll.dice = []
@@ -88,7 +89,7 @@ export class RollUtil {
         let formulas: string[] = [];
         for (let roll of rolls) {
             formulas.push(roll.formula);
-            groupedRoll.total += roll.total!;
+            groupedRoll.total += roll.total;
         }
         groupedRoll.formula = `{${formulas.join(',')}}`;
 

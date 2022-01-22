@@ -84,9 +84,6 @@ export class StatisticDetail {
     add(name: string, data: {[statName: string]: any}) {
         let subCategories: {[subCategoryName: string]: any} = {};
         for (let i in data) {
-            if (!data.hasOwnProperty(i)) {
-                continue;
-            }
             let category = StatisticDetail.getDetailCategoryForStat(i);
             if (!this[category]) {
                 this[category] = [];
@@ -94,9 +91,6 @@ export class StatisticDetail {
             subCategories[category] = 1;
         }
         for (let i in subCategories) {
-            if (!subCategories.hasOwnProperty(i)) {
-                continue;
-            }
             if (i === 'evea') {
                 this.evea.push({
                     name: name,
@@ -251,7 +245,7 @@ export class Character {
     modifiers: ActiveStatsModifier[] = [];
     specialities: Speciality[] = [];
     statBonusAD: string;
-    user: Object;
+    user: object;
     color: string;
     gmData: any;
     group?: CharacterGroupResponse;
@@ -280,6 +274,7 @@ export class Character {
             throw new Error('Invalid origin id. Origin was not found in database: ' + response.originId);
         }
         character.origin = origin;
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         character.jobs = response.jobIds.map(jobId => jobs.find(j => j.id === jobId)!).filter(job => !!job);
         character.skills = response.skillIds.map(skillId => skillsById[skillId]).filter(skill => !!skill);
         character.items = response.items.map(itemResponse => Item.fromResponse(itemResponse, skillsById));
@@ -798,7 +793,6 @@ export class Character {
         let prevSkill: SkillDetail|null = null;
         for (let i = 0; i < this.computedData.skills.length; i++) {
             let skill = this.computedData.skills[i];
-            let ignoreSkill = false;
             if ('NO_SKILL' in flagsData) {
                 let noSkills = flagsData['NO_SKILL'];
                 for (let noSkill of noSkills) {
@@ -1408,6 +1402,6 @@ export class Character {
     }
 
     dispose() {
-
+        this.onUpdate.unsubscribe();
     }
 }

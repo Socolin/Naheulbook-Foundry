@@ -170,9 +170,6 @@ export class Monster {
 
     public changeData(data: MonsterData) {
         for (let fieldName in data) {
-            if (!data.hasOwnProperty(fieldName)) {
-                continue;
-            }
             if (data[fieldName] !== this.data[fieldName]) {
                 this.notify('changeData',
                     'Modification: ' + fieldName.toUpperCase() + ': ' + this.data[fieldName] + ' -> ' + data[fieldName],

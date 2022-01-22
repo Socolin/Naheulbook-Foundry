@@ -4,6 +4,7 @@ import {CharacterConnector} from "./character-connector.js";
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
 import {NaheulbookConfig} from '../naheulbook-config';
 import {inject, singleton} from 'tsyringe';
+import {InitializedGame} from '../models/misc/game';
 
 @singleton()
 export class NaheulbookConnector {
@@ -14,7 +15,7 @@ export class NaheulbookConnector {
     constructor(
         @inject(NaheulbookConfig) private readonly config: NaheulbookConfig,
         @inject(NaheulbookLogger) private readonly logger: NaheulbookLogger,
-        @inject(Game) private readonly game: Game,
+        @inject(InitializedGame) private readonly game: InitializedGame,
     ) {
     }
 
@@ -27,7 +28,7 @@ export class NaheulbookConnector {
         })
 
         Hooks.on('renderPlayerList', (playerList, div, userData) => {
-            if (this.game.user!.role === CONST.USER_ROLES.GAMEMASTER) {
+            if (this.game.user.role === CONST.USER_ROLES.GAMEMASTER) {
                 return;
             }
             const gameMasterOnline = userData.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)
@@ -56,8 +57,8 @@ export class NaheulbookConnector {
             return;
         }
 
-        if (this.game.user!.role !== CONST.USER_ROLES.GAMEMASTER) {
-            if (this.game.users!.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
+        if (this.game.user.role !== CONST.USER_ROLES.GAMEMASTER) {
+            if (this.game.users.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
                 this.logger.info('A GM is already connected, skip naheulbook sync');
                 return;
             }
@@ -68,13 +69,13 @@ export class NaheulbookConnector {
 
         this.logger.info('Connected to Naheulbook');
 
-        this.monsterConnector = new MonsterConnector(this.nhbkApi, this.logger);
+        this.monsterConnector = new MonsterConnector(this.nhbkApi, this.logger, this.game);
         this.monsterConnector.enable();
 
         await this.monsterConnector.synchronizeGroupMonsters(this.config.groupId);
         await this.monsterConnector.synchronizeExistingMonstersActors();
 
-        this.characterConnector = new CharacterConnector(this.nhbkApi, this.logger);
+        this.characterConnector = new CharacterConnector(this.nhbkApi, this.logger, this.game);
         this.characterConnector.enable();
 
         await this.characterConnector.synchronizeGroupCharacters(this.config.groupId);

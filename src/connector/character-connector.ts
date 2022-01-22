@@ -1,37 +1,26 @@
 import {NaheulbookLogger} from '../utils/naheulbook-logger';
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
-import {ActorData, TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import {TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import {
     TokenBarData
 } from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
 import {Character} from '../naheulbook-api/models/character.model';
 import {CharacterActorData} from '../models/actor/character-actor-properties';
+import {InitializedGame} from '../models/misc/game';
 
 export class CharacterConnector {
-    _updatableStats = ['ev', 'ea'];
-
-    /**
-     * @type number
-     * @private
-     */
-    _updateActorHook;
-
-    /**
-     * @type number
-     * @private
-     */
-    _updateActorIdHook;
+    private _updatableStats = ['ev', 'ea'];
+    private _updateActorHook: number;
+    private _updateActorIdHook: number;
 
     constructor(
         private readonly nhbkApi: NaheulbookApi,
-        private readonly logger: NaheulbookLogger
+        private readonly logger: NaheulbookLogger,
+        private readonly game: InitializedGame,
     ) {
     }
 
-    /**
-     * @return void
-     */
-    enable() {
+    enable(): void {
         // When an actor is updated (like when updating HP / Mana on a token linked to an actor) send this to naheulbook
         // to keep the actor sync with the monster. This allow to edit monster health/mana inside foundry.
         this._updateActorHook = Hooks.on('updateActor', (actor, data, options, _id) => {
@@ -88,11 +77,7 @@ export class CharacterConnector {
         Hooks.off('updateActor', this._updateActorIdHook);
     }
 
-    /**
-     * @param {number|undefined} groupId
-     * @return Promise<void>
-     */
-    async synchronizeGroupCharacters(groupId) {
+    async synchronizeGroupCharacters(groupId?: number): Promise<void> {
         if (!groupId) {
             return;
         }
@@ -104,7 +89,7 @@ export class CharacterConnector {
         let group = await this.nhbkApi.loadGroupData(groupId);
 
         for (let characterId of group.characterIds) {
-            let characterActor = game.actors!.contents.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
+            let characterActor = this.game.actors.contents.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
             if (characterActor) {
                 continue;
             }
@@ -119,11 +104,8 @@ export class CharacterConnector {
     }
 
     async synchronizeExistingCharactersActors(): Promise<void> {
-        if (!game.actors)
-            throw new Error('game.actors is not ready yet');
-
-        for (let actor of game.actors.contents.filter(a => a.data.type === 'character')) {
-            if (!actor.testUserPermission(game.user!, "OWNER"))
+        for (let actor of this.game.actors.contents.filter(a => a.data.type === 'character')) {
+            if (!actor.testUserPermission(this.game.user, "OWNER"))
                 continue;
             await this.syncCharacterActorWithNaheulbook(actor);
         }
@@ -142,8 +124,7 @@ export class CharacterConnector {
 
             let character = await this.nhbkApi.loadCharacterData(naheulbookCharacterId);
             await this.nhbkApi.synchronizeCharacter(character, async (character) => this._updateActor(actor, character));
-        }
-        catch (e) {
+        } catch (e) {
             this.logger.warn(`Failed to sync character ${actor.name} with id ${naheulbookCharacterId}`, e)
         }
     }

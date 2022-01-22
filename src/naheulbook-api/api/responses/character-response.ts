@@ -1,4 +1,4 @@
-import {IActiveStatsModifier, IGroupConfig} from '../shared';
+import {IActiveStatsModifier} from '../shared';
 import {ItemResponse} from './item-response';
 import {SpecialityResponse} from './speciality-response';
 import {CharacterGroupInviteResponse} from './character-group-invite-response';

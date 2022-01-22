@@ -7,7 +7,7 @@ export class DialogAwaiter {
         type: { new(data: TData, result: DialogResultCallback<TResult>): TDialog },
         data: TData
     ): Promise<TResult | undefined> {
-        return new Promise<TResult | undefined>(async (resolve) => {
+        return new Promise<TResult | undefined>((resolve) => {
             let dialog = new type(data, result => resolve(result));
             dialog.render(true);
         });
