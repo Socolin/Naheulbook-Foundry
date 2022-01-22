@@ -135,12 +135,17 @@ export class CharacterConnector {
             return;
         }
 
-        this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
+        try {
+            this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook character: ${naheulbookCharacterId}`);
 
-        await actor.setFlag('naheulbook', 'characterId', naheulbookCharacterId);
+            await actor.setFlag('naheulbook', 'characterId', naheulbookCharacterId);
 
-        let character = await this.nhbkApi.loadCharacterData(naheulbookCharacterId);
-        await this.nhbkApi.synchronizeCharacter(character, async (character) => this._updateActor(actor, character));
+            let character = await this.nhbkApi.loadCharacterData(naheulbookCharacterId);
+            await this.nhbkApi.synchronizeCharacter(character, async (character) => this._updateActor(actor, character));
+        }
+        catch (e) {
+            this.logger.warn(`Failed to sync character ${actor.name} with id ${naheulbookCharacterId}`, e)
+        }
     }
 
 

@@ -159,10 +159,15 @@ export class MonsterConnector {
             return;
         }
 
-        this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
+        try {
+            this.logger.info(`Synchronizing actor ${actor.name}(${actor.id}) with naheulbook monster: ${naheulbookMonsterId}`);
 
-        let monster = await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, (monster) => this._updateActor(actor, monster));
-        this._monstersById[monster.id] = monster;
+            let monster = await this.nhbkApi.synchronizeMonster(naheulbookMonsterId, (monster) => this._updateActor(actor, monster));
+            this._monstersById[monster.id] = monster;
+        }
+        catch (e) {
+            this.logger.warn(`Failed to sync monster ${actor.name} with id ${naheulbookMonsterId}`, e)
+        }
     }
 
     /**
