@@ -318,7 +318,7 @@ export class MonsterConnector {
             let name = matchRollWithName[2].trim()
             return [rollFormula, name];
         }
-        console.error('Unsupported monster damage form: ' + damage);
+        this.logger.warn('Unsupported monster damage form: ' + damage);
         return ['1d6'];
     }
 
