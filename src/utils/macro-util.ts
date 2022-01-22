@@ -1,4 +1,7 @@
 import {MacroData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
+import {NaheulbookActor} from '../models/actor/naheulbook-actor';
+import {DialogAwaiter} from './dialog-awaiter';
+import {MacroCreatorHelperDialog} from '../ui/dialog/macro-creator-helper-dialog';
 
 export class MacroUtil {
 
@@ -68,4 +71,26 @@ export class MacroUtil {
         }
     }
 
+    static async openMacroCreatorHelper(actor: NaheulbookActor, stat: string, label: string) {
+        let macroInfo = await DialogAwaiter.openAndWaitResult(MacroCreatorHelperDialog, {
+            actor: actor,
+            stat: stat,
+            label: label
+        })
+        if (!macroInfo)
+            return;
+        let command = MacroUtil.guardScriptExecutionWithTokenCheck(`token.actor.rollCustomSkill(
+                        '${macroInfo.name.replace(/'/g, '\\')}',
+                        '${macroInfo.icon}',
+                        '${macroInfo.stat}',
+                        ${macroInfo.testModifier}
+                        ${macroInfo.extraRoll ? `,${JSON.stringify(macroInfo.extraRoll)}` : ''},
+                    );`);
+        await MacroUtil.createAndAssignMacroToFirstAvailableSlot({
+            name: macroInfo.name,
+            img: macroInfo.icon,
+            type: 'script',
+            command: command
+        });
+    }
 }

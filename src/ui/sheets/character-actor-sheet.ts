@@ -1,7 +1,5 @@
 import {assertIsCharacter} from '../../models/actor/character-actor-properties';
 import ClickEvent = JQuery.ClickEvent;
-import {DialogAwaiter} from '../../utils/dialog-awaiter';
-import {MacroCreatorHelperDialog} from '../dialog/macro-creator-helper-dialog';
 import {MacroUtil} from '../../utils/macro-util';
 
 export interface CharacterActorSheetData extends ActorSheet.Data {
@@ -38,26 +36,7 @@ export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet
                     await this.actor.rollCustomSkill(stateDisplayName, undefined, stateName, 0);
                     break;
                 case 'macro':
-                    let macroInfo = await DialogAwaiter.openAndWaitResult(MacroCreatorHelperDialog, {
-                        actor: this.actor,
-                        stat: stateName,
-                        label: stateDisplayName
-                    })
-                    if (!macroInfo)
-                        return;
-                    let command = MacroUtil.guardScriptExecutionWithTokenCheck(`token.actor.rollCustomSkill(
-                        '${macroInfo.name.replace(/'/g, '\\')}',
-                        '${macroInfo.icon}',
-                        '${macroInfo.stat}',
-                        ${macroInfo.testModifier}
-                        ${macroInfo.extraRoll ? `,${JSON.stringify(macroInfo.extraRoll)}` : ''},
-                    );`);
-                    await MacroUtil.createAndAssignMacroToFirstAvailableSlot({
-                        name: macroInfo.name,
-                        img: macroInfo.icon,
-                        type: 'script',
-                        command: command
-                    });
+                    await MacroUtil.openMacroCreatorHelper(this.actor, stateName, stateDisplayName);
             }
         });
     }

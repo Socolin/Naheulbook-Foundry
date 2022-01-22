@@ -2,7 +2,6 @@
   display: grid;
   grid-template-rows: auto auto 1fr;
 
-
   .sheet-header {
     display: grid;
     grid-template-areas: "img header-fields";
@@ -45,5 +44,4 @@
       }
     }
   }
-
 }

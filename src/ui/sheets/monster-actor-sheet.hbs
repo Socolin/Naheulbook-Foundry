@@ -8,26 +8,49 @@
                 <input type="text" name="data.ev.value" value="{{actor.data.data.ev.value}}" data-dtype="Number"/>
                 <span> / </span>
                 <input type="text" name="data.ev.max" value="{{actor.data.data.ev.max}}" data-dtype="Number"
-                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+                       {{#if isSynced}}disabled{{/if}} />
             </div>
             <div class="resource mana">
                 <span>Énergie astrale</span>
                 <input type="text" name="data.ea.value" value="{{actor.data.data.ea.value}}" data-dtype="Number"/>
                 <span> / </span>
                 <input type="text" name="data.ea.max" value="{{actor.data.data.ea.max}}" data-dtype="Number"
-                       {{#if data.naheulbookCharacterId}}disabled{{/if}} />
+                       {{#if isSynced}}disabled{{/if}} />
             </div>
         </div>
     </header>
 
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="attributes">Attributes</a>
-        <a class="item" data-tab="items">Inventaires</a>
         <a class="item" data-tab="naheulbook">Naheulbook</a>
     </nav>
 
-
     <section class="sheet-body">
+        <div class="tab attributes" data-group="primary" data-tab="attributes">
+            {{#each statsByGroup as |statGroup|}}
+                <section class="{{@key}}">
+                    <h3>{{statGroup.label}}</h3>
+                    <section class="stats">
+                        {{#each statGroup.stats as |stat|}}
+                            <div class="attribute" data-stat-display-name="{{stat.name}}" data-stat-name="{{stat.stat}}">
+                                <span class="label">{{stat.name}} <span class="shortName">({{stat.stat}})</span></span>
+                                <input class="value" type="text" name="data.at" value="{{lookup ../../actor.data.data stat.stat}}"
+                                       data-dtype="Number" {{#if ../../isSynced}}disabled{{/if}}/>
+                                {{#if stat.canUseForSkill}}
+                                    <span class="actions">
+                                        <a data-stat-action="test" title="Lancer les dé"><i class="fa fa-dice"></i></a>
+                                        <a data-stat-action="macro" title="Créer une macro"><i class="fa fa-cog"></i></a>
+                                    </span>
+                                {{/if}}
+                            </div>
+                        {{/each}}
+                    </section>
+                </section>
+                {{#if (not @last)}}
+                    <div class="separator"></div>
+                {{/if}}
+            {{/each}}
+        </div>
         <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">
             <div class="attribute">
                 <span>Naheulbook Id (Monstre):</span>

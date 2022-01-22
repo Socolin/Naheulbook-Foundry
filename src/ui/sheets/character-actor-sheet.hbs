@@ -22,18 +22,10 @@
 
     <nav class="sheet-tabs tabs" data-group="primary">
         <a class="item" data-tab="attributes">Attributes</a>
-        <a class="item" data-tab="items">Inventaires</a>
         <a class="item" data-tab="naheulbook">Naheulbook</a>
     </nav>
 
     <section class="sheet-body">
-        <div class="tab biography" data-group="primary" data-tab="description">
-            {{editor content=data.biography target="data.biography" button=true owner=owner editable=editable}}
-        </div>
-
-        <div class="tab items" data-group="primary" data-tab="items">
-        </div>
-
         <div class="tab attributes" data-group="primary" data-tab="attributes">
             {{#each statsByGroup as |statGroup|}}
                 <section class="{{@key}}">
