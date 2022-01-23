@@ -7,7 +7,7 @@ export class RollFactory {
     public async createRoll(formula: string): Promise<Evaluated<Roll>> {
         let roll = new Roll(formula);
         await roll.roll({async: true});
-        if (!roll.total)
+        if (roll.total === undefined)
             throw new Error('.roll() failed to provide total')
         return roll as Evaluated<Roll>;
     }
