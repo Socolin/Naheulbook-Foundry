@@ -1,3 +1,4 @@
+import {inject, injectable} from 'tsyringe';
 import {DialogBase, DialogResultCallback} from './dialog-base';
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 import ClickEvent = JQuery.ClickEvent;
@@ -18,12 +19,13 @@ export interface MacroCreatorHelperDialogResult {
     extraRoll?: { rollFormula: string, item: string, label: string };
 }
 
+@injectable()
 export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialogData, MacroCreatorHelperDialogResult> {
     private readonly data: MacroCreatorHelperDialogResult;
 
     constructor(
-        data: MacroCreatorHelperDialogData,
-        result: DialogResultCallback<MacroCreatorHelperDialogResult>
+        @inject("DIALOG_DATA") data: MacroCreatorHelperDialogData,
+        @inject("DIALOG_RESULT") result: DialogResultCallback<MacroCreatorHelperDialogResult>,
     ) {
         super(data, result);
         this.data = {

@@ -1,4 +1,5 @@
-import {DialogBase} from './dialog-base';
+import {inject, injectable} from 'tsyringe';
+import {DialogBase, DialogResultCallback} from './dialog-base';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
 import ChangeEvent = JQuery.ChangeEvent;
 import {MonsterDamage} from '../../models/actor/monster-actor-properties';
@@ -7,8 +8,16 @@ export interface SelectWeaponDialogData {
     weapons: CharacterWeaponDamage[] | MonsterDamage[]
 }
 
+@injectable()
 export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, CharacterWeaponDamage | MonsterDamage> {
     private selectedWeaponId: number | undefined;
+
+    constructor(
+        @inject("DIALOG_DATA") data: SelectWeaponDialogData,
+        @inject("DIALOG_RESULT") result: DialogResultCallback<CharacterWeaponDamage | MonsterDamage>,
+    ) {
+        super(data, result);
+    }
 
     override getData(options?: Partial<Application.Options>): object | Promise<object> {
         return {
