@@ -15,13 +15,13 @@ export class MacroUtil {
     ) {
     }
 
-    async createAndAssignMacroToFirstAvailableSlot(data: Partial<MacroData> & {name: string}, slot?: number): Promise<void> {
+    async createAndAssignMacroToFirstAvailableSlot(data: Partial<MacroData> & {name: string}, slot?: number | string): Promise<void> {
         let macro = await Macro.create(data)
         if (!macro) {
             throw new Error('Failed to create macro');
         }
         if (slot && (slot in this.game.user.data.hotbar)) {
-            slot = 0;
+            slot = '';
         }
         try {
             await this.game.user.assignHotbarMacro(macro, slot || '');
