@@ -189,6 +189,8 @@ export class CharacterConnector {
                 fo: character.computedData.stats['FO'],
                 cou: character.computedData.stats['COU'],
 
+                spellDamageBonus: character.computedData.stats['INT'] > 12 ? character.computedData.stats['INT'] - 12 : 0,
+
                 weapons: character.computedData.weaponsDamages
             } as CharacterActorData
         };

@@ -15,6 +15,7 @@ export interface CharacterActorData extends BaseStatsActorProperties {
     cha: number;
     ad: number;
     fo: number;
+    spellDamageBonus: number;
     weapons: CharacterWeaponDamage[];
 }
 
