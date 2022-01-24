@@ -23,7 +23,11 @@ export class MacroUtil {
         if (slot && (slot in this.game.user.data.hotbar)) {
             slot = 0;
         }
-        await this.game.user.assignHotbarMacro(macro, slot || 0);
+        try {
+            await this.game.user.assignHotbarMacro(macro, slot || 0);
+        } catch (e) {
+            console.error(`Failed to add macro add ${macro.name}: ${e.message}`);
+        }
     }
 
     guardScriptExecutionWithTokenCheck(script: string): string {
