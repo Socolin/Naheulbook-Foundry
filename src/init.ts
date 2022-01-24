@@ -34,12 +34,12 @@ Hooks.once("ready", async function () {
     let naheulbookConfig = container.resolve(NaheulbookConfig);
     naheulbookConfig.registerConfigs();
 
-    let macroUtil = container.resolve(MacroUtil)
-    await macroUtil.createNaheulbeukDefaultMacros();
-
     let naheulbookConnector = container.resolve(NaheulbookConnector)
     naheulbookConnector.init();
     await naheulbookConnector.connect();
+
+    let macroUtil = container.resolve(MacroUtil)
+    await macroUtil.createNaheulbeukDefaultMacros();
 });
 
 Hooks.once('diceSoNiceReady', (_dice3d) => {

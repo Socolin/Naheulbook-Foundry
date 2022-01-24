@@ -4,21 +4,26 @@ import {NaheulbookActor} from '../models/actor/naheulbook-actor';
 import {DialogAwaiter} from './dialog-awaiter';
 import {MacroCreatorHelperDialog} from '../ui/dialog/macro-creator-helper-dialog';
 import {InitializedGame} from '../models/misc/game';
+import {NaheulbookLogger} from './naheulbook-logger';
 
 @singleton()
 export class MacroUtil {
     constructor(
         @inject(DialogAwaiter) private readonly dialogAwaiter: DialogAwaiter,
-        @inject(InitializedGame) private readonly game: InitializedGame
+        @inject(InitializedGame) private readonly game: InitializedGame,
+        @inject(NaheulbookLogger) private readonly logger: NaheulbookLogger,
     ) {
     }
 
-    async createAndAssignMacroToFirstAvailableSlot(data: Partial<MacroData> & {name: string}): Promise<void> {
+    async createAndAssignMacroToFirstAvailableSlot(data: Partial<MacroData> & {name: string}, slot?: number): Promise<void> {
         let macro = await Macro.create(data)
         if (!macro) {
             throw new Error('Failed to create macro');
         }
-        await this.game.user.assignHotbarMacro(macro, '');
+        if (slot && (slot in this.game.user.data.hotbar)) {
+            slot = 0;
+        }
+        await this.game.user.assignHotbarMacro(macro, slot || 0);
     }
 
     guardScriptExecutionWithTokenCheck(script: string): string {
@@ -30,13 +35,22 @@ export class MacroUtil {
     }
 
     async createNaheulbeukDefaultMacros() {
-        let isNewUser = this.game.user.getHotbarMacros(1).filter(x => x.macro != null).length === 0;
+        this.logger.info('Creating default macros');
 
-        if (isNewUser) {
+        if (Object.keys(this.game.user.data.hotbar).length == 0) {
+            this.logger.info('No macro assigned in hotbar yet, clean possible legacy macro');
             await this.deleteSamplesMacro();
         }
 
-        if (!this.getSampleMacro('attack'))
+        // Cleanup old macro deleted but not removed
+        for (let [slot, macroId] of Object.entries(this.game.user.data.hotbar)) {
+            if (!this.game.macros.get(macroId)) {
+                await this.game.user.assignHotbarMacro(null, slot);
+            }
+        }
+
+        if (!this.getSampleMacro('attack')) {
+            this.logger.info('Add default attack macro');
             await this.createAndAssignMacroToFirstAvailableSlot({
                 name: 'Attaque',
                 type: 'script',
@@ -45,9 +59,11 @@ export class MacroUtil {
                 flags: {
                     "naheulbook.sampleMacro": 'attack'
                 }
-            });
+            }, 1);
+        }
 
-        if (!this.getSampleMacro('parry'))
+        if (!this.getSampleMacro('parry')) {
+            this.logger.info('Add default parry macro');
             await this.createAndAssignMacroToFirstAvailableSlot({
                 name: 'Parade',
                 type: 'script',
@@ -56,12 +72,13 @@ export class MacroUtil {
                 flags: {
                     "naheulbook.sampleMacro": 'parry'
                 }
-            });
+            }, 2);
+        }
 
         return false;
     }
 
-    getSampleMacro(name) {
+    getSampleMacro(name: string): Macro | undefined {
         let macro = this.game.macros.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
         if (macro && this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))
             return macro;
@@ -74,8 +91,14 @@ export class MacroUtil {
             return;
 
         for (let macro of macros) {
-            if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))
-                macro.delete();
+            if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))  {
+                for (let [slot, macroId] of Object.entries(this.game.user.data.hotbar)) {
+                    if (macroId == macro.id) {
+                        delete this.game.user.data.hotbar[slot];
+                    }
+                }
+                await macro.delete();
+            }
         }
     }
 
