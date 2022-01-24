@@ -69,11 +69,13 @@ export class NaheulbookConnector {
 
         this.logger.info('Connected to Naheulbook');
 
-        this.monsterConnector = new MonsterConnector(this.nhbkApi, this.logger, this.game);
-        this.monsterConnector.enable();
+        if (this.game.user.role === CONST.USER_ROLES.GAMEMASTER) {
+            this.monsterConnector = new MonsterConnector(this.nhbkApi, this.logger, this.game);
+            this.monsterConnector.enable();
 
-        await this.monsterConnector.synchronizeGroupMonsters(this.config.groupId);
-        await this.monsterConnector.synchronizeExistingMonstersActors();
+            await this.monsterConnector.synchronizeGroupMonsters(this.config.groupId);
+            await this.monsterConnector.synchronizeExistingMonstersActors();
+        }
 
         this.characterConnector = new CharacterConnector(this.nhbkApi, this.logger, this.game);
         this.characterConnector.enable();
