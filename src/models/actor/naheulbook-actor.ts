@@ -70,7 +70,14 @@ export class NaheulbookActor extends Actor {
     }
 
     async rollParry(): Promise<RollResult> {
+        if (!this.data.data.prd && this.data.data.esq) {
+            return await this.rollAvoidance();
+        }
         return await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.data.data.prd)
+    }
+
+    async rollAvoidance(): Promise<RollResult> {
+        return await this.rollSkill('Esquive', 'systems/naheulbook/assets/macro-icons/avoidance.svg', this.data.data.esq)
     }
 
     async rollCustomSkill(
