@@ -1,8 +1,8 @@
 import {container} from "tsyringe";
 import {CharacterActorProperties} from './character-actor-properties';
 import {MonsterActorProperties, MonsterDamage} from './monster-actor-properties';
-import {RollUtil} from '../../utils/roll-util';
-import {AdditionalRoll, RollChatUtil} from '../../utils/roll-chat-util';
+import {RollResult, RollUtil} from '../../utils/roll-util';
+import {AdditionalRoll, RollChatUtil, TestRoll} from '../../utils/roll-chat-util';
 import {DialogAwaiter} from '../../utils/dialog-awaiter';
 import {SelectWeaponDialog} from '../../ui/dialog/select-weapon-dialog';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
@@ -34,7 +34,7 @@ export class NaheulbookActor extends Actor {
         this.rollFactory = container.resolve(RollFactory)
     }
 
-    async rollAttack(): Promise<void> {
+    async rollAttack(): Promise<RollResult | undefined> {
         let weapon: CharacterWeaponDamage | MonsterDamage | undefined;
         if (this.data.type === 'character') {
             if (this.data.data.weapons.length === 1) {
@@ -52,12 +52,12 @@ export class NaheulbookActor extends Actor {
 
         if (!weapon) {
             ui.notifications?.warn('Aucune arme disponible');
-            return;
+            return undefined;
         }
 
         let damageRoll = await this.rollFactory.createRoll(weapon.rollFormula);
 
-        await this.rollSkill(
+        return await this.rollSkill(
             'Attaque',
             'systems/naheulbook/assets/macro-icons/saber-slash.svg',
             this.data.data.at,
@@ -66,14 +66,20 @@ export class NaheulbookActor extends Actor {
                 item: weapon.name,
                 roll: damageRoll
             }
-        )
+        );
     }
 
-    async rollParry() {
-        await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.data.data.prd)
+    async rollParry(): Promise<RollResult> {
+        return await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.data.data.prd)
     }
 
-    async rollCustomSkill(name: string, icon: string | undefined, statName: string, testModifier: number, extra?: { rollFormula: string, item: string, label: string }) {
+    async rollCustomSkill(
+        name: string,
+        icon: string | undefined,
+        statName: string,
+        testModifier: number,
+        extra?: { rollFormula: string, item: string, label: string }
+    ): Promise<RollResult> {
         icon = icon || 'systems/naheulbook/assets/macro-icons/dice20.svg';
 
         if (!(statName in this.data.data))
@@ -87,14 +93,19 @@ export class NaheulbookActor extends Actor {
 
         let damageRoll = await this.rollFactory.createRoll(extra.rollFormula);
 
-        await this.rollSkill(name, icon, successValue, {
+        return await this.rollSkill(name, icon, successValue, {
             label: extra.label + damageRoll.total,
             item: extra.item,
             roll: damageRoll
         })
     }
 
-    async rollSkill(name: string, icon: string, maxSuccessScore: number, additionalRoll?: AdditionalRoll) {
+    async rollSkill(
+        name: string,
+        icon: string,
+        maxSuccessScore: number,
+        additionalRoll?: AdditionalRoll
+    ): Promise<RollResult> {
         let roll = await this.rollFactory.createRoll('1d20');
         let result = this.rollUtil.getRollResult(roll.total, maxSuccessScore);
 
@@ -114,5 +125,23 @@ export class NaheulbookActor extends Actor {
         })
 
         await this.rollUtil.playEpicSoundAfterMessage(result, message?.id);
+
+        return result;
+    }
+
+    async useMana(amount: number): Promise<void> {
+        await this.update({
+            data: {
+                mana: {value: this.data.data.ea.value - amount}
+            }
+        }, {diff: true});
+    }
+
+    async updateHealth(amount: number): Promise<void> {
+        await this.update({
+            data: {
+                health: {value: Math.min(this.data.data.ev.value + amount, this.data.data.ev.max)}
+            }
+        }, {diff: true});
     }
 }
