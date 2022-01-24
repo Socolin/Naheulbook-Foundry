@@ -10,7 +10,7 @@ export class DialogAwaiter {
         return new Promise<TResult | undefined>((resolve) => {
             let childContainer = container.createChildContainer();
             childContainer.register('DIALOG_DATA', {useValue: data});
-            childContainer.register('DIALOG_RESULT', {useValue: () => result => resolve(result)});
+            childContainer.register('DIALOG_RESULT', {useValue: result => resolve(result)});
 
             let dialog = childContainer.resolve(type)
             dialog.render(true);
