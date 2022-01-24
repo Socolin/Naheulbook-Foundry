@@ -24,7 +24,7 @@ export class MacroUtil {
             slot = 0;
         }
         try {
-            await this.game.user.assignHotbarMacro(macro, slot || 0);
+            await this.game.user.assignHotbarMacro(macro, slot || '');
         } catch (e) {
             console.error(`Failed to add macro add ${macro.name}: ${e.message}`);
         }
