@@ -137,6 +137,11 @@ export class NaheulbookActor extends Actor {
         }, {diff: true});
     }
 
+    async useManaAfterCastingSpell(result: RollResult, mana: number) {
+        let manaConsumeDiviser = result == 'fail' ? 2 : 1;
+        await this.useMana(Math.max(1, Math.floor(mana / manaConsumeDiviser)));
+    }
+
     async updateHealth(amount: number): Promise<void> {
         await this.update({
             data: {
