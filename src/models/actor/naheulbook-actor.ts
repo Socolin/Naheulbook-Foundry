@@ -132,7 +132,7 @@ export class NaheulbookActor extends Actor {
     async useMana(amount: number): Promise<void> {
         await this.update({
             data: {
-                mana: {value: this.data.data.ea.value - amount}
+                ea: {value: this.data.data.ea.value - amount}
             }
         }, {diff: true});
     }
@@ -140,7 +140,7 @@ export class NaheulbookActor extends Actor {
     async updateHealth(amount: number): Promise<void> {
         await this.update({
             data: {
-                health: {value: Math.min(this.data.data.ev.value + amount, this.data.data.ev.max)}
+                ev: {value: Math.min(this.data.data.ev.value + amount, this.data.data.ev.max)}
             }
         }, {diff: true});
     }
