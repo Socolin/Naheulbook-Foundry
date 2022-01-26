@@ -1,5 +1,5 @@
 import {singleton} from 'tsyringe';
-import {Evaluated} from './roll-factory';
+import {Evaluated} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/roll';
 
 export type RollResult = 'epicFail' | 'fail' | 'success' | 'criticalSuccess';
 

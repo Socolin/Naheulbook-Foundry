@@ -84,7 +84,7 @@ export class MacroUtil {
 
     getSampleMacro(name: string): Macro | undefined {
         let macro = this.game.macros.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
-        if (macro && this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))
+        if (macro && this.game.user && macro.testUserPermission(this.game.user, 'OWNER', {}))
             return macro;
         return undefined;
     }
@@ -95,7 +95,7 @@ export class MacroUtil {
             return;
 
         for (let macro of macros) {
-            if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER'))  {
+            if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER', {}))  {
                 for (let [slot, macroId] of Object.entries(this.game.user.data.hotbar)) {
                     if (macroId == macro.id) {
                         delete this.game.user.data.hotbar[slot];

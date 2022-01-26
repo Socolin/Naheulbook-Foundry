@@ -105,7 +105,7 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
         });
     }
 
-    getData(options?: Partial<Application.Options>): object | Promise<object> {
+    getData(options?: Partial<ApplicationOptions>): object | Promise<object> {
         return {
             ...super.getData(options),
             data: this.data,
@@ -118,7 +118,7 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
     }
 
 
-    static get defaultOptions(): Application.Options {
+    static get defaultOptions(): ApplicationOptions {
         return {
             ...super.defaultOptions,
             id: "macro-creator-helper",
