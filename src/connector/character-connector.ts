@@ -189,6 +189,11 @@ export class CharacterConnector {
                 fo: character.computedData.stats['FO'],
                 cou: character.computedData.stats['COU'],
 
+                discretionModifier: character.computedData.stats['DISCRETION_MODIFIER'],
+                throwModifier: character.computedData.stats['THROW_MODIFIER'],
+                danseModifier: character.computedData.stats['DANSE_MODIFIER'],
+                pi: character.computedData.stats['PI'],
+
                 spellDamageBonus: character.computedData.stats['INT'] > 12 ? character.computedData.stats['INT'] - 12 : 0,
 
                 weapons: character.computedData.weaponsDamages
