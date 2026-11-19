@@ -225,12 +225,12 @@ export class MonsterConnector {
 
         await actor.update(data, {fromNaheulbook: true})
 
-        await this.replaceEffect(actor, 'naheulbookMonsterColor', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
-        await this.replaceEffect(actor, 'naheulbookMonsterNumber', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
+        await this.replaceEffect(actor, 'naheulbookMonsterColor', 'Couleur', await this._monsterIconGenerator.createMonsterEffectIconColor(monster.data.color));
+        await this.replaceEffect(actor, 'naheulbookMonsterNumber', 'Numéro', await this._monsterIconGenerator.createMonsterEffectIconNumber(monster.data.number));
     }
 
-    private async replaceEffect(actor: NaheulbookActor, effectId: string, icon: string): Promise<void> {
-        let colorEffect = actor.effects.find(e => e.getFlag('core', 'statusId') === effectId);
+    private async replaceEffect(actor: NaheulbookActor, effectId: string, name: string, icon: string | undefined): Promise<void> {
+        let colorEffect = actor.effects.find(e => e.statuses.has(effectId));
         if (colorEffect) {
             await colorEffect.delete({});
         }
@@ -238,10 +238,9 @@ export class MonsterConnector {
         if (!icon)
             return;
         const effectData = {
+            name: name,
             icon: icon,
-            flags: {
-                "core.statusId": effectId
-            }
+            statuses: [effectId]
         };
         await ActiveEffect.create(effectData, {parent: actor})
     }
@@ -255,10 +254,14 @@ export class MonsterConnector {
         if (!effectData)
             return;
 
-        const createData = foundry.utils.deepClone(effectData);
-        createData.label = game.i18n.localize(effectData.label);
-        createData["flags.core.statusId"] = effectData.id;
-        createData["flags.core.overlay"] = true;
+        const createData = {
+            name: game.i18n.localize(effectData.label),
+            icon: effectData.icon,
+            statuses: [effectData.id],
+            flags: {
+                core: {overlay: true}
+            }
+        };
 
         await ActiveEffect.create(createData, {parent: monsterActor})
     }

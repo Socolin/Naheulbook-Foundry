@@ -13,4 +13,9 @@ declare global {
     interface User {
         hotbar: Record<string, string>;
     }
+
+    // Foundry v11+ fields, not described by the v9 types package
+    interface ActiveEffect {
+        statuses: Set<string>;
+    }
 }
