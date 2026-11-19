@@ -17,7 +17,8 @@ console.info('Naheulbook | Starting');
 Hooks.once("init", async function () {
     CONFIG.Actor.documentClass = NaheulbookActor;
 
-    Actors.unregisterSheet("core", ActorSheet);
+    const Actors = foundry.documents.collections.Actors;
+    Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
     Actors.registerSheet("naheulbook", CharacterActorSheet, {types: ['character'], makeDefault: true, label: 'Personnage'});
     Actors.registerSheet("naheulbook", MonsterActorSheet, {types: ['monster'], makeDefault: true, label: 'Monstre'});
 });

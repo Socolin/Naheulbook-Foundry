@@ -5,28 +5,28 @@ import {MacroUtil} from '../../utils/macro-util';
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 import {InitializedGame} from '../../models/misc/game';
 
-export interface CharacterActorSheetData extends ActorSheet.ActorSheetData {
+export interface CharacterActorSheetData extends foundry.appv1.sheets.ActorSheet.ActorSheetData {
     isGm: boolean;
     isSynced: boolean;
     statsByGroup: typeof statsByGroup;
 }
 
-export class CharacterActorSheet extends ActorSheet {
+export class CharacterActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     private readonly macroUtil: MacroUtil;
     private readonly game: InitializedGame;
 
-    constructor(object: NaheulbookActor, options?: Partial<ActorSheet.Options>) {
+    constructor(object: NaheulbookActor, options?: Partial<foundry.appv1.sheets.ActorSheet.Options>) {
         super(object, options);
         this.macroUtil = container.resolve(MacroUtil)
         this.game = container.resolve(InitializedGame)
     }
 
-    override async getData(options?: Partial<ActorSheet.Options>): Promise<CharacterActorSheetData> {
+    override async getData(options?: Partial<foundry.appv1.sheets.ActorSheet.Options>): Promise<CharacterActorSheetData> {
         assertIsCharacter(this.actor);
 
         return {
-            ...await super.getData(options) as ActorSheet.ActorSheetData,
+            ...await super.getData(options) as foundry.appv1.sheets.ActorSheet.ActorSheetData,
             statsByGroup: statsByGroup,
             isGm: this.game.user.isGM,
             isSynced: !!this.actor.system.naheulbookCharacterId
@@ -52,7 +52,7 @@ export class CharacterActorSheet extends ActorSheet {
         });
     }
 
-    static override get defaultOptions(): ActorSheet.Options {
+    static override get defaultOptions(): foundry.appv1.sheets.ActorSheet.Options {
         return {
             ...super.defaultOptions,
             template: "systems/naheulbook/ui/sheets/character-actor-sheet.hbs",

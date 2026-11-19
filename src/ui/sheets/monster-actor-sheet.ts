@@ -5,28 +5,28 @@ import ClickEvent = JQuery.ClickEvent;
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 import {InitializedGame} from '../../models/misc/game';
 
-export interface MonsterActorSheetData extends ActorSheet.ActorSheetData {
+export interface MonsterActorSheetData extends foundry.appv1.sheets.ActorSheet.ActorSheetData {
     isGm: boolean;
     isSynced: boolean;
     statsByGroup: typeof statsByGroup;
 }
 
-export class MonsterActorSheet extends ActorSheet {
+export class MonsterActorSheet extends foundry.appv1.sheets.ActorSheet {
 
     private readonly macroUtil: MacroUtil;
     private readonly game: InitializedGame;
 
-    constructor(actor: NaheulbookActor, options?: Partial<ActorSheet.Options>) {
+    constructor(actor: NaheulbookActor, options?: Partial<foundry.appv1.sheets.ActorSheet.Options>) {
         super(actor, options);
         this.macroUtil = container.resolve(MacroUtil);
         this.game = container.resolve(InitializedGame)
     }
 
-    override async getData(options?: Partial<ActorSheet.Options>): Promise<MonsterActorSheetData> {
+    override async getData(options?: Partial<foundry.appv1.sheets.ActorSheet.Options>): Promise<MonsterActorSheetData> {
         assertIsMonster(this.actor);
 
         return {
-            ...await super.getData(options) as ActorSheet.ActorSheetData,
+            ...await super.getData(options) as foundry.appv1.sheets.ActorSheet.ActorSheetData,
             statsByGroup: statsByGroup,
             isGm: this.game.user.isGM,
             isSynced: !!this.actor.system.naheulbookMonsterId
@@ -52,7 +52,7 @@ export class MonsterActorSheet extends ActorSheet {
         });
     }
 
-    static override get defaultOptions(): ActorSheet.Options {
+    static override get defaultOptions(): foundry.appv1.sheets.ActorSheet.Options {
         return {
             ...super.defaultOptions,
             template: "systems/naheulbook/ui/sheets/monster-actor-sheet.hbs",

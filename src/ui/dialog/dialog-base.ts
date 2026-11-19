@@ -2,7 +2,7 @@ import ClickEvent = JQuery.ClickEvent;
 
 export type DialogResultCallback<TResult> = (result: TResult | undefined) => void;
 
-export abstract class DialogBase<TData, TResult> extends Application {
+export abstract class DialogBase<TData, TResult> extends foundry.appv1.api.Application {
     constructor(
         protected readonly dialogData: TData,
         protected readonly result: DialogResultCallback<TResult>
@@ -26,7 +26,7 @@ export abstract class DialogBase<TData, TResult> extends Application {
         });
     }
 
-    override close(options?: Application.CloseOptions & { selected: boolean }) {
+    override close(options?: foundry.appv1.api.Application.CloseOptions & { selected: boolean }) {
         if (!options?.selected) {
             this.result(undefined);
         }

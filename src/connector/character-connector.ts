@@ -49,7 +49,7 @@ export class CharacterConnector {
                 return;
 
             let oldCharacterId = actor.getFlag('naheulbook', 'characterId');
-            let newCharacterId = +data.system.naheulbookCharacterId;
+            let newCharacterId = Number(data.system.naheulbookCharacterId);
             if (oldCharacterId === newCharacterId)
                 return;
 

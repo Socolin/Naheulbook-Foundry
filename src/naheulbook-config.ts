@@ -12,9 +12,10 @@ export class NaheulbookConfig {
     ) {
     }
 
-    changeValue(valueName, value) {
+    changeValue<K extends 'naheulbookHost' | 'groupId' | 'accessKey'>(valueName: K, value: this[K]) {
         this[valueName] = value;
-        Hooks.call('naheulbookConfig' + valueName, value);
+        // Hook name is computed from the setting name, see HookConfig in global.d.ts
+        (Hooks.call as (hook: string, ...args: unknown[]) => boolean)(`naheulbookConfig${valueName}`, value);
         Hooks.call('naheulbookConfig', this);
     }
 

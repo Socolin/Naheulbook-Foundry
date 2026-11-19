@@ -19,7 +19,7 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
         super(data, result);
     }
 
-    override getData(options?: Partial<ApplicationOptions>): object | Promise<object> {
+    override getData(options?: Partial<foundry.appv1.api.Application.Options>): object | Promise<object> {
         return {
             ...super.getData(options),
             weapons: this.dialogData.weapons,
@@ -43,7 +43,7 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
         return (this.dialogData.weapons as (CharacterWeaponDamage | MonsterDamage)[]).find(w => w.itemId == this.selectedWeaponId);
     }
 
-    static get defaultOptions(): ApplicationOptions {
+    static get defaultOptions(): foundry.appv1.api.Application.Options {
         return {
             ...super.defaultOptions,
             id: "select-weapon",

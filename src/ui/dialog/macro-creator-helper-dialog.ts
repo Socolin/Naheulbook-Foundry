@@ -65,7 +65,7 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
         html.find('[data-action]').on('click', async (ev: ClickEvent) => {
             switch (ev.currentTarget.dataset.action) {
                 case 'selectImg': {
-                    let fp = new FilePicker({
+                    let fp = new foundry.applications.apps.FilePicker.implementation({
                         type: "image",
                         displayMode: 'thumbs',
                         current: this.data.icon,
@@ -73,8 +73,10 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
                             ev.currentTarget.src = path;
                             this.data.icon = path;
                         },
-                        top: (this.position.top || 0) + 40,
-                        left: (this.position.left || 0) + 10
+                        position: {
+                            top: (this.position.top || 0) + 40,
+                            left: (this.position.left || 0) + 10
+                        }
                     });
                     await fp.browse('');
                     break;
@@ -105,7 +107,7 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
         });
     }
 
-    getData(options?: Partial<ApplicationOptions>): object | Promise<object> {
+    getData(options?: Partial<foundry.appv1.api.Application.Options>): object | Promise<object> {
         return {
             ...super.getData(options),
             data: this.data,
@@ -118,7 +120,7 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
     }
 
 
-    static get defaultOptions(): ApplicationOptions {
+    static get defaultOptions(): foundry.appv1.api.Application.Options {
         return {
             ...super.defaultOptions,
             id: "macro-creator-helper",

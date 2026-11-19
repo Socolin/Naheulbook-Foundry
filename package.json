@@ -1,7 +1,7 @@
 {
   "type": "module",
   "devDependencies": {
-    "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5",
+    "@league-of-foundry-developers/foundry-vtt-types": "^13.346.0-beta.20250812191140",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "esbuild": "^0.14.11",

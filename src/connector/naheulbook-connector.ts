@@ -27,11 +27,11 @@ export class NaheulbookConnector {
             }
         })
 
-        Hooks.on('renderPlayerList', (playerList, div, userData) => {
+        Hooks.on('userConnected', () => {
             if (this.game.user.role === CONST.USER_ROLES.GAMEMASTER) {
                 return;
             }
-            const gameMasterOnline = userData.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)
+            const gameMasterOnline = this.game.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)
             if (this.nhbkApi && gameMasterOnline) {
                 // Game master just connect, disconnect to avoid duplicate notification
                 this.disconnect();

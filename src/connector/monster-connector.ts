@@ -78,7 +78,7 @@ export class MonsterConnector {
                 return;
 
             let oldMonsterId = actor.getFlag('naheulbook', 'monsterId');
-            let newMonsterId = +data.system.naheulbookMonsterId;
+            let newMonsterId = Number(data.system.naheulbookMonsterId);
             if (oldMonsterId === newMonsterId)
                 return;
 
