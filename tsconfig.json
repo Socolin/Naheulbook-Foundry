@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ES2022",
+    "module": "ESNext",
     "types": ["@league-of-foundry-developers/foundry-vtt-types"],
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   }
 }

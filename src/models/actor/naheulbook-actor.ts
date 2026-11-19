@@ -1,6 +1,6 @@
 import {container} from "tsyringe";
-import {CharacterActorData, CharacterActorProperties} from './character-actor-properties';
-import {MonsterActorData, MonsterActorProperties, MonsterDamage} from './monster-actor-properties';
+import {CharacterActorData} from './character-actor-properties';
+import {MonsterActorData, MonsterDamage} from './monster-actor-properties';
 import {RollResult, RollUtil} from '../../utils/roll-util';
 import {AdditionalRoll, RollChatUtil, TestRoll} from '../../utils/roll-chat-util';
 import {DialogAwaiter} from '../../utils/dialog-awaiter';
@@ -8,45 +8,38 @@ import {SelectWeaponDialog} from '../../ui/dialog/select-weapon-dialog';
 import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model';
 import {RollFactory} from '../../utils/roll-factory';
 
-declare global {
-    interface DataConfig {
-        Actor: CharacterActorProperties | MonsterActorProperties;
-    }
-}
-
-declare global {
-    interface DocumentClassConfig {
-        Actor: typeof NaheulbookActor;
-    }
-}
-
 export class NaheulbookActor extends Actor {
-    declare system: CharacterActorData | MonsterActorData;
-
     private readonly rollUtil: RollUtil;
     private readonly rollChatUtil: RollChatUtil;
     private readonly dialogAwaiter: DialogAwaiter;
     private readonly rollFactory: RollFactory;
 
-    constructor(data, context) {
-        super(data, context);
+    constructor(...args: ConstructorParameters<typeof Actor>) {
+        super(...args);
         this.rollUtil = container.resolve(RollUtil)
         this.rollChatUtil = container.resolve(RollChatUtil)
         this.dialogAwaiter = container.resolve(DialogAwaiter)
         this.rollFactory = container.resolve(RollFactory)
     }
 
+    /**
+     * The actor system data, typed for the actor types defined by this system
+     */
+    get stats(): CharacterActorData | MonsterActorData {
+        return this.system as unknown as CharacterActorData | MonsterActorData;
+    }
+
     async rollAttack(): Promise<RollResult | undefined> {
         let weapon: CharacterWeaponDamage | MonsterDamage | undefined;
         if (this.type === 'character') {
-            let weapons = (this.system as CharacterActorData).weapons;
+            let weapons = (this.stats as CharacterActorData).weapons;
             if (weapons.length === 1) {
                 weapon = weapons[0];
             } else if (weapons.length > 1) {
                 weapon = await this.dialogAwaiter.openAndWaitResult(SelectWeaponDialog, {weapons: weapons});
             }
         } else if (this.type === 'monster') {
-            let damages = (this.system as MonsterActorData).damages;
+            let damages = (this.stats as MonsterActorData).damages;
             if (damages.length === 1) {
                 weapon = damages[0];
             } else if (damages.length > 1) {
@@ -59,7 +52,7 @@ export class NaheulbookActor extends Actor {
             return undefined;
         }
 
-        let at = 'at' in weapon ? weapon.at : this.system.at;
+        let at = 'at' in weapon ? weapon.at : this.stats.at;
         let damageRoll = weapon.rollFormula ? await this.rollFactory.createRoll(weapon.rollFormula) : undefined;
 
         return await this.rollSkill(
@@ -75,14 +68,14 @@ export class NaheulbookActor extends Actor {
     }
 
     async rollParry(): Promise<RollResult> {
-        if (!this.system.prd && this.system.esq) {
+        if (!this.stats.prd && this.stats.esq) {
             return await this.rollAvoidance();
         }
-        return await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.system.prd)
+        return await this.rollSkill('Parade', 'systems/naheulbook/assets/macro-icons/shield.svg', this.stats.prd)
     }
 
     async rollAvoidance(): Promise<RollResult> {
-        return await this.rollSkill('Esquive', 'systems/naheulbook/assets/macro-icons/avoidance.svg', this.system.esq)
+        return await this.rollSkill('Esquive', 'systems/naheulbook/assets/macro-icons/avoidance.svg', this.stats.esq)
     }
 
     async rollCustomSkill(
@@ -94,10 +87,10 @@ export class NaheulbookActor extends Actor {
     ): Promise<RollResult> {
         icon = icon || 'systems/naheulbook/assets/macro-icons/dice20.svg';
 
-        if (!(statName in this.system))
-            throw new Error(`Stat ${statName} is not available for actor data ${this.name} (${this.id}). Available are: ${Object.keys(this.system).join(',')}`);
+        if (!(statName in this.stats))
+            throw new Error(`Stat ${statName} is not available for actor data ${this.name} (${this.id}). Available are: ${Object.keys(this.stats).join(',')}`);
 
-        let successValue = +this.system[statName] + testModifier;
+        let successValue = +this.stats[statName] + testModifier;
 
         if (!extra) {
             return this.rollSkill(name, icon, successValue);
@@ -132,7 +125,6 @@ export class NaheulbookActor extends Actor {
                 {roll: roll, successValue: maxSuccessScore, total: roll.total, result: result},
                 additionalRoll
             ),
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             rolls: [this.rollUtil.mergeRolls(rolls)],
         })
 
@@ -144,7 +136,7 @@ export class NaheulbookActor extends Actor {
     async useMana(amount: number): Promise<void> {
         await this.update({
             system: {
-                ea: {value: this.system.ea.value - amount}
+                ea: {value: this.stats.ea.value - amount}
             }
         }, {diff: true});
     }
@@ -157,7 +149,7 @@ export class NaheulbookActor extends Actor {
     async updateHealth(amount: number): Promise<void> {
         await this.update({
             system: {
-                ev: {value: Math.min(this.system.ev.value + amount, this.system.ev.max)}
+                ev: {value: Math.min(this.stats.ev.value + amount, this.stats.ev.max)}
             }
         }, {diff: true});
     }

@@ -1,22 +1,9 @@
-import {
-    ConfiguredCollectionClassForName
-} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/game';
-import {ConfiguredDocumentClass} from '@league-of-foundry-developers/foundry-vtt-types/src/types/helperTypes';
+/**
+ * Injection token for the `game` global, once Foundry is fully initialized (after the `ready` hook)
+ */
+export class InitializedGame {
+}
 
-export class InitializedGame extends Game {
-    users: ConfiguredCollectionClassForName<'User'>;
-    folders: ConfiguredCollectionClassForName<'Folder'>;
-    actors: ConfiguredCollectionClassForName<'Actor'>;
-    items: ConfiguredCollectionClassForName<'Item'>;
-    scenes: ConfiguredCollectionClassForName<'Scene'>;
-    combats: ConfiguredCollectionClassForName<'Combat'>;
-    journal: ConfiguredCollectionClassForName<'JournalEntry'>;
-    macros: ConfiguredCollectionClassForName<'Macro'>;
-    playlists: ConfiguredCollectionClassForName<'Playlist'>;
-    tables: ConfiguredCollectionClassForName<'RollTable'>;
-    messages: ConfiguredCollectionClassForName<'ChatMessage'>;
-    override get user(): StoredDocument<InstanceType<ConfiguredDocumentClass<typeof User>>> {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        return super.user!;
-    }
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface InitializedGame extends ReadyGame {
 }

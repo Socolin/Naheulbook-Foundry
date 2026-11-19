@@ -5,29 +5,28 @@ import ClickEvent = JQuery.ClickEvent;
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 import {InitializedGame} from '../../models/misc/game';
 
-export interface MonsterActorSheetData extends ActorSheet.Data {
+export interface MonsterActorSheetData extends ActorSheet.ActorSheetData {
     isGm: boolean;
     isSynced: boolean;
     statsByGroup: typeof statsByGroup;
 }
 
-export class MonsterActorSheet<Options extends ActorSheet.Options = ActorSheet.Options>
-    extends ActorSheet<Options, MonsterActorSheetData> {
+export class MonsterActorSheet extends ActorSheet {
 
     private readonly macroUtil: MacroUtil;
     private readonly game: InitializedGame;
 
-    constructor(actor: NaheulbookActor, options: Partial<Options>) {
+    constructor(actor: NaheulbookActor, options?: Partial<ActorSheet.Options>) {
         super(actor, options);
         this.macroUtil = container.resolve(MacroUtil);
         this.game = container.resolve(InitializedGame)
     }
 
-    override getData(options?: Partial<Options>): Promise<MonsterActorSheetData> | MonsterActorSheetData {
+    override async getData(options?: Partial<ActorSheet.Options>): Promise<MonsterActorSheetData> {
         assertIsMonster(this.actor);
 
         return {
-            ...super.getData(options),
+            ...await super.getData(options) as ActorSheet.ActorSheetData,
             statsByGroup: statsByGroup,
             isGm: this.game.user.isGM,
             isSynced: !!this.actor.system.naheulbookMonsterId

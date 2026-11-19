@@ -1,5 +1,4 @@
 import {singleton} from 'tsyringe';
-import {Evaluated} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/roll';
 
 export type RollResult = 'epicFail' | 'fail' | 'success' | 'criticalSuccess';
 
@@ -56,18 +55,16 @@ export class RollUtil {
 
     private async playEpicSound(result: RollResult) {
         if (result === 'criticalSuccess') {
-            await AudioHelper.play({
+            await foundry.audio.AudioHelper.play({
                 src: 'systems/naheulbook/assets/sounds/critical-success.mp3',
                 volume: 0.20,
-                loop: false,
-                autoplay: true
+                loop: false
             }, true);
         } else if (result === 'epicFail') {
-            await AudioHelper.play({
+            await foundry.audio.AudioHelper.play({
                 src: 'systems/naheulbook/assets/sounds/epic-fail.mp3',
                 volume: 0.20,
-                loop: false,
-                autoplay: true
+                loop: false
             }, true);
         }
     }
@@ -79,9 +76,9 @@ export class RollUtil {
         return result.substring(0, totalIndex) + result.substring(endTotalIndex);
     }
 
-    mergeRolls(rolls: Evaluated<Roll>[]): Roll {
+    mergeRolls(rolls: Roll.Evaluated<Roll>[]): ReturnType<typeof Roll.fromJSON> {
         let groupedRoll = new Roll('').toJSON();
-        groupedRoll.terms = [PoolTerm.fromRolls(rolls)];
+        groupedRoll.terms = [foundry.dice.terms.PoolTerm.fromRolls(rolls)];
         groupedRoll.dice = []
         groupedRoll.evaluated = true;
         groupedRoll.total = 0;

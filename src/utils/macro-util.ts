@@ -1,5 +1,4 @@
 import {inject, singleton} from 'tsyringe';
-import {MacroData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
 import {NaheulbookActor} from '../models/actor/naheulbook-actor';
 import {DialogAwaiter} from './dialog-awaiter';
 import {MacroCreatorHelperDialog} from '../ui/dialog/macro-creator-helper-dialog';
@@ -15,16 +14,16 @@ export class MacroUtil {
     ) {
     }
 
-    async createAndAssignMacroToFirstAvailableSlot(data: Partial<MacroData> & {name: string}, slot?: number | string): Promise<void> {
+    async createAndAssignMacroToFirstAvailableSlot(data: Macro.CreateData, slot?: number): Promise<void> {
         let macro = await Macro.create(data)
         if (!macro) {
             throw new Error('Failed to create macro');
         }
         if (slot && (slot in this.game.user.hotbar)) {
-            slot = '';
+            slot = undefined;
         }
         try {
-            await this.game.user.assignHotbarMacro(macro, slot || '');
+            await this.game.user.assignHotbarMacro(macro, slot);
         } catch (e) {
             console.error(`Failed to add macro add ${macro.name}: ${e.message}`);
         }
@@ -49,7 +48,7 @@ export class MacroUtil {
         // Cleanup old macro deleted but not removed
         for (let [slot, macroId] of Object.entries(this.game.user.hotbar)) {
             if (!this.game.macros.get(macroId)) {
-                await this.game.user.assignHotbarMacro(null, slot);
+                await this.game.user.assignHotbarMacro(null, +slot);
             }
         }
 
@@ -61,7 +60,7 @@ export class MacroUtil {
                 img: 'systems/naheulbook/assets/macro-icons/saber-slash.svg',
                 command: this.guardScriptExecutionWithTokenCheck(`token.actor.rollAttack();`),
                 flags: {
-                    "naheulbook.sampleMacro": 'attack'
+                    naheulbook: {sampleMacro: 'attack'}
                 }
             }, 1);
         }
@@ -74,7 +73,7 @@ export class MacroUtil {
                 img: 'systems/naheulbook/assets/macro-icons/shield.svg',
                 command: this.guardScriptExecutionWithTokenCheck(`token.actor.rollParry()`),
                 flags: {
-                    "naheulbook.sampleMacro": 'parry'
+                    naheulbook: {sampleMacro: 'parry'}
                 }
             }, 2);
         }
@@ -83,14 +82,14 @@ export class MacroUtil {
     }
 
     getSampleMacro(name: string): Macro | undefined {
-        let macro = this.game.macros.contents.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
+        let macro = this.game.macros.find(x => x.getFlag('naheulbook', 'sampleMacro') === name);
         if (macro && this.game.user && macro.testUserPermission(this.game.user, 'OWNER', {}))
             return macro;
         return undefined;
     }
 
     async deleteSamplesMacro() {
-        let macros = this.game.macros.contents.filter(x => !!x.getFlag('naheulbook', 'sampleMacro'));
+        let macros = this.game.macros.filter(x => !!x.getFlag('naheulbook', 'sampleMacro'));
         if (!macros)
             return;
 
@@ -98,7 +97,7 @@ export class MacroUtil {
             if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER', {}))  {
                 for (let [slot, macroId] of Object.entries(this.game.user.hotbar)) {
                     if (macroId == macro.id) {
-                        delete this.game.user.hotbar[slot];
+                        await this.game.user.assignHotbarMacro(null, +slot);
                     }
                 }
                 await macro.delete();

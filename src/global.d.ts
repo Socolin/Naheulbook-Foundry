@@ -1,21 +1,45 @@
-import '';
+import type {CharacterActorData} from './models/actor/character-actor-properties';
+import type {MonsterActorData} from './models/actor/monster-actor-properties';
+import type {NaheulbookActor} from './models/actor/naheulbook-actor';
 
-declare global {
-    namespace ClientSettings {
-        interface Values {
-            'naheulbook.naheulbookHost': string;
-            'naheulbook.groupId': number;
-            'naheulbook.accessKey': string;
-        }
+declare module "@league-of-foundry-developers/foundry-vtt-types/configuration" {
+    interface AssumeHookRan {
+        ready: never; // the type doesn't matter
     }
 
-    // Foundry v10+ fields, not described by the v9 types package
-    interface User {
-        hotbar: Record<string, string>;
+    interface DocumentClassConfig {
+        Actor: typeof NaheulbookActor;
     }
 
-    // Foundry v11+ fields, not described by the v9 types package
-    interface ActiveEffect {
-        statuses: Set<string>;
+    interface SourceConfig {
+        Actor: {
+            character: CharacterActorData;
+            monster: MonsterActorData;
+        };
+    }
+
+    interface FlagConfig {
+        Actor: {
+            naheulbook?: {
+                characterId?: number;
+                monsterId?: number;
+            };
+        };
+        Folder: {
+            naheulbook?: {
+                specialFolder?: 'players' | 'currentFight';
+            };
+        };
+        Macro: {
+            naheulbook?: {
+                sampleMacro?: string;
+            };
+        };
+    }
+
+    interface SettingConfig {
+        'naheulbook.naheulbookHost': string;
+        'naheulbook.groupId': number;
+        'naheulbook.accessKey': string;
     }
 }

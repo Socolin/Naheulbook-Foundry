@@ -1,9 +1,8 @@
 import {inject, singleton} from 'tsyringe';
 import {RollResult, RollUtil} from './roll-util';
-import {Evaluated} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/roll';
 
-export type AdditionalRoll = { label: string, item?: string, roll: Evaluated<Roll> };
-export type TestRoll = { result: RollResult, total: number, successValue: number, roll: Evaluated<Roll> };
+export type AdditionalRoll = { label: string, item?: string, roll: Roll.Evaluated<Roll> };
+export type TestRoll = { result: RollResult, total: number, successValue: number, roll: Roll.Evaluated<Roll> };
 
 @singleton()
 export class RollChatUtil {

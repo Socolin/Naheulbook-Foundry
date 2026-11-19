@@ -1,7 +1,7 @@
 {
   "type": "module",
   "devDependencies": {
-    "@league-of-foundry-developers/foundry-vtt-types": "League-of-Foundry-Developers/foundry-vtt-types#main",
+    "@league-of-foundry-developers/foundry-vtt-types": "^12.331.5",
     "@typescript-eslint/eslint-plugin": "^5.10.0",
     "@typescript-eslint/parser": "^5.10.0",
     "esbuild": "^0.14.11",
@@ -11,7 +11,7 @@
     "handlebars": "^4.7.6",
     "jquery": "^3.5.1",
     "node-sass": "^7.0.1",
-    "typescript": "^4.5.4"
+    "typescript": "~5.6"
   },
   "scripts": {
     "esbuild": "esbuild",
@@ -25,6 +25,6 @@
     "@sentry/tracing": "^6.16.1",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^6.6.3",
-    "tsyringe": "^4.6.0"
+    "tsyringe": "^4.10.0"
   }
 }

@@ -2,10 +2,6 @@ import {MonsterIconGenerator} from "./monster-icon-generator.js";
 import {NaheulbookActor} from '../models/actor/naheulbook-actor';
 import {MonsterActorData, MonsterDamage} from '../models/actor/monster-actor-properties';
 import {Monster} from '../naheulbook-api/models/monster.model';
-import {ActorData, TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
-import {
-    TokenBarData
-} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
 import {NaheulbookLogger} from '../utils/naheulbook-logger';
 import {InitializedGame} from '../models/misc/game';
@@ -122,7 +118,7 @@ export class MonsterConnector {
 
         let monsters = await this.nhbkApi.loadGroupMonsters(groupId);
         for (let monster of monsters) {
-            let monsterActor = this.game.actors.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
+            let monsterActor = this.game.actors.find(actor => actor.getFlag('naheulbook', 'monsterId') === monster.id);
             if (monsterActor instanceof Actor) {
                 await this._updateActor(monsterActor, monster);
             } else {
@@ -183,7 +179,7 @@ export class MonsterConnector {
             folder: folder.id,
             prototypeToken: this.createTokenData(monster),
             items: [],
-            flags: {"naheulbook.monsterId": monster.id}
+            flags: {naheulbook: {monsterId: monster.id}}
         }).then((actor) => {
             this.syncMonsterActorWithNaheulbook(actor)
         });
@@ -193,15 +189,18 @@ export class MonsterConnector {
      * @return Folder
      * @private
      */
-    async _getOrCreateCurrentFightFolder() {
-        let folder = ui.actors?.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'currentFight');
+    async _getOrCreateCurrentFightFolder(): Promise<Folder> {
+        let folder = this.game.folders.find(f => f.type === 'Actor' && f.getFlag('naheulbook', 'specialFolder') === 'currentFight');
         if (!folder) {
             folder = await Folder.create({
                 name: 'Combat courant',
                 type: "Actor",
-                parent: null,
-                flags: {"naheulbook.specialFolder": "currentFight"}
+                folder: null,
+                flags: {naheulbook: {specialFolder: "currentFight"}}
             });
+            if (!folder) {
+                throw new Error('Failed to create folder `Combat courant`');
+            }
         }
 
         return folder;
@@ -218,7 +217,7 @@ export class MonsterConnector {
         let data = {
             name: monster.name,
             system: this.convertMonsterTokActorData(monster),
-        } as Partial<ActorData> & { system: MonsterActorData };
+        } as { name: string, system: MonsterActorData, img?: string };
 
         if (actor.img?.indexOf('data:') === 0)
             data.img = await this._monsterIconGenerator.createMonsterIcon(monster);
@@ -232,38 +231,25 @@ export class MonsterConnector {
     private async replaceEffect(actor: NaheulbookActor, effectId: string, name: string, icon: string | undefined): Promise<void> {
         let colorEffect = actor.effects.find(e => e.statuses.has(effectId));
         if (colorEffect) {
-            await colorEffect.delete({});
+            await colorEffect.delete();
         }
 
         if (!icon)
             return;
         const effectData = {
             name: name,
-            icon: icon,
+            img: icon,
             statuses: [effectId]
         };
         await ActiveEffect.create(effectData, {parent: actor})
     }
 
     async killMonster(monsterId: number): Promise<void> {
-        let monsterActor = game.actors?.contents.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
+        let monsterActor = this.game.actors.find(actor => actor.getFlag('naheulbook', 'monsterId') === monsterId);
         if (!monsterActor)
             return;
 
-        let effectData = CONFIG.statusEffects.find(e => e.id === 'dead');
-        if (!effectData)
-            return;
-
-        const createData = {
-            name: game.i18n.localize(effectData.label),
-            icon: effectData.icon,
-            statuses: [effectData.id],
-            flags: {
-                core: {overlay: true}
-            }
-        };
-
-        await ActiveEffect.create(createData, {parent: monsterActor})
+        await monsterActor.toggleStatusEffect(CONFIG.specialStatusEffects.DEFEATED, {active: true, overlay: true});
     }
 
     private convertMonsterTokActorData(monster: Monster): MonsterActorData {
@@ -329,16 +315,16 @@ export class MonsterConnector {
         return '1d6';
     }
 
-    private createTokenData(monster: Monster): TokenData {
+    private createTokenData(monster: Monster): Actor.CreateData["prototypeToken"] {
         let tokenData = {
             actorLink: true,
             displayBars: CONST.TOKEN_DISPLAY_MODES.ALWAYS,
             bar1: {attribute: 'ev'}
-        } as TokenData;
+        } as NonNullable<Actor.CreateData["prototypeToken"]>;
         if (monster.data.maxEa) {
             tokenData.bar2 = {
                 attribute: 'ea'
-            } as TokenBarData
+            };
         }
 
         return tokenData;

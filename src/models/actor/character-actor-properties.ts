@@ -3,12 +3,7 @@ import {CharacterWeaponDamage} from '../../naheulbook-api/models/character.model
 import {NaheulbookActor} from './naheulbook-actor';
 import {NaheulbookActorCharacter} from './naheulbook-actor-types';
 
-export interface CharacterActorProperties {
-    type: 'character';
-    data: CharacterActorData;
-}
-
-export interface CharacterActorData extends BaseStatsActorProperties {
+export type CharacterActorData = BaseStatsActorProperties & {
     naheulbookCharacterId?: number;
     cou: number;
     int: number;

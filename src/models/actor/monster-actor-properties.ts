@@ -2,11 +2,6 @@ import {BaseStatsActorProperties} from './base-stats-actor-properties';
 import {NaheulbookActor} from './naheulbook-actor';
 import {NaheulbookActorMonster} from './naheulbook-actor-types';
 
-export interface MonsterActorProperties {
-    type: 'monster';
-    data: MonsterActorData;
-}
-
 export interface MonsterDamage {
     itemId: number;
     name: string;
@@ -16,7 +11,7 @@ export interface MonsterDamage {
     damageType?: string;
 }
 
-export interface MonsterActorData extends BaseStatsActorProperties {
+export type MonsterActorData = BaseStatsActorProperties & {
     naheulbookMonsterId: number;
     cou: number;
     chercheNoise: boolean;

@@ -9,8 +9,8 @@
     }
   ],
   "compatibility": {
-    "minimum": "11",
-    "verified": "11.315"
+    "minimum": "12",
+    "verified": "12.343"
   },
   "scripts": [
     "init.js"
@@ -27,8 +27,10 @@
     }
   ],
   "socket": false,
-  "gridDistance": 1,
-  "gridUnits": "m",
+  "grid": {
+    "distance": 1,
+    "units": "m"
+  },
   "primaryTokenAttribute": "resources.ev",
   "secondaryTokenAttribute": "resources.ea",
   "url": "https://github.com/Socolin/Naheulbook-Foundry",

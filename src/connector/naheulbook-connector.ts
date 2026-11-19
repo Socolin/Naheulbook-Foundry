@@ -58,7 +58,7 @@ export class NaheulbookConnector {
         }
 
         if (this.game.user.role !== CONST.USER_ROLES.GAMEMASTER) {
-            if (this.game.users.contents.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
+            if (this.game.users.find(u => u.role === CONST.USER_ROLES.GAMEMASTER && u.active)) {
                 this.logger.info('A GM is already connected, skip naheulbook sync');
                 return;
             }

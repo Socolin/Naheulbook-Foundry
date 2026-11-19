@@ -12,12 +12,6 @@ import {InitializedGame} from './models/misc/game';
 
 console.info('Naheulbook | Starting');
 
-declare global {
-    interface LenientGlobalVariableTypes {
-        game: never; // the type doesn't matter
-    }
-}
-
 // CONFIG.debug.hooks = true;
 
 Hooks.once("init", async function () {

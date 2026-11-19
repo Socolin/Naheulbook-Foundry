@@ -1,9 +1,5 @@
 import {NaheulbookLogger} from '../utils/naheulbook-logger';
 import {NaheulbookApi} from '../naheulbook-api/naheulbook-api';
-import {TokenData} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs';
-import {
-    TokenBarData
-} from '@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/tokenBarData';
 import {Character} from '../naheulbook-api/models/character.model';
 import {CharacterActorData} from '../models/actor/character-actor-properties';
 import {InitializedGame} from '../models/misc/game';
@@ -89,7 +85,7 @@ export class CharacterConnector {
         let group = await this.nhbkApi.loadGroupData(groupId);
 
         for (let characterId of group.characterIds) {
-            let characterActor = this.game.actors.contents.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
+            let characterActor = this.game.actors.find(actor => actor.getFlag('naheulbook', 'characterId') === characterId);
             if (characterActor) {
                 continue;
             }
@@ -104,7 +100,7 @@ export class CharacterConnector {
     }
 
     async synchronizeExistingCharactersActors(): Promise<void> {
-        for (let actor of this.game.actors.contents.filter(a => a.type === 'character')) {
+        for (let actor of this.game.actors.filter(a => a.type === 'character')) {
             if (!actor.testUserPermission(this.game.user, "OWNER"))
                 continue;
             await this.syncCharacterActorWithNaheulbook(actor);
@@ -144,7 +140,7 @@ export class CharacterConnector {
             folder: folder.id,
             prototypeToken: this.createTokenData(character),
             items: [],
-            flags: {"naheulbook.characterId": character.id}
+            flags: {naheulbook: {characterId: character.id}}
         })
     }
 
@@ -206,14 +202,14 @@ export class CharacterConnector {
     }
 
     private async getOrCreatePlayersFolder(): Promise<Folder> {
-        let folder = ui.actors?.folders.find(f => f.getFlag('naheulbook', 'specialFolder') === 'players');
+        let folder = this.game.folders.find(f => f.type === 'Actor' && f.getFlag('naheulbook', 'specialFolder') === 'players');
 
         if (!folder) {
             folder = await Folder.create({
                 name: 'Joueurs',
                 type: "Actor",
-                parent: null,
-                flags: {"naheulbook.specialFolder": "players"}
+                folder: null,
+                flags: {naheulbook: {specialFolder: "players"}}
             });
             if (!folder) {
                 throw new Error('Failed to create folder `Joueurs`');
@@ -223,17 +219,17 @@ export class CharacterConnector {
         return folder;
     }
 
-    private createTokenData(character: Character): TokenData {
+    private createTokenData(character: Character): Actor.CreateData["prototypeToken"] {
         let tokenData = {
             actorLink: true,
             displayBars: CONST.TOKEN_DISPLAY_MODES.OWNER,
             bar1: {attribute: 'ev'}
-        } as TokenData;
+        } as NonNullable<Actor.CreateData["prototypeToken"]>;
 
         if (character.computedData.stats['EA']) {
             tokenData.bar2 = {
                 attribute: 'ea'
-            } as TokenBarData;
+            };
         }
 
         return tokenData;

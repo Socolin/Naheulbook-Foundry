@@ -5,29 +5,28 @@ import {MacroUtil} from '../../utils/macro-util';
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
 import {InitializedGame} from '../../models/misc/game';
 
-export interface CharacterActorSheetData extends ActorSheet.Data {
+export interface CharacterActorSheetData extends ActorSheet.ActorSheetData {
     isGm: boolean;
     isSynced: boolean;
     statsByGroup: typeof statsByGroup;
 }
 
-export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet.Options>
-    extends ActorSheet<Options, CharacterActorSheetData> {
+export class CharacterActorSheet extends ActorSheet {
 
     private readonly macroUtil: MacroUtil;
     private readonly game: InitializedGame;
 
-    constructor(object: NaheulbookActor, options: Partial<Options>) {
+    constructor(object: NaheulbookActor, options?: Partial<ActorSheet.Options>) {
         super(object, options);
         this.macroUtil = container.resolve(MacroUtil)
         this.game = container.resolve(InitializedGame)
     }
 
-    override getData(options?: Partial<Options>): Promise<CharacterActorSheetData> | CharacterActorSheetData {
+    override async getData(options?: Partial<ActorSheet.Options>): Promise<CharacterActorSheetData> {
         assertIsCharacter(this.actor);
 
         return {
-            ...super.getData(options),
+            ...await super.getData(options) as ActorSheet.ActorSheetData,
             statsByGroup: statsByGroup,
             isGm: this.game.user.isGM,
             isSynced: !!this.actor.system.naheulbookCharacterId

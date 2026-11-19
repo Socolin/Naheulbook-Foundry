@@ -1,4 +1,4 @@
-export interface BaseStatsActorProperties {
+export type BaseStatsActorProperties = {
     ev: {
         value: number;
         max: number;
