@@ -7,7 +7,7 @@
             <div class="weapon">
                 <label>
                     <input type="radio" name="selectedWeapon" data-weapon-id="{{weapon.itemId}}" {{#if (eq weapon.itemId ../selectedWeaponId)}}checked{{/if}}>
-                    {{weapon.name}}: {{weapon.damage}}
+                    {{weapon.name}}{{#if weapon.at}} (AT {{weapon.at}}){{/if}}{{#if weapon.damage}}: {{weapon.damage}}{{/if}}
                 </label>
             </div>
         {{/each}}

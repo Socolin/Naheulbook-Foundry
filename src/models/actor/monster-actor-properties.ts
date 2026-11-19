@@ -10,8 +10,9 @@ export interface MonsterActorProperties {
 export interface MonsterDamage {
     itemId: number;
     name: string;
-    damage: string;
-    rollFormula: string;
+    at: number;
+    damage?: string;
+    rollFormula?: string;
     damageType?: string;
 }
 

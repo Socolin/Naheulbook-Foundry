@@ -1,5 +1,7 @@
+import {MonsterAttackData} from './monster-attack-data';
+
 export interface IMonsterData {
-    at: number;
+    attacks: MonsterAttackData[];
     prd?: number;
     esq?: number;
     ev: number;
@@ -8,7 +10,6 @@ export interface IMonsterData {
     maxEa: number;
     pr: number;
     pr_magic: number;
-    dmg: string;
     cou: number;
     chercheNoise: boolean;
     resm: number;

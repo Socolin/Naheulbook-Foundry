@@ -1,11 +1,12 @@
+import {MonsterAttackData} from './monster-attack-data';
+
 export interface MonsterTemplateData {
-    at: number;
+    attacks: MonsterAttackData[];
     prd?: number;
     esq?: number;
     ev: number;
     ea: number;
     cou: number;
-    dmg: string;
     note: string;
     pr: number;
     pr_magic: number;

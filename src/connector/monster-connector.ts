@@ -267,7 +267,7 @@ export class MonsterConnector {
 
         return {
             naheulbookMonsterId: monster.id,
-            at: monster.computedData.at,
+            at: monster.computedData.attacks[0]?.at ?? 0,
             prd: monster.computedData.prd,
             esq: monster.computedData.esq,
             pr: monster.computedData.pr,
@@ -292,34 +292,38 @@ export class MonsterConnector {
     private parseDamages(monster: Monster): MonsterDamage[] {
         let damages: MonsterDamage[] = []
         let id = 1;
-        for (let dmgElement of monster.computedData.dmg) {
-            for (let damage of dmgElement.damage.split(';')) {
-                let [rollFormula, name] = this.parseMonsterDamage(damage);
-                damages.push({
-                    itemId: id++,
-                    name: name || dmgElement.name,
-                    damage: damage,
-                    rollFormula: rollFormula
-                })
-            }
+        for (let attack of monster.computedData.attacks) {
+            let damage = attack.dmg?.trim();
+            // Damages from equipped items are formatted like `1D+2(type)`
+            let damageTypeMatch = damage?.match(/^(.*?)\s*\(\s*(.+?)\s*\)$/);
+            let rollDamage = damageTypeMatch ? damageTypeMatch[1] : damage;
+            damages.push({
+                itemId: id++,
+                name: attack.name || (monster.computedData.attacks.length > 1 ? `Attaque ${id - 1}` : 'Attaque'),
+                at: attack.at,
+                damage: damage || undefined,
+                rollFormula: rollDamage ? this.parseMonsterDamage(rollDamage) : undefined,
+                damageType: damageTypeMatch?.[2],
+            })
         }
         return damages;
     }
 
-    private readonly rollWithNameRegex = /^(?<rollFormula>\d+\s*D\s*(?:\+\s*\d+))\s*\(\s*(?<name>[\w\s]+)\s*\)$/;
-    private parseMonsterDamage(damage: string): [rollFormula: string, name?: string] {
-        if (damage.match(/^\d+\s*[dD]\s*(\+\s*\d+)$/))
-            return [damage.replace('d', 'd6').replace('D', 'd6')];
-        if (damage.match(/^\d+\s*d6\s*(\+\s*\d+)$/))
-            return [damage];
-        let matchRollWithName = damage.match(this.rollWithNameRegex)
-        if (matchRollWithName) {
-            let rollFormula = matchRollWithName[1].replace('D', 'd6');
-            let name = matchRollWithName[2].trim()
-            return [rollFormula, name];
+    // Support `1D+2`, `2D-1`, `1D6+3`, `1D20`, `D`, `3` ...
+    private readonly damageRegex = /^(?:(?<count>\d*)\s*[dD]\s*(?<faces>\d*))?\s*(?<modifier>[+-]?\s*\d+)?$/;
+    private parseMonsterDamage(damage: string): string {
+        let match = damage.match(this.damageRegex);
+        if (match?.groups && (match[0].match(/[dD]/) || match.groups.modifier)) {
+            let {count, faces, modifier} = match.groups;
+            let formula = match[0].match(/[dD]/) ? `${count || 1}d${faces || 6}` : '';
+            if (modifier) {
+                modifier = modifier.replace(/\s+/g, '');
+                formula += (formula && !modifier.startsWith('-') && !modifier.startsWith('+') ? '+' : '') + modifier;
+            }
+            return formula;
         }
         this.logger.warn('Unsupported monster damage form: ' + damage);
-        return ['1d6'];
+        return '1d6';
     }
 
     private createTokenData(monster: Monster): TokenData {

@@ -1,7 +1,7 @@
 import {Subject} from 'rxjs';
 
 import {MonsterSubCategoryResponse, MonsterResponse, MonsterTemplateResponse, MonsterTypeResponse} from '../api/responses';
-import {IMonsterData, MonsterTemplateData} from '../api/shared';
+import {IMonsterData, MonsterAttackData, MonsterTemplateData} from '../api/shared';
 import {Item, PartialItem} from './item.model';
 import {ActiveStatsModifier, StatModifier} from './stat-modifier.model';
 import {SkillDictionary} from './skill.model';
@@ -10,7 +10,7 @@ import {JobDictionary} from './job.model';
 import {ItemTemplate} from './item-template.model';
 
 export class MonsterData implements IMonsterData {
-    at: number;
+    attacks: MonsterAttackData[] = [];
     prd?: number;
     esq?: number;
     ev: number;
@@ -19,7 +19,6 @@ export class MonsterData implements IMonsterData {
     maxEa: number;
     pr: number;
     pr_magic: number;
-    dmg: string;
     cou: number;
     chercheNoise: boolean;
     resm: number;
@@ -33,24 +32,25 @@ export class MonsterData implements IMonsterData {
     static fromJson(jsonData: IMonsterData): MonsterData {
         let monsterData = new MonsterData();
         Object.assign(monsterData, jsonData);
+        monsterData.attacks = jsonData.attacks || [];
         return monsterData;
     }
 
     constructor(monsterData?: MonsterData) {
         if (monsterData) {
             Object.assign(this, monsterData);
+            this.attacks = (monsterData.attacks || []).map(attack => ({...attack}));
         }
     }
 }
 
 
 export class MonsterComputedData {
-    at: number;
+    attacks: MonsterAttackData[] = [];
     prd: number;
     esq: number;
     pr: number;
     pr_magic: number;
-    dmg: { name: string, damage: string, incompatible?: boolean }[] = [];
     cou: number;
     chercheNoise: boolean;
     resm: number;
@@ -232,7 +232,9 @@ export class Monster {
 
     private applyStatModifier(mod: StatModifier) {
         if (mod.stat === 'AT') {
-            this.computedData.at = StatModifier.apply(this.computedData.at, mod);
+            for (const attack of this.computedData.attacks) {
+                attack.at = StatModifier.apply(attack.at, mod);
+            }
         }
         if (mod.stat === 'PRD' && this.computedData.prd !== undefined) {
             this.computedData.prd = StatModifier.apply(this.computedData.prd, mod);
@@ -267,7 +269,7 @@ export class Monster {
     }
 
     update() {
-        this.computedData.at = this.data.at;
+        this.computedData.attacks = (this.data.attacks || []).map(attack => ({...attack}));
         this.computedData.prd = this.data.prd ? this.data.prd : 0;
         this.computedData.esq = this.data.esq ? this.data.esq : 0;
         this.computedData.pr = this.data.pr;
@@ -275,7 +277,6 @@ export class Monster {
         if (!this.computedData.pr_magic) {
             this.computedData.pr_magic = 0;
         }
-        this.computedData.dmg = [{name: 'base', damage: this.data.dmg}];
         this.computedData.cou = this.data.cou;
         this.computedData.chercheNoise = this.data.chercheNoise;
         this.computedData.resm = this.data.resm;
@@ -289,9 +290,10 @@ export class Monster {
         }
         for (let item of this.items) {
             if (item.data.equiped) {
-                this.computedData.dmg.push({
+                this.computedData.attacks.push({
                     name: item.data.name || item.template.name,
-                    damage: item.getDamageString()
+                    dmg: item.getDamageString(),
+                    at: this.computedData.attacks[0]?.at ?? 0,
                 });
             }
             if (item.data.equiped && item.template.modifiers) {

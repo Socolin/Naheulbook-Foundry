@@ -55,17 +55,18 @@ export class NaheulbookActor extends Actor {
             return undefined;
         }
 
-        let damageRoll = await this.rollFactory.createRoll(weapon.rollFormula);
+        let at = 'at' in weapon ? weapon.at : this.data.data.at;
+        let damageRoll = weapon.rollFormula ? await this.rollFactory.createRoll(weapon.rollFormula) : undefined;
 
         return await this.rollSkill(
             'Attaque',
             'systems/naheulbook/assets/macro-icons/saber-slash.svg',
-            this.data.data.at,
-            {
+            at,
+            damageRoll ? {
                 label: 'Dégâts: ' + damageRoll.total + (weapon.damageType ? `(${weapon.damageType})` : ''),
                 item: weapon.name,
                 roll: damageRoll
-            }
+            } : undefined
         );
     }
 

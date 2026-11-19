@@ -39,8 +39,8 @@ export class SelectWeaponDialog extends DialogBase<SelectWeaponDialogData, Chara
         })
     }
 
-    override getResult(): CharacterWeaponDamage | undefined {
-        return this.dialogData.weapons.find(w => w.itemId == this.selectedWeaponId);
+    override getResult(): CharacterWeaponDamage | MonsterDamage | undefined {
+        return (this.dialogData.weapons as (CharacterWeaponDamage | MonsterDamage)[]).find(w => w.itemId == this.selectedWeaponId);
     }
 
     static get defaultOptions(): ApplicationOptions {
