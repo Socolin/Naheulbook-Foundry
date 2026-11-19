@@ -2,7 +2,7 @@
   "id": "naheulbook",
   "title": "Naheulbeuk",
   "description": "Système de jeu pour Naheulbeuk. Fonctionne avec Naheulbook",
-  "version": "0.1.25",
+  "version": "0.1.26",
   "authors": [
     {
       "name": "Socolin"
@@ -45,6 +45,6 @@
   "secondaryTokenAttribute": "resources.ea",
   "url": "https://github.com/Socolin/Naheulbook-Foundry",
   "manifest": "https://raw.githubusercontent.com/Socolin/Naheulbook-Foundry/main/system.json",
-  "download": "https://github.com/Socolin/Naheulbook-Foundry/releases/download/v0.1.25/module.zip",
+  "download": "https://github.com/Socolin/Naheulbook-Foundry/releases/download/v0.1.26/module.zip",
   "bugs": "https://github.com/Socolin/Naheulbook-Foundry/issues"
 }
