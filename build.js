@@ -2,7 +2,7 @@ import esbuild from 'esbuild';
 import {sassPlugin} from 'esbuild-sass-plugin'
 import fs from 'fs';
 import path from 'path';
-import glob from 'glob';
+import {globSync} from 'glob';
 
 let watch = process.argv.indexOf('--watch') !== -1;
 
@@ -15,7 +15,7 @@ copyAndWatchFiles([
 
 
 (async () => {
-    await esbuild.build({
+    const ctx = await esbuild.context({
         entryPoints: [
             'src/init.ts',
             'src/ui/style.scss',
@@ -26,19 +26,24 @@ copyAndWatchFiles([
         sourcemap: true,
         minifyIdentifiers: false,
         logLevel: "info",
-        target: ['es6'],
-        watch: watch,
+        target: ['es2021'],
         outdir: 'dist',
         plugins: [
             sassPlugin(),
         ]
-    })
+    });
+    if (watch) {
+        await ctx.watch();
+    } else {
+        await ctx.rebuild();
+        await ctx.dispose();
+    }
 })();
 
 
 function copyAndWatchFiles(filesPatterns, targetDirectory, watch) {
     for (let filesPattern of filesPatterns) {
-        for (let file of glob(filesPattern.pattern, {sync: true})) {
+        for (let file of globSync(filesPattern.pattern)) {
             const destination = path.join(targetDirectory, file.replace(filesPattern.remove, ''));
             fs.cpSync(file, destination);
         }
@@ -54,7 +59,7 @@ function watchFiles(filesPatterns, targetDirectory) {
     let watchers = [];
 
     for (let filesPattern of filesPatterns) {
-        for (let file of glob(filesPattern.pattern, {sync: true})) {
+        for (let file of globSync(filesPattern.pattern)) {
             const destination = path.join(targetDirectory, file.replace(filesPattern.remove, ''));
             watchers.push(fs.watch(file, {encoding: "utf8"})
                 .on("change", () => {

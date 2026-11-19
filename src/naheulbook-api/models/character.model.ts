@@ -274,7 +274,7 @@ export class Character {
             throw new Error('Invalid origin id. Origin was not found in database: ' + response.originId);
         }
         character.origin = origin;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+         
         character.jobs = response.jobIds.map(jobId => jobs.find(j => j.id === jobId)!).filter(job => !!job);
         character.skills = response.skillIds.map(skillId => skillsById[skillId]).filter(skill => !!skill);
         character.items = response.items.map(itemResponse => Item.fromResponse(itemResponse, skillsById));

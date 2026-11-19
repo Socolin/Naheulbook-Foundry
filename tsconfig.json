@@ -5,6 +5,7 @@
     "module": "ESNext",
     "types": ["@league-of-foundry-developers/foundry-vtt-types"],
     "moduleResolution": "bundler",
+    "strict": false,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "experimentalDecorators": true,
