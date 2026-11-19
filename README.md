@@ -23,7 +23,7 @@ npm run dev
 ```
 
 Crée un lien symbolique dans le dossier `systems` de foundry vers le dossier `dist/`.
-- sur Linux: `ln -s dist/ ~.local/share/FoundryVTT/Data/systems/naheulbook`
+- sur Linux: `ln -s dist/ ~/.local/share/FoundryVTT/Data/systems/naheulbook`
 
 ## Notes
 
