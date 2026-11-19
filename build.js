@@ -7,7 +7,6 @@ import glob from 'glob';
 let watch = process.argv.indexOf('--watch') !== -1;
 
 copyAndWatchFiles([
-    {pattern: "template.json", remove: ''},
     {pattern: "system.json", remove: ''},
     {pattern: "lang/**/*.json", remove: ''},
     {pattern: "assets/**/*.*", remove: ''},

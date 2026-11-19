@@ -118,7 +118,7 @@ export class NaheulbookActor extends Actor {
         if (additionalRoll)
             rolls.push(additionalRoll.roll);
         let message = await ChatMessage.create({
-            speaker: ChatMessage.getSpeaker({actor: this}),
+            speaker: ChatMessage.getSpeaker({actor: this as Actor.Stored}),
             content: await this.rollChatUtil.formatRollResult(
                 name,
                 icon,

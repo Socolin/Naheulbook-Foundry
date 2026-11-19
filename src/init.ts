@@ -9,6 +9,7 @@ import {CharacterActorSheet} from './ui/sheets/character-actor-sheet';
 import {MacroUtil} from './utils/macro-util';
 import {RollUtil} from './utils/roll-util';
 import {InitializedGame} from './models/misc/game';
+import {CharacterDataModel, MonsterDataModel} from './models/actor/actor-data-models';
 
 console.info('Naheulbook | Starting');
 
@@ -16,6 +17,8 @@ console.info('Naheulbook | Starting');
 
 Hooks.once("init", async function () {
     CONFIG.Actor.documentClass = NaheulbookActor;
+    CONFIG.Actor.dataModels.character = CharacterDataModel;
+    CONFIG.Actor.dataModels.monster = MonsterDataModel;
 
     const Actors = foundry.documents.collections.Actors;
     Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);

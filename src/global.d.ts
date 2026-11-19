@@ -1,5 +1,4 @@
-import type {CharacterActorData} from './models/actor/character-actor-properties';
-import type {MonsterActorData} from './models/actor/monster-actor-properties';
+import type {CharacterDataModel, MonsterDataModel} from './models/actor/actor-data-models';
 import type {NaheulbookActor} from './models/actor/naheulbook-actor';
 import type {NaheulbookConfig} from './naheulbook-config';
 
@@ -12,10 +11,10 @@ declare module "@league-of-foundry-developers/foundry-vtt-types/configuration" {
         Actor: typeof NaheulbookActor;
     }
 
-    interface SourceConfig {
+    interface DataModelConfig {
         Actor: {
-            character: CharacterActorData;
-            monster: MonsterActorData;
+            character: typeof CharacterDataModel;
+            monster: typeof MonsterDataModel;
         };
     }
 
