@@ -52,6 +52,12 @@ export class NaheulbookApi {
         return monster;
     }
 
+    stopSynchronizeMonster(monster: Monster): void {
+        this.naheulbookWebsocket.stopSynchronizeMonster(monster.id);
+        monster.onUpdate.unsubscribe();
+        monster.dispose();
+    }
+
     changeCharacterStat(characterId: number, stat: string, value: any): Promise<any> {
         return this.naheulbookHttpApi.patch(`/api/v2/characters/${characterId}/`, {
             [stat]: value

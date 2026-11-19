@@ -47,48 +47,49 @@ export class MonsterIconGenerator {
         return canvas.toDataURL("image/png");
     }
 
-    async createMonsterEffectIconColor(color: string): Promise<string> {
-        let monsterColor = color ? `#${color}` : 'black';
+    /**
+     * Draw a big skull (same icon as the "Dead" status) over an existing token image, to mark the monster as dead.
+     */
+    async createDeadIcon(sourceSrc: string): Promise<string> {
+        const size = 200;
+        const [source, skull] = await Promise.all([
+            this.loadImage(sourceSrc),
+            this.loadImage(CONFIG.controlIcons.defeated),
+        ]);
 
         let canvas = document.createElement("canvas");
-        canvas.width = 100;
-        canvas.height = 100;
+        canvas.width = size;
+        canvas.height = size;
 
         let ctx = canvas.getContext("2d");
         if (!ctx) {
             throw new Error('Failed to get 2d context from canvas');
         }
-        ctx.fillStyle = monsterColor;
 
-        let circle = new Path2D();
-        circle.arc(50, 50, 50, 0, 2 * Math.PI);
-        ctx.fill(circle);
+        ctx.drawImage(source, 0, 0, size, size);
+
+        // Darken the image so the skull stands out
+        ctx.globalCompositeOperation = "source-atop";
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(0, 0, size, size);
+        ctx.globalCompositeOperation = "source-over";
+
+        const skullSize = size * 0.9;
+        const offset = (size - skullSize) / 2;
+        ctx.shadowColor = 'black';
+        ctx.shadowBlur = size * 0.05;
+        ctx.drawImage(skull, offset, offset, skullSize, skullSize);
 
         return canvas.toDataURL("image/png");
     }
 
-    async createMonsterEffectIconNumber(monsterNumber: number): Promise<string | undefined> {
-        if (!monsterNumber)
-            return undefined;
-
-        let canvas = document.createElement("canvas");
-        canvas.width = 100;
-        canvas.height = 100;
-
-        let ctx = canvas.getContext("2d");
-        if (!ctx) {
-            throw new Error('Failed to get 2d context from canvas');
-        }
-
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'black';
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = '120px serif';
-        ctx.fillText(monsterNumber.toString(), 50, 60);
-        ctx.lineWidth = 3;
-        ctx.strokeText(monsterNumber.toString(), 50, 60);
-
-        return canvas.toDataURL("image/png");
+    private loadImage(src: string): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            const image = new Image();
+            image.crossOrigin = 'anonymous';
+            image.onload = () => resolve(image);
+            image.onerror = () => reject(new Error(`Failed to load image ${src}`));
+            image.src = src;
+        });
     }
 }

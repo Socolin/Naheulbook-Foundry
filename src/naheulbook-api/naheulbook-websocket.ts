@@ -35,6 +35,11 @@ export class NaheulbookWebsocket {
             await this.sendSyncMessage('Monster', monster.id);
     }
 
+    stopSynchronizeMonster(monsterId: number) {
+        // Only stop handling the events locally: the monster is dead, nothing more will be sent for it.
+        delete this.synchronizedMonsters[monsterId];
+    }
+
     async listenForGroupEvents(groupId: number, onEvent: (opcode: string, data: any) => void) {
         this.synchronizedGroup[groupId] = onEvent;
         if (this.connection)
