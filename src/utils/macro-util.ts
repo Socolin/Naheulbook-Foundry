@@ -20,7 +20,7 @@ export class MacroUtil {
         if (!macro) {
             throw new Error('Failed to create macro');
         }
-        if (slot && (slot in this.game.user.data.hotbar)) {
+        if (slot && (slot in this.game.user.hotbar)) {
             slot = '';
         }
         try {
@@ -41,13 +41,13 @@ export class MacroUtil {
     async createNaheulbeukDefaultMacros() {
         this.logger.info('Creating default macros');
 
-        if (Object.keys(this.game.user.data.hotbar).length == 0) {
+        if (Object.keys(this.game.user.hotbar).length == 0) {
             this.logger.info('No macro assigned in hotbar yet, clean possible legacy macro');
             await this.deleteSamplesMacro();
         }
 
         // Cleanup old macro deleted but not removed
-        for (let [slot, macroId] of Object.entries(this.game.user.data.hotbar)) {
+        for (let [slot, macroId] of Object.entries(this.game.user.hotbar)) {
             if (!this.game.macros.get(macroId)) {
                 await this.game.user.assignHotbarMacro(null, slot);
             }
@@ -96,9 +96,9 @@ export class MacroUtil {
 
         for (let macro of macros) {
             if (this.game.user && macro.testUserPermission(this.game.user, 'OWNER', {}))  {
-                for (let [slot, macroId] of Object.entries(this.game.user.data.hotbar)) {
+                for (let [slot, macroId] of Object.entries(this.game.user.hotbar)) {
                     if (macroId == macro.id) {
-                        delete this.game.user.data.hotbar[slot];
+                        delete this.game.user.hotbar[slot];
                     }
                 }
                 await macro.delete();

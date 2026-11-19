@@ -30,7 +30,7 @@ export class CharacterActorSheet<Options extends ActorSheet.Options = ActorSheet
             ...super.getData(options),
             statsByGroup: statsByGroup,
             isGm: this.game.user.isGM,
-            isSynced: !!this.actor.data.data.naheulbookCharacterId
+            isSynced: !!this.actor.system.naheulbookCharacterId
         };
     }
 

@@ -23,7 +23,7 @@ export function assertIsCharacter(actor?: NaheulbookActor | null): asserts actor
     if (!actor) {
         throw new Error('Actor is not defined');
     }
-    if (actor.data.type !== 'character') {
-        throw new Error('Not supported for actor of type: ' + this.actor.data.type);
+    if (actor.type !== 'character') {
+        throw new Error('Not supported for actor of type: ' + actor.type);
     }
 }

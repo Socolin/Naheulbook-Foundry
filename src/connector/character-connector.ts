@@ -26,34 +26,34 @@ export class CharacterConnector {
         this._updateActorHook = Hooks.on('updateActor', (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
-            if (!data.data)
+            if (!data.system)
                 return;
 
             let characterId = actor.getFlag('naheulbook', 'characterId');
             if (characterId) {
-                let keys = Object.keys(data.data);
+                let keys = Object.keys(data.system);
                 for (let key of keys) {
-                    if ((typeof data.data) !== 'object')
+                    if ((typeof data.system[key]) !== 'object')
                         continue;
                     if (this._updatableStats.indexOf(key) === -1)
                         continue;
-                    if (!('value' in data.data[key]))
+                    if (!('value' in data.system[key]))
                         continue;
-                    this.nhbkApi.changeCharacterStat(characterId, key, data.data[key].value).then();
+                    this.nhbkApi.changeCharacterStat(characterId, key, data.system[key].value).then();
                 }
             }
         });
         this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
-            if (!data.data)
+            if (!data.system)
                 return;
 
-            if (!('naheulbookCharacterId' in data.data))
+            if (!('naheulbookCharacterId' in data.system))
                 return;
 
             let oldCharacterId = actor.getFlag('naheulbook', 'characterId');
-            let newCharacterId = +data.data.naheulbookCharacterId;
+            let newCharacterId = +data.system.naheulbookCharacterId;
             if (oldCharacterId === newCharacterId)
                 return;
 
@@ -104,7 +104,7 @@ export class CharacterConnector {
     }
 
     async synchronizeExistingCharactersActors(): Promise<void> {
-        for (let actor of this.game.actors.contents.filter(a => a.data.type === 'character')) {
+        for (let actor of this.game.actors.contents.filter(a => a.type === 'character')) {
             if (!actor.testUserPermission(this.game.user, "OWNER"))
                 continue;
             await this.syncCharacterActorWithNaheulbook(actor);
@@ -112,7 +112,7 @@ export class CharacterConnector {
     }
 
     private async syncCharacterActorWithNaheulbook(actor) {
-        const naheulbookCharacterId = actor.getFlag('naheulbook', 'characterId') || actor.data?.data['naheulbookCharacterId'];
+        const naheulbookCharacterId = actor.getFlag('naheulbook', 'characterId') || actor.system?.naheulbookCharacterId;
         if (!naheulbookCharacterId) {
             return;
         }
@@ -140,9 +140,9 @@ export class CharacterConnector {
         return Actor.create({
             name: character.name,
             type: 'character',
-            data: foundry.utils.mergeObject(this._convertCharacterToActorData(character), {naheulbookCharacterId: character.id}),
-            folder: folder.data._id,
-            token: this.createTokenData(character),
+            system: this._convertCharacterToActorData(character).system,
+            folder: folder.id,
+            prototypeToken: this.createTokenData(character),
             items: [],
             flags: {"naheulbook.characterId": character.id}
         })
@@ -162,7 +162,7 @@ export class CharacterConnector {
     _convertCharacterToActorData(character: Character) {
         return {
             name: character.name,
-            data: {
+            system: {
                 naheulbookCharacterId: character.id,
                 ev: {
                     value: character.ev,

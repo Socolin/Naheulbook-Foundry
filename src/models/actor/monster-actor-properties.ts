@@ -28,7 +28,7 @@ export function assertIsMonster(actor?: NaheulbookActor | null): asserts actor i
     if (!actor) {
         throw new Error('Actor is not defined');
     }
-    if (actor.data.type !== 'monster') {
-        throw new Error('Not supported for actor of type: ' + this.actor.data.type);
+    if (actor.type !== 'monster') {
+        throw new Error('Not supported for actor of type: ' + actor.type);
     }
 }

@@ -54,35 +54,35 @@ export class MonsterConnector {
         this._updateActorHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
-            if (!data.data)
+            if (!data.system)
                 return;
 
             let monsterId = actor.getFlag('naheulbook', 'monsterId');
             if (monsterId) {
-                let keys = Object.keys(data.data);
+                let keys = Object.keys(data.system);
                 for (let key of keys) {
-                    if ((typeof data.data) !== 'object')
+                    if ((typeof data.system[key]) !== 'object')
                         continue;
                     if (this._updatableStats.indexOf(key) === -1)
                         continue;
-                    if (!('value' in data.data[key]))
+                    if (!('value' in data.system[key]))
                         continue;
                     let monster = this._monstersById[monsterId];
-                    await this.nhbkApi.updateMonsterData(monsterId, {...monster.data, [key]: data.data[key].value});
+                    await this.nhbkApi.updateMonsterData(monsterId, {...monster.data, [key]: data.system[key].value});
                 }
             }
         });
         this._updateActorIdHook = Hooks.on('updateActor', async (actor, data, options, _id) => {
             if (options.fromNaheulbook)
                 return;
-            if (!data.data)
+            if (!data.system)
                 return;
 
-            if (!('naheulbookMonsterId' in data.data))
+            if (!('naheulbookMonsterId' in data.system))
                 return;
 
             let oldMonsterId = actor.getFlag('naheulbook', 'monsterId');
-            let newMonsterId = +data.data.naheulbookMonsterId;
+            let newMonsterId = +data.system.naheulbookMonsterId;
             if (oldMonsterId === newMonsterId)
                 return;
 
@@ -141,7 +141,7 @@ export class MonsterConnector {
     }
 
     async synchronizeExistingMonstersActors(): Promise<void> {
-        for (let actor of this.game.actors.filter(a => a.data.type === 'monster')) {
+        for (let actor of this.game.actors.filter(a => a.type === 'monster')) {
             if (!actor.testUserPermission(this.game.user, "OWNER"))
                 continue;
             await this.syncMonsterActorWithNaheulbook(actor);
@@ -153,7 +153,7 @@ export class MonsterConnector {
      * @return {Promise<void>}
      */
     async syncMonsterActorWithNaheulbook(actor) {
-        const naheulbookMonsterId = actor.getFlag('naheulbook', 'monsterId') || actor.data?.data['naheulbookCharacterId'];
+        const naheulbookMonsterId = actor.getFlag('naheulbook', 'monsterId') || actor.system?.naheulbookMonsterId;
         if (!naheulbookMonsterId) {
             return;
         }
@@ -179,9 +179,9 @@ export class MonsterConnector {
             name: monster.name,
             type: 'monster',
             img: await this._monsterIconGenerator.createMonsterIcon(monster),
-            data: foundry.utils.mergeObject(this.convertMonsterTokActorData(monster), {naheulbookMonsterId: monster.id}),
-            folder: folder.data._id,
-            token: this.createTokenData(monster),
+            system: this.convertMonsterTokActorData(monster),
+            folder: folder.id,
+            prototypeToken: this.createTokenData(monster),
             items: [],
             flags: {"naheulbook.monsterId": monster.id}
         }).then((actor) => {
@@ -217,10 +217,10 @@ export class MonsterConnector {
         this.logger.info(`Updating actor ${actor.name} (${actor.id}) with monster data from naheulbook: ${monster.name} (${monster.id})`);
         let data = {
             name: monster.name,
-            data: this.convertMonsterTokActorData(monster),
-        } as ActorData;
+            system: this.convertMonsterTokActorData(monster),
+        } as Partial<ActorData> & { system: MonsterActorData };
 
-        if (actor.data.img?.indexOf('data:') === 0)
+        if (actor.img?.indexOf('data:') === 0)
             data.img = await this._monsterIconGenerator.createMonsterIcon(monster);
 
         await actor.update(data, {fromNaheulbook: true})
@@ -255,12 +255,12 @@ export class MonsterConnector {
         if (!effectData)
             return;
 
-        const createData = duplicate(effectData);
+        const createData = foundry.utils.deepClone(effectData);
         createData.label = game.i18n.localize(effectData.label);
         createData["flags.core.statusId"] = effectData.id;
         createData["flags.core.overlay"] = true;
 
-        await ActiveEffect.create(effectData, {parent: monsterActor})
+        await ActiveEffect.create(createData, {parent: monsterActor})
     }
 
     private convertMonsterTokActorData(monster: Monster): MonsterActorData {

@@ -8,4 +8,9 @@ declare global {
             'naheulbook.accessKey': string;
         }
     }
+
+    // Foundry v10+ fields, not described by the v9 types package
+    interface User {
+        hotbar: Record<string, string>;
+    }
 }

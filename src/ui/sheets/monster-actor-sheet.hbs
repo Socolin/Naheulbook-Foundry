@@ -5,16 +5,16 @@
             <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
             <div class="resource health">
                 <span>Énergie vitale</span>
-                <input type="text" name="data.ev.value" value="{{actor.data.data.ev.value}}" data-dtype="Number"/>
+                <input type="text" name="system.ev.value" value="{{actor.system.ev.value}}" data-dtype="Number"/>
                 <span> / </span>
-                <input type="text" name="data.ev.max" value="{{actor.data.data.ev.max}}" data-dtype="Number"
+                <input type="text" name="system.ev.max" value="{{actor.system.ev.max}}" data-dtype="Number"
                        {{#if isSynced}}disabled{{/if}} />
             </div>
             <div class="resource mana">
                 <span>Énergie astrale</span>
-                <input type="text" name="data.ea.value" value="{{actor.data.data.ea.value}}" data-dtype="Number"/>
+                <input type="text" name="system.ea.value" value="{{actor.system.ea.value}}" data-dtype="Number"/>
                 <span> / </span>
-                <input type="text" name="data.ea.max" value="{{actor.data.data.ea.max}}" data-dtype="Number"
+                <input type="text" name="system.ea.max" value="{{actor.system.ea.max}}" data-dtype="Number"
                        {{#if isSynced}}disabled{{/if}} />
             </div>
         </div>
@@ -34,7 +34,7 @@
                         {{#each statGroup.stats as |stat|}}
                             <div class="attribute" data-stat-display-name="{{stat.name}}" data-stat-name="{{stat.stat}}">
                                 <span class="label">{{stat.name}} <span class="shortName">({{stat.stat}})</span></span>
-                                <input class="value" type="text" name="data.at" value="{{lookup ../../actor.data.data stat.stat}}"
+                                <input class="value" type="text" name="system.{{stat.stat}}" value="{{lookup ../../actor.system stat.stat}}"
                                        data-dtype="Number" {{#if ../../isSynced}}disabled{{/if}}/>
                                 {{#if stat.canUseForSkill}}
                                     <span class="actions">
@@ -54,7 +54,7 @@
         <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">
             <div class="attribute">
                 <span>Naheulbook Id (Monstre):</span>
-                <input type="text" name="data.naheulbookMonsterId" value="{{actor.data.data.naheulbookMonsterId}}"
+                <input type="text" name="system.naheulbookMonsterId" value="{{actor.system.naheulbookMonsterId}}"
                        data-dtype="Number" {{#unless isGm}}disabled{{/unless}} />
             </div>
         </div>
