@@ -21,10 +21,9 @@ export class NaheulbookConnector {
 
     init() {
         Hooks.on('naheulbookConfig', async (_config) => {
-            if (this.nhbkApi) {
-                await this.disconnect();
-                await this.connect();
-            }
+            // Reconnect even if the previous connection failed (e.g. the access key was just fixed)
+            await this.disconnect();
+            await this.connect();
         })
 
         Hooks.on('userConnected', () => {
@@ -64,6 +63,19 @@ export class NaheulbookConnector {
             }
         }
 
+        try {
+            await this.connectAndSynchronize();
+        } catch (error) {
+            console.error('Naheulbook | Failed to connect to naheulbook', error);
+            await this.disconnect();
+            const message = error instanceof Error && error.message.includes(': 401 ')
+                ? 'Naheulbook : clé d\'accès invalide ou expirée. Générez une nouvelle clé sur Naheulbook et mettez-la à jour dans les paramètres du module.'
+                : 'Naheulbook : impossible de se connecter. Voir la console [F12] pour plus d\'informations.';
+            ui.notifications?.error(message, {permanent: true});
+        }
+    }
+
+    private async connectAndSynchronize() {
         this.nhbkApi = NaheulbookApi.create(this.config.naheulbookHost, this.config.accessKey);
         await this.nhbkApi.init();
 

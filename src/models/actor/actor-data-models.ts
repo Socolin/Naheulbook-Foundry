@@ -54,9 +54,27 @@ function monsterSchema() {
     };
 }
 
+// Old worlds stored some stats (like esq) as a resource object `{min, value}` instead of a number
+function migrateLegacyNumberFields(source: Record<string, unknown>, schema: Record<string, unknown>) {
+    for (const [key, field] of Object.entries(schema)) {
+        if (!(field instanceof fields.NumberField))
+            continue;
+        const value = source[key];
+        if (value && typeof value === 'object') {
+            const legacyValue = (value as { value?: unknown }).value;
+            source[key] = typeof legacyValue === 'number' ? legacyValue : null;
+        }
+    }
+}
+
 export class CharacterDataModel extends foundry.abstract.TypeDataModel<ReturnType<typeof characterSchema>, Actor.Implementation> {
     static override defineSchema() {
         return characterSchema();
+    }
+
+    static override migrateData(source: Record<string, unknown>) {
+        migrateLegacyNumberFields(source, characterSchema());
+        return super.migrateData(source);
     }
 }
 
@@ -66,6 +84,7 @@ export class MonsterDataModel extends foundry.abstract.TypeDataModel<ReturnType<
     }
 
     static override migrateData(source: Record<string, unknown>) {
+        migrateLegacyNumberFields(source, monsterSchema());
         // template.json defined chercheNoise as `{value: boolean}` while the monster connector writes a boolean
         const chercheNoise = source.chercheNoise;
         if (chercheNoise && typeof chercheNoise === 'object') {
