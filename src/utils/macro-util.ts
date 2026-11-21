@@ -113,13 +113,14 @@ export class MacroUtil {
         })
         if (!macroInfo)
             return;
-        let command = this.guardScriptExecutionWithTokenCheck(`token.actor.rollCustomSkill(
-                        '${macroInfo.name.replace(/'/g, '\\')}',
-                        '${macroInfo.icon}',
-                        '${macroInfo.stat}',
-                        ${macroInfo.testModifier}
-                        ${macroInfo.extraRoll ? `,${JSON.stringify(macroInfo.extraRoll)}` : ''},
-                    );`);
+        const args = [
+            macroInfo.name,
+            macroInfo.icon,
+            macroInfo.stat,
+            Number(macroInfo.testModifier) || 0,
+            ...(macroInfo.extraRoll ? [macroInfo.extraRoll] : []),
+        ].map(arg => JSON.stringify(arg));
+        let command = this.guardScriptExecutionWithTokenCheck(`token.actor.rollCustomSkill(${args.join(', ')});`);
         await this.createAndAssignMacroToFirstAvailableSlot({
             name: macroInfo.name,
             img: macroInfo.icon,
