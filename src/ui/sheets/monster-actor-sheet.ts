@@ -1,70 +1,26 @@
 import {assertIsMonster} from '../../models/actor/monster-actor-properties';
-import {container} from 'tsyringe';
-import {MacroUtil} from '../../utils/macro-util';
-import ClickEvent = JQuery.ClickEvent;
-import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
-import {InitializedGame} from '../../models/misc/game';
+import {BaseActorSheet, StatsByGroup} from './base-actor-sheet';
 
-export interface MonsterActorSheetData extends foundry.appv1.sheets.ActorSheet.ActorSheetData {
-    isGm: boolean;
-    isSynced: boolean;
-    statsByGroup: typeof statsByGroup;
-}
+export class MonsterActorSheet extends BaseActorSheet {
+    static override DEFAULT_OPTIONS: foundry.applications.sheets.ActorSheetV2.DefaultOptions = {
+        classes: ['naheulbook-monster'],
+    };
 
-export class MonsterActorSheet extends foundry.appv1.sheets.ActorSheet {
+    static override PARTS = {
+        sheet: {template: 'systems/naheulbook/ui/sheets/monster-actor-sheet.hbs'},
+    };
 
-    private readonly macroUtil: MacroUtil;
-    private readonly game: InitializedGame;
-
-    constructor(actor: NaheulbookActor, options?: Partial<foundry.appv1.sheets.ActorSheet.Options>) {
-        super(actor, options);
-        this.macroUtil = container.resolve(MacroUtil);
-        this.game = container.resolve(InitializedGame)
+    protected override get statsByGroup(): StatsByGroup {
+        return statsByGroup;
     }
 
-    override async getData(options?: Partial<foundry.appv1.sheets.ActorSheet.Options>): Promise<MonsterActorSheetData> {
+    protected override get isSynced(): boolean {
         assertIsMonster(this.actor);
-
-        return {
-            ...await super.getData(options) as foundry.appv1.sheets.ActorSheet.ActorSheetData,
-            statsByGroup: statsByGroup,
-            isGm: this.game.user.isGM,
-            isSynced: !!this.actor.system.naheulbookMonsterId
-        };
-    }
-
-    override activateListeners(html: JQuery) {
-        super.activateListeners(html);
-
-        html.find('[data-stat-action]').on('click', async (ev: ClickEvent) => {
-            let attributeContainer = ev.currentTarget.closest('[data-stat-name]');
-            if (!attributeContainer)
-                throw new Error('Failed to find a parent with stat infos');
-            let stateName = attributeContainer.dataset.statName;
-            let stateDisplayName = attributeContainer.dataset.statDisplayName;
-            switch (ev.currentTarget.dataset.statAction) {
-                case 'test':
-                    await this.actor.rollCustomSkill(stateDisplayName, undefined, stateName, 0);
-                    break;
-                case 'macro':
-                    await this.macroUtil.openMacroCreatorHelper(this.actor, stateName, stateDisplayName);
-            }
-        });
-    }
-
-    static override get defaultOptions(): foundry.appv1.sheets.ActorSheet.Options {
-        return {
-            ...super.defaultOptions,
-            template: "systems/naheulbook/ui/sheets/monster-actor-sheet.hbs",
-            width: 600,
-            height: 600,
-            tabs: [{navSelector: ".sheet-tabs", contentSelector: ".sheet-body", initial: "description"}],
-            dragDrop: [{dragSelector: ".item-list .item", dropSelector: null}]
-        }
+        return !!this.actor.system.naheulbookMonsterId;
     }
 }
 
-let statsByGroup = {
+const statsByGroup: StatsByGroup = {
     combat: {
         label: "Combat",
         stats: [

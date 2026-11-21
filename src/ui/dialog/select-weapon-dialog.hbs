@@ -6,14 +6,14 @@
         {{#each weapons as |weapon| }}
             <div class="weapon">
                 <label>
-                    <input type="radio" name="selectedWeapon" data-weapon-id="{{weapon.itemId}}" {{#if (eq weapon.itemId ../selectedWeaponId)}}checked{{/if}}>
+                    <input type="radio" name="selectedWeapon" data-action="selectWeapon" data-weapon-id="{{weapon.itemId}}" {{#if (eq weapon.itemId ../selectedWeaponId)}}checked{{/if}}>
                     {{weapon.name}}{{#if weapon.at}} (AT {{weapon.at}}){{/if}}{{#if weapon.damage}}: {{weapon.damage}}{{/if}}
                 </label>
             </div>
         {{/each}}
     </div>
     <div class="actions">
-        <button data-dialog-action="cancel">Annuler</button>
-        <button data-dialog-action="confirm" {{#if (not ready)}}disabled{{/if}}>Valider</button>
+        <button data-action="cancel">Annuler</button>
+        <button data-action="confirm" {{#if (not ready)}}disabled{{/if}}>Valider</button>
     </div>
 </div>

@@ -21,7 +21,7 @@ Hooks.once("init", async function () {
     CONFIG.Actor.dataModels.monster = MonsterDataModel;
 
     const Actors = foundry.documents.collections.Actors;
-    Actors.unregisterSheet("core", foundry.appv1.sheets.ActorSheet);
+    Actors.unregisterSheet("core", foundry.applications.sheets.ActorSheetV2);
     Actors.registerSheet("naheulbook", CharacterActorSheet, {types: ['character'], makeDefault: true, label: 'Personnage'});
     Actors.registerSheet("naheulbook", MonsterActorSheet, {types: ['monster'], makeDefault: true, label: 'Monstre'});
 });

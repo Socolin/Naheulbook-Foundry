@@ -13,7 +13,7 @@ export class DialogAwaiter {
             childContainer.register('DIALOG_RESULT', {useValue: result => resolve(result)});
 
             let dialog = childContainer.resolve(type)
-            dialog.render(true);
+            dialog.render({force: true});
         });
     }
 

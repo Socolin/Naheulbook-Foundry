@@ -24,8 +24,8 @@
             <label class="label">Modificateur (pour les tests du style AD+2 / AD-5, écrire 2 ou -5)</label>
             <input type="number" data-dtype="number" data-field-edit value="{{data.testModifier}}" name="testModifier">
         </div>
-        <label class="field-checkbox" data-action="enableExtraRoll">
-            <input type="checkbox" {{#if data.extraRoll}}checked{{/if}} />
+        <label class="field-checkbox">
+            <input type="checkbox" data-action="enableExtraRoll" {{#if data.extraRoll}}checked{{/if}} />
             Dégâts / soin ou autre jet additionnel
         </label>
 
@@ -46,7 +46,7 @@
     </div>
     <button class="test-action" data-action="test">Tester</button>
     <div class="actions">
-        <button data-dialog-action="cancel">Annuler</button>
-        <button data-dialog-action="confirm" {{#if (not ready)}}disabled{{/if}}>Valider</button>
+        <button data-action="cancel">Annuler</button>
+        <button data-action="confirm" {{#if (not ready)}}disabled{{/if}}>Valider</button>
     </div>
 </div>

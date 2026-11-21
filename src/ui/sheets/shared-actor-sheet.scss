@@ -37,3 +37,14 @@
   }
 
 }
+
+.naheulbook-actor-sheet {
+  .window-content > div {
+    flex: 1;
+    min-height: 0;
+  }
+
+  .sheet-body .tab:not(.active) {
+    display: none;
+  }
+}

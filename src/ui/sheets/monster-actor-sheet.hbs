@@ -1,6 +1,6 @@
-<form class="naheulbook-monster-sheet" autocomplete="off">
+<div class="naheulbook-monster-sheet">
     <header class="sheet-header">
-        <img class="profile-img" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
+        <img class="profile-img" src="{{actor.img}}" data-action="editImage" data-edit="img" title="{{actor.name}}" height="100" width="100"/>
         <div class="header-fields">
             <h1 class="charname"><input name="name" type="text" value="{{actor.name}}" placeholder="Name"/></h1>
             <div class="resource health">
@@ -21,12 +21,13 @@
     </header>
 
     <nav class="sheet-tabs tabs" data-group="primary">
-        <a class="item" data-tab="attributes">Attributes</a>
-        <a class="item" data-tab="naheulbook">Naheulbook</a>
+        {{#each tabs as |tab|}}
+            <a class="item {{tab.cssClass}}" data-action="tab" data-group="primary" data-tab="{{tab.id}}">{{tab.label}}</a>
+        {{/each}}
     </nav>
 
     <section class="sheet-body">
-        <div class="tab attributes" data-group="primary" data-tab="attributes">
+        <div class="tab attributes {{tabs.attributes.cssClass}}" data-group="primary" data-tab="attributes">
             {{#each statsByGroup as |statGroup|}}
                 <section class="{{@key}}">
                     <h3>{{statGroup.label}}</h3>
@@ -38,8 +39,8 @@
                                        data-dtype="Number" {{#if ../../isSynced}}disabled{{/if}}/>
                                 {{#if stat.canUseForSkill}}
                                     <span class="actions">
-                                        <a data-stat-action="test" title="Lancer les dé"><i class="fa fa-dice"></i></a>
-                                        <a data-stat-action="macro" title="Créer une macro"><i class="fa fa-cog"></i></a>
+                                        <a data-action="rollStat" title="Lancer les dé"><i class="fa fa-dice"></i></a>
+                                        <a data-action="createStatMacro" title="Créer une macro"><i class="fa fa-cog"></i></a>
                                     </span>
                                 {{/if}}
                             </div>
@@ -51,7 +52,7 @@
                 {{/if}}
             {{/each}}
         </div>
-        <div class="tab naheulbook" data-group="primary" data-tab="naheulbook">
+        <div class="tab naheulbook {{tabs.naheulbook.cssClass}}" data-group="primary" data-tab="naheulbook">
             <div class="attribute">
                 <span>Naheulbook Id (Monstre):</span>
                 <input type="text" name="system.naheulbookMonsterId" value="{{actor.system.naheulbookMonsterId}}"
@@ -59,4 +60,4 @@
             </div>
         </div>
     </section>
-</form>
+</div>

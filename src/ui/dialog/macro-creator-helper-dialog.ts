@@ -1,8 +1,6 @@
 import {inject, injectable} from 'tsyringe';
 import {DialogBase, DialogResultCallback} from './dialog-base';
 import {NaheulbookActor} from '../../models/actor/naheulbook-actor';
-import ClickEvent = JQuery.ClickEvent;
-import ChangeEvent = JQuery.ChangeEvent;
 
 export interface MacroCreatorHelperDialogData {
     actor: NaheulbookActor;
@@ -21,6 +19,21 @@ export interface MacroCreatorHelperDialogResult {
 
 @injectable()
 export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialogData, MacroCreatorHelperDialogResult> {
+    static override DEFAULT_OPTIONS: foundry.applications.api.ApplicationV2.DefaultOptions = {
+        id: "macro-creator-helper",
+        window: {title: "Création d'une macro"},
+        position: {width: 450},
+        actions: {
+            selectImg: MacroCreatorHelperDialog.onSelectImg,
+            enableExtraRoll: MacroCreatorHelperDialog.onEnableExtraRoll,
+            test: MacroCreatorHelperDialog.onTest,
+        },
+    };
+
+    static override PARTS = {
+        content: {template: "systems/naheulbook/ui/dialog/macro-creator-helper-dialog.hbs"},
+    };
+
     private readonly data: MacroCreatorHelperDialogResult;
 
     constructor(
@@ -37,97 +50,74 @@ export class MacroCreatorHelperDialog extends DialogBase<MacroCreatorHelperDialo
         };
     }
 
-    setValue<T>(data: object, name: string, value: T) {
+    private setValue<T>(data: object, name: string, value: T) {
         let splitName = name.split('.');
         for (let i = 0; i < splitName.length - 1; i++) {
             data = data[splitName[i]]
         }
         data[splitName[splitName.length - 1]] = value;
-        this.render(true);
     }
 
-    override activateListeners(html: JQuery) {
-        super.activateListeners(html);
-
-        html.find('[data-field-edit]').on('change', async (ev: ChangeEvent) => {
-            let type = ev.currentTarget.dataset.dtype || 'string';
-            let value = (ev.currentTarget as HTMLInputElement).value;
-            switch (type) {
-                case 'number':
-                    this.setValue(this.data, ev.currentTarget.name, +value);
-                    break;
-                default:
-                    this.setValue(this.data, ev.currentTarget.name, value);
-                    break;
-            }
-        });
-
-        html.find('[data-action]').on('click', async (ev: ClickEvent) => {
-            switch (ev.currentTarget.dataset.action) {
-                case 'selectImg': {
-                    let fp = new foundry.applications.apps.FilePicker.implementation({
-                        type: "image",
-                        displayMode: 'thumbs',
-                        current: this.data.icon,
-                        callback: path => {
-                            ev.currentTarget.src = path;
-                            this.data.icon = path;
-                        },
-                        position: {
-                            top: (this.position.top || 0) + 40,
-                            left: (this.position.left || 0) + 10
-                        }
-                    });
-                    await fp.browse('');
-                    break;
-                }
-                case 'enableExtraRoll': {
-                    if (this.data.extraRoll)
-                        this.data.extraRoll = undefined;
-                    else
-                        this.data.extraRoll = {
-                            item: '',
-                            label: 'Dégâts: ',
-                            rollFormula: '1d6'
-                        };
-                    this.render(true);
-                    break;
-                }
-                case 'test': {
-                    await this.dialogData.actor.rollCustomSkill(
-                        this.data.name,
-                        this.data.icon,
-                        this.data.stat,
-                        this.data.testModifier,
-                        this.data.extraRoll
-                    );
-                    break;
-                }
-            }
-        });
-    }
-
-    getData(options?: Partial<foundry.appv1.api.Application.Options>): object | Promise<object> {
+    override async _prepareContext(options: Parameters<DialogBase<unknown, unknown>['_prepareContext']>[0]) {
         return {
-            ...super.getData(options),
+            ...await super._prepareContext(options),
             data: this.data,
             ready: true
         };
+    }
+
+    protected override async _onFirstRender(...args: Parameters<DialogBase<unknown, unknown>['_onFirstRender']>) {
+        await super._onFirstRender(...args);
+        this.element.addEventListener('change', async (ev: Event) => {
+            const input = ev.target as HTMLInputElement;
+            if (!input.matches('[data-field-edit]'))
+                return;
+            const type = input.dataset.dtype || 'string';
+            this.setValue(this.data, input.name, type === 'number' ? +input.value : input.value);
+            await this.render();
+        });
     }
 
     protected getResult(): MacroCreatorHelperDialogResult {
         return this.data;
     }
 
+    private static async onSelectImg(this: MacroCreatorHelperDialog) {
+        const fp = new foundry.applications.apps.FilePicker.implementation({
+            type: "image",
+            displayMode: 'thumbs',
+            current: this.data.icon,
+            callback: async (path: string) => {
+                this.data.icon = path;
+                await this.render();
+            },
+            position: {
+                top: (this.position.top || 0) + 40,
+                left: (this.position.left || 0) + 10
+            }
+        });
+        await fp.browse('');
+    }
 
-    static get defaultOptions(): foundry.appv1.api.Application.Options {
-        return {
-            ...super.defaultOptions,
-            id: "macro-creator-helper",
-            template: "systems/naheulbook/ui/dialog/macro-creator-helper-dialog.hbs",
-            title: "Création d'une macro",
-            width: 450,
-            popOut: true,
-        };
+    private static async onEnableExtraRoll(this: MacroCreatorHelperDialog) {
+        if (this.data.extraRoll)
+            this.data.extraRoll = undefined;
+        else
+            this.data.extraRoll = {
+                item: '',
+                label: 'Dégâts: ',
+                rollFormula: '1d6'
+            };
+        await this.render();
+    }
+
+    private static async onTest(this: MacroCreatorHelperDialog) {
+        await this.dialogData.actor.rollCustomSkill(
+            this.data.name,
+            this.data.icon,
+            this.data.stat,
+            this.data.testModifier,
+            this.data.extraRoll
+        );
     }
 }
